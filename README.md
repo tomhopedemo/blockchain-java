@@ -1,2 +1,2 @@
-# polyglot
-demo code ported to multiple languages
+# polyglot-java
+demo code ported to multiple languages - java repo

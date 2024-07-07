@@ -4,6 +4,7 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
@@ -11,24 +12,15 @@ import java.util.Map;
 
 public class NBN {
 
-    public static void main(String[] args) throws Exception {
-        Map<String, String> statisticsMap = new HashMap<>();
+    public static void main(String[] args) throws IOException {
+        String baseDir = "/Users/tom/datas/";
+        String outputsDir = baseDir + "outputs/javas/";
+        Map<String, Object> statisticsMap = new HashMap<>();
 
-        List<String> strings = Files.readLines(new File("/Users/tom/datas/Atlas_of_European_Mammals_-_Rodentia.csv"), Charset.defaultCharset());
+        List<String> speciesData = Files.readLines(new File(baseDir + "Atlas_of_European_Mammals_-_Rodentia.csv"), Charset.defaultCharset());
+        statisticsMap.put("size", speciesData.size());
 
-        //statistics map (size)
-        int size = strings.size();
-        statisticsMap.put("size", String.valueOf(size));
-        System.out.println(size);
-        //reverse
-        List<String> reversed = strings.reversed();
-        //join
-        String joined = String.join("\n", reversed);
-        //write
-        Files.write(joined.getBytes(), new File("/Users/tom/datas/outputs/javas/ReverseRodents.csv"));
-
-        Gson gson = new Gson();
-        String jsonStatisticsMap = gson.toJson(statisticsMap);
-        Files.write(jsonStatisticsMap.getBytes(), new File("/Users/tom/datas/outputs/javas/RodentsStats.csv"));
+        Files.write(String.join("\n", speciesData.reversed()).getBytes(), new File(outputsDir + "ReverseRodents.csv"));
+        Files.write(new Gson().toJson(statisticsMap).getBytes(), new File(outputsDir + "RodentsStats.csv"));
     }
 }

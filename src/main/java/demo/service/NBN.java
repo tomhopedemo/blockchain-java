@@ -18,9 +18,13 @@ public class NBN {
         Map<String, Object> statisticsMap = new HashMap<>();
 
         List<String> speciesData = Files.readLines(new File(baseDir + "Atlas_of_European_Mammals_-_Rodentia.csv"), Charset.defaultCharset());
-        statisticsMap.put("size", speciesData.size());
+        String csvHeader = speciesData.getFirst();
 
-        Files.write(String.join("\n", speciesData.reversed()).getBytes(), new File(outputsDir + "ReverseRodents.csv"));
+        speciesData.removeFirst();
+        String reversed = String.join("\n", speciesData.reversed());
+
+        statisticsMap.put("size", speciesData.size());
+        Files.write((csvHeader + "\n" + reversed).getBytes(), new File(outputsDir + "ReverseRodents.csv"));
         Files.write(new Gson().toJson(statisticsMap).getBytes(), new File(outputsDir + "RodentsStats.csv"));
     }
 }

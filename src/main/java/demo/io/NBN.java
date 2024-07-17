@@ -1,7 +1,9 @@
-package demo.service;
+package demo.io;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import demo.objects.CSV;
+import demo.toJson.CSVtoJSON;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -18,7 +20,7 @@ public class NBN {
         Map<String, Object> statisticsMap = new HashMap<>();
 
         //Read As CSV
-        CSV csv = CSV.readParse(inputFileName);
+        CSV csv = new ReadParseLocalCSV(inputFileName).readParse();
 
         //Read As Lines
         List<String> speciesData = readAllLines(Path.of(inputFileName));
@@ -28,7 +30,7 @@ public class NBN {
         String reversed = String.join("\n", speciesData.reversed());
 
         //Write as Json
-        List<Map<String, String>> jsonRecords = CSV.csvToJson(csv);
+        List<Map<String, String>> jsonRecords = new CSVtoJSON().csvToJson(csv);
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         statisticsMap.put("size", speciesData.size());

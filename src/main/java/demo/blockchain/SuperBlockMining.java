@@ -12,7 +12,7 @@ public class SuperBlockMining {
         this.difficulty = difficulty;
     }
 
-    public void mine(BlockchainStore blockchainStore) {
+    public void mine(BlockchainStore blockchainStore) throws Exception {
         for (int i = 0; i < numBlocksToMine; i++) {
             for (Blockchain blockchain : blockchainStore.blockchains) {
                 BlockMining blockMining = new BlockMining(difficulty);

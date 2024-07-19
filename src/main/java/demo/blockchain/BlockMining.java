@@ -12,10 +12,10 @@ public class BlockMining {
         this.difficulty = difficulty;
     }
 
-    public Block mineNextBlock(Blockchain blockchain) {
+    public Block mineNextBlock(Blockchain blockchain) throws Exception {
         Block mostRecentBlock = blockchain.getMostRecent();
         String data = getData();
-        Block nextBlock = new Block(data, mostRecentBlock.hash);
+        Block nextBlock = new Block(data, data, mostRecentBlock.blockHashId);
         BlockMiner blockMiner = new BlockMiner(nextBlock);
         blockMiner.mineHash(difficulty);
         return nextBlock;

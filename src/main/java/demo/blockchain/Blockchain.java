@@ -9,10 +9,10 @@ public class Blockchain {
 
     public String id;
     public List<Block> blocks = new ArrayList<>();
+
     public boolean valid = true;
 
-    public Blockchain(Block block, String id) {
-        blocks.add(block);
+    public Blockchain(String id) {
         this.id = id;
     }
 
@@ -21,6 +21,9 @@ public class Blockchain {
     }
 
     public Block getMostRecent(){
+        if (blocks.isEmpty()){
+            return null;
+        }
         return blocks.getLast();
     }
 

@@ -12,6 +12,4 @@ public class Wallet {
         this.publicKeyAddress = publicKeyAddress;
     }
 
-
-
 }

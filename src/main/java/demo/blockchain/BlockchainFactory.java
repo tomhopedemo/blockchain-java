@@ -11,14 +11,15 @@ public class BlockchainFactory {
         this.difficulty = difficulty;
     }
 
-    public Blockchain createBlockchain() {
+    public Blockchain createBlockchainWithGenesisBlock() throws Exception {
         String data = "abcde";
         String previousHash = "";
-        Block block = new Block(data, previousHash);
+        Block block = new Block(data, data, previousHash);
         BlockMiner blockMiner = new BlockMiner(block);
         blockMiner.mineHash(difficulty);
         nextId++;
-        Blockchain blockchain = new Blockchain(block, String.valueOf(nextId));
+        Blockchain blockchain = new Blockchain(String.valueOf(nextId));
+        blockchain.add(block);
         return blockchain;
     }
 }

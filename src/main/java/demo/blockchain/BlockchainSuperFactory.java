@@ -10,11 +10,11 @@ public class BlockchainSuperFactory {
         this.numBlockchains = numBlockchains;
     }
 
-    public BlockchainStore construct(){
+    public BlockchainStore construct() throws Exception {
         BlockchainFactory blockchainFactory = new BlockchainFactory(difficulty);
         BlockchainStore blockchainStore = new BlockchainStore();
         for (int i = 0; i < numBlockchains; i++) {
-            Blockchain blockchain = blockchainFactory.createBlockchain();
+            Blockchain blockchain = blockchainFactory.createBlockchainWithGenesisBlock();
             blockchainStore.add(blockchain);
         }
         return blockchainStore;

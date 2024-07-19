@@ -10,16 +10,16 @@ public class BlockMiner {
         this.block = block;
     }
 
-    public void mineHash(int difficultyPrefixLength) {
+    public void mineHash(int difficultyPrefixLength) throws Exception {
         int nonce = 0;
         String hash = null;
-        BlockHashCalculator hashCalculator = new BlockHashCalculator(block);
+        BlockHash hashCalculator = new BlockHash(block);
         String prefixString = new String(new char[difficultyPrefixLength]).replace('\0', '0');
         while (hash == null || !hash.substring(0, difficultyPrefixLength).equals(prefixString)) {
             nonce++;
             hash = hashCalculator.calculate(nonce);
         }
-        block.hash = hash;
-        block.nonce = nonce;
+        block.blockHashId = hash;
+        block.setNonce(nonce);
     }
 }

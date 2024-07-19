@@ -6,7 +6,7 @@ public class SimpleBlockchainTechnologyMain {
 
     private record RunParameters (int difficulty, int numBlockchains, int numBlocksToMine) { }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         RunParameters runParameters = new RunParameters(1, 2, 4);
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 

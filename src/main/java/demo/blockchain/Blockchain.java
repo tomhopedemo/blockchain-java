@@ -27,4 +27,8 @@ public class Blockchain {
         return blocks.getLast();
     }
 
+    public Block get(int index){
+        return blocks.get(index);
+    }
+
 }

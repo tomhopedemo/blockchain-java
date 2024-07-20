@@ -1,10 +1,7 @@
 package demo.blockchain;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import demo.encoding.Encoder;
 
-import java.util.Base64;
 import java.util.List;
 
 public class SuperWalletVisualiser {

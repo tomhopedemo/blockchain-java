@@ -13,4 +13,7 @@ public class BlockchainStore {
         blockchains.add(blockchain);
     }
 
+    public List<Blockchain> getBlockchains(){
+        return blockchains;
+    }
 }

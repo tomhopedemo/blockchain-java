@@ -1,14 +1,16 @@
-package demo.blockchain;
+package demo.blockchain.simple;
 
+import demo.blockchain.BlockMiner;
+import demo.blockchain.Blockchain;
 import demo.objects.Block;
 
 import java.util.Random;
 
-public class BlockMining {
+public class SimpleBlockMining {
 
     public int difficulty;
 
-    public BlockMining(int difficulty) {
+    public SimpleBlockMining(int difficulty) {
         this.difficulty = difficulty;
     }
 
@@ -17,7 +19,7 @@ public class BlockMining {
         String data = getData();
         Block nextBlock = new Block(data, data, mostRecentBlock.blockHashId);
         BlockMiner blockMiner = new BlockMiner(nextBlock);
-        blockMiner.mineHash(difficulty);
+        blockMiner.mineBlockHash("0".repeat(difficulty));
         return nextBlock;
     }
 

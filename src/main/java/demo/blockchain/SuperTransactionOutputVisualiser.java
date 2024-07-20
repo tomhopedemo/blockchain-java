@@ -6,11 +6,11 @@ import demo.encoding.Encoder;
 
 import java.util.stream.Collectors;
 
-public class SuperTransactionOutputVisualizer {
+public class SuperTransactionOutputVisualiser {
 
     public TransactionCache transactionCache;
 
-    public SuperTransactionOutputVisualizer(TransactionCache transactionCache) {
+    public SuperTransactionOutputVisualiser(TransactionCache transactionCache) {
         this.transactionCache = transactionCache;
     }
 
@@ -20,15 +20,16 @@ public class SuperTransactionOutputVisualizer {
         System.out.println(json);
     }
 
+    //modify wallets visualisation to json
+    //deserialise
+
     static class TransactionOutputVisualised {
-        public String id;
         public String transactionOutputValue;
         public String recipientEncoded;
 
         public TransactionOutputVisualised(TransactionOutput transactionOutput) {
-            this.id = transactionOutput.id();
-            this.transactionOutputValue = String.valueOf(transactionOutput.value());
-            this.recipientEncoded = Encoder.encode(transactionOutput.recipient());
+            this.transactionOutputValue = String.valueOf(transactionOutput.getValue());
+            this.recipientEncoded = Encoder.encode(transactionOutput.getRecipient());
         }
     }
 

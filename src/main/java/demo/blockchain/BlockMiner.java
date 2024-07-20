@@ -1,5 +1,7 @@
 package demo.blockchain;
 
+import demo.encoding.Encoder;
+import demo.hashing.Hashing;
 import demo.objects.Block;
 
 public class BlockMiner {
@@ -10,16 +12,16 @@ public class BlockMiner {
         this.block = block;
     }
 
-    public void mineHash(int difficultyPrefixLength) throws Exception {
+    public void mineBlockHash(String blockHashPrefixMatch) throws Exception {
         int nonce = 0;
-        String hash = null;
-        BlockHash hashCalculator = new BlockHash(block);
-        String prefixString = new String(new char[difficultyPrefixLength]).replace('\0', '0');
-        while (hash == null || !hash.substring(0, difficultyPrefixLength).equals(prefixString)) {
-            nonce++;
-            hash = hashCalculator.calculate(nonce);
+        while (true){
+            byte[] blockHash = Hashing.hash(block.getPreHash(++nonce));
+            String blockHashHexEncoding = Encoder.encodeToHexadecimal(blockHash);
+            if (blockHashHexEncoding.startsWith(blockHashPrefixMatch)){
+                block.setBlockHashId(blockHashHexEncoding);
+                block.setNonce(nonce);
+                return;
+            }
         }
-        block.blockHashId = hash;
-        block.setNonce(nonce);
     }
 }

@@ -8,6 +8,8 @@ public class Block {
     public Object dataObject;
     public String dataString;
     public String previousBlockHashId;
+
+    //these are set later
     public int nonce;
     public String blockHashId;
 
@@ -15,6 +17,14 @@ public class Block {
         this.dataObject = dataObject;
         this.dataString = dataAsString;
         this.previousBlockHashId = previousHashId;
+    }
+
+    public String getPreHash(int nonce){
+        return previousBlockHashId + nonce + dataString;
+    }
+
+    public String getPreHash(){
+        return getPreHash(nonce);
     }
 
     public boolean validateHash() throws Exception {
@@ -36,4 +46,19 @@ public class Block {
         this.nonce = nonce;
     }
 
+    public void setBlockHashId(String blockHashId){
+        this.blockHashId = blockHashId;
+    }
+
+    public String getDataString(){
+        return dataString;
+    }
+
+    public String getPreviousBlockHashId(){
+        return previousBlockHashId;
+    }
+
+    public String getBlockHashId() {
+        return blockHashId;
+    }
 }

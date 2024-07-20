@@ -11,8 +11,8 @@ public class TransactionCache {
     public TransactionCache() {
     }
 
-    public void put(String id, TransactionOutput transactionOutput) {
-        unspentOutputsById.put(id, transactionOutput);
+    public void put(String transactionOutputHash, TransactionOutput transactionOutput) {
+        unspentOutputsById.put(transactionOutputHash, transactionOutput);
     }
 
     public void remove(String transactionId) {
@@ -25,5 +25,9 @@ public class TransactionCache {
 
     public Collection<TransactionOutput> values(){
         return unspentOutputsById.values();
+    }
+
+    public TransactionOutput get(String transactionOutputHash){
+        return unspentOutputsById.get(transactionOutputHash);
     }
 }

@@ -34,12 +34,12 @@ public class WalletBlockchainTechnologyMain {
         //Validation
         BlockchainStore blockchainStore = new BlockchainStore();
         blockchainStore.add(blockchain);
-        SuperValidator superValidator = new SuperValidator(blockchainStore);
-        superValidator.validate();
+        SuperBlockchainValidator superBlockchainValidator = new SuperBlockchainValidator(blockchainStore);
+        superBlockchainValidator.validate();
 
         //Visualization
         new SuperBlockchainVisualiser(blockchainStore).visualise();
-        new SuperTransactionOutputVisualizer(transactionCache).visualise();
+        new SuperTransactionOutputVisualiser(transactionCache).visualise();
         new SuperWalletVisualiser(walletStore).visualise();
     }
 }

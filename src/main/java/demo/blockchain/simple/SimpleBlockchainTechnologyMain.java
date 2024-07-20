@@ -25,8 +25,8 @@ public class SimpleBlockchainTechnologyMain {
         superBlockchainValidator.validate();
 
         //Visualization
-        SuperBlockchainVisualiser superBlockchainVisualiser = new SuperBlockchainVisualiser(blockchainStore);
-        superBlockchainVisualiser.visualise();
+        Visualiser visualiser = new Visualiser();
+        visualiser.visualise(blockchainStore);
     }
 
 }

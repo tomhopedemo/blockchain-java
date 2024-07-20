@@ -1,33 +1,30 @@
 package demo.objects;
 
-import demo.blockchain.BlockHashable;
+import demo.blockchain.BlockDataHashable;
+import demo.blockchain.TransactionRequest;
 
 import java.security.MessageDigest;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class Block {
-    public Object dataObject;
-    public String dataString;
+    public Object blockData; //i don't want to do this, it's only for gson
+    //is there some way around this - e.g. a transaction request block.
+    public String blockDataHash;
     public String previousBlockHashId;
 
     //these are set later
     public int nonce;
     public String blockHashId;
 
-
-    //the block needs to be deterministically converted into a datastring for the hash
-    //but it doesn't need to be converted back. //so we can have a function
-    // to create the blockhash from the dataObject
-
-    public Block(BlockHashable blockhashable, String previousHashId) throws Exception {
-        this.dataObject = blockhashable;
-        this.dataString = blockhashable.blockhash();
+    public Block(BlockDataHashable blockDataHashable, String previousHashId) throws Exception {
+        this.blockData =  blockDataHashable;
+        this.blockDataHash = blockDataHashable.blockDataHash();
         this.previousBlockHashId = previousHashId;
     }
 
     public String getPreHash(int nonce){
-        return previousBlockHashId + nonce + dataString;
+        return previousBlockHashId + nonce + blockDataHash;
     }
 
     public String getPreHash(){
@@ -40,7 +37,7 @@ public class Block {
     }
 
     public String calculateHash(int nonce) throws Exception {
-        byte[] prehash = (this.previousBlockHashId + nonce + dataString).getBytes(UTF_8);
+        byte[] prehash = (this.previousBlockHashId + nonce + blockDataHash).getBytes(UTF_8);
         byte[] hash = MessageDigest.getInstance("SHA-256").digest(prehash);
         StringBuilder hashStringRepresentation = new StringBuilder();
         for (byte b : hash) {
@@ -58,7 +55,7 @@ public class Block {
     }
 
     public String getDataString(){
-        return dataString;
+        return blockDataHash;
     }
 
     public String getPreviousBlockHashId(){

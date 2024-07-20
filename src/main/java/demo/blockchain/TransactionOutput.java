@@ -3,19 +3,17 @@ package demo.blockchain;
 import demo.encoding.Encoder;
 import demo.hashing.Hashing;
 
-import java.security.PublicKey;
-
 public class TransactionOutput {
     String recipient;
-    long value;
+    String value;
 
     public TransactionOutput(String recipientPublicKeyAddress, long value) {
         this.recipient = recipientPublicKeyAddress;
-        this.value = value;
+        this.value = String.valueOf(value);
     }
 
     public long getValue(){
-        return value;
+        return Long.parseLong(value);
     }
 
     public String getRecipient(){

@@ -4,7 +4,6 @@ import demo.cryptography.ECDSA;
 import demo.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;
 
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +11,9 @@ import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+
+//next implementation will be to allow multiple transactions per block with the blockhash on the
+//group of transactions.
 public class TransactionRequestFactory {
 
     WalletStore walletStore;
@@ -22,7 +24,7 @@ public class TransactionRequestFactory {
         this.transactionCache = transactionCache;
     }
 
-    public TransactionRequest sendFunds(Wallet wallet, String recipientPublicKeyAddress, long transactionValue) throws Exception {
+    public TransactionRequest createTransactionRequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue) throws Exception {
         Map<String, TransactionOutput> transactionOutputsById = getTransactionOutputsById(wallet);
         long balance = transactionOutputsById.values().stream().map(transactionOutput -> transactionOutput.getValue()).mapToLong(Long::longValue).sum();
         if (balance < transactionValue) {
@@ -44,21 +46,7 @@ public class TransactionRequestFactory {
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
         transactionOutputs.add(new TransactionOutput(recipientPublicKeyAddress, transactionValue));
         transactionOutputs.add(new TransactionOutput(wallet.publicKeyAddress, total - transactionValue));
-        TransactionRequest transactionRequest = new TransactionRequest(wallet.publicKeyAddress, recipientPublicKeyAddress, transactionValue, transactionInputs, transactionOutputs);
-
-        for (TransactionInput transactionInput : transactionInputs) {
-            String transactionOutputHash = transactionInput.getTransactionOutputHash();
-            TransactionOutput transactionOutput = transactionCache.get(transactionOutputHash);
-            boolean verified = ECDSA.verifyECDSASignature(Encoder.decodeToPublicKey(transactionOutput.recipient), transactionOutputHash.getBytes(UTF_8), Hex.decode(transactionInput.getSignature()));
-            System.out.println("Input Verification : " + verified);
-        }
-
-        for (TransactionOutput transactionOutput : transactionOutputs) {
-            transactionCache.put(transactionOutput.generateTransactionOutputHash(transactionRequest.getTransactionRequestHash()), transactionOutput);
-        }
-        for (TransactionInput transactionInput : transactionInputs) {
-            transactionCache.remove(transactionInput.getTransactionOutputHash());
-        }
+        TransactionRequest transactionRequest = new TransactionRequest(transactionInputs, transactionOutputs);
         return transactionRequest;
     }
 
@@ -73,10 +61,10 @@ public class TransactionRequestFactory {
         return transactionOutputsById;
     }
 
-    public TransactionRequest genesisTransaction(Wallet genesisWallet, Wallet walletA, long genesisTransactionValue) throws Exception {
-        TransactionOutput genesisTransactionOutput = new TransactionOutput(walletA.publicKeyAddress, 100);
+    public TransactionRequest genesisTransaction(Wallet walletA, long genesisTransactionValue) throws Exception {
+        TransactionOutput genesisTransactionOutput = new TransactionOutput(walletA.publicKeyAddress, genesisTransactionValue);
         List<TransactionOutput> transactionOutputs = List.of(genesisTransactionOutput);
-        TransactionRequest genesisTransactionRequest = new TransactionRequest(genesisWallet.publicKeyAddress, walletA.publicKeyAddress, genesisTransactionValue, new ArrayList<>(), transactionOutputs);
+        TransactionRequest genesisTransactionRequest = new TransactionRequest(new ArrayList<>(), transactionOutputs);
         String transactionOutputHash = genesisTransactionOutput.generateTransactionOutputHash(genesisTransactionRequest.getTransactionRequestHash());
         transactionCache.put(transactionOutputHash, genesisTransactionOutput);
         return genesisTransactionRequest;

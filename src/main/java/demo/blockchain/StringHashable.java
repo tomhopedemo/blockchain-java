@@ -1,6 +1,6 @@
 package demo.blockchain;
 
-public class StringHashable implements BlockHashable {
+public class StringHashable implements BlockDataHashable {
 
     String string;
 
@@ -9,7 +9,7 @@ public class StringHashable implements BlockHashable {
     }
 
     @Override
-    public String blockhash() throws Exception {
+    public String blockDataHash() {
         return string;
     }
 }

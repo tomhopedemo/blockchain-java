@@ -18,7 +18,4 @@ public class WalletStore {
         return wallets.get(index);
     }
 
-    public List<Wallet> get(){
-        return new ArrayList<>(wallets);
-    }
 }

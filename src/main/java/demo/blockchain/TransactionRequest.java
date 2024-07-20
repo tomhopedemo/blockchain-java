@@ -1,47 +1,42 @@
 package demo.blockchain;
 
-import demo.cryptography.ECDSA;
 import demo.encoding.Encoder;
 import demo.hashing.Hashing;
 
-import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.ArrayList;
 import java.util.List;
 
-public class TransactionRequest {
 
-    public PublicKey senderPublicKeyAddress;
-    public PublicKey recipientPublicKeyAddress;
-    public float transactionValue;
+//transaction hash id to be encoded.
+//the visualization of wallets to be the json mechanism -
+//wallet private key as string and back again
+
+public class TransactionRequest implements BlockHashable {
+
+    public String senderPublicKeyAddress;
+    public String recipientPublicKeyAddress;
+    public long transactionValue;
     public List<TransactionInput> transactionInputs;
     public List<TransactionOutput> transactionOutputs;
-    public byte[] transactionHashId;
+    public String transactionRequestHashHex;
 
-    public TransactionRequest(Wallet senderWallet, PublicKey recipientPublicKeyAddress, float transactionValue, List<TransactionInput> transactionInputs, List<TransactionOutput> transactionOutputs) throws Exception {
-        this.senderPublicKeyAddress = senderWallet.publicKeyAddress;
+    public TransactionRequest(String senderPublicKeyAddress, String recipientPublicKeyAddress, long transactionValue, List<TransactionInput> transactionInputs, List<TransactionOutput> transactionOutputs) throws Exception {
+        this.senderPublicKeyAddress = senderPublicKeyAddress;
         this.recipientPublicKeyAddress = recipientPublicKeyAddress;
         this.transactionValue = transactionValue;
         this.transactionInputs = transactionInputs;
         this.transactionOutputs = transactionOutputs;
-        this.transactionHashId = calculateTransactionHash();
+        this.transactionRequestHashHex = Encoder.encodeToHexadecimal(calculateTransactionHash());
     }
 
     private byte[] calculateTransactionHash() throws Exception {
-        String preHash = getPreHash();
-        return Hashing.hash(preHash);
-    }
-
-    public String getPreHash(){
-        return Encoder.encode(senderPublicKeyAddress) +
-                Encoder.encode(recipientPublicKeyAddress) +
+        String preHash = senderPublicKeyAddress +
+                recipientPublicKeyAddress +
                 transactionValue +
-                transactionInputs + //convert to string.
-                transactionOutputs;
-    }
+                String.join("", getTransactionInputs().stream().map(transactionInput -> transactionInput.serialise()).toList()) +
+                String.join("", getTransactionOutputs().stream().map(transactionOutput -> transactionOutput.serialise()).toList());
 
-    public void addTransactionOutput(TransactionOutput transactionOutput) {
-        transactionOutputs.add(transactionOutput);
+        return Hashing.hash(preHash);
     }
 
     public List<TransactionOutput> getTransactionOutputs() {
@@ -52,29 +47,12 @@ public class TransactionRequest {
         return transactionInputs;
     }
 
-    public byte[] getHash() {
-        return this.transactionHashId;
+    public String getTransactionRequestHash() {
+        return this.transactionRequestHashHex;
+    }
+
+    @Override
+    public String blockhash() {
+        return transactionRequestHashHex;
     }
 }
-
-
-//it's not about verifying the transaction, it's about verifying the indivial aspects so i don't think this is requied.
-//maybe we could do a simple transaction mechanism also alongside this - i.e. a signle input/output.
-//    public void calculateTransactionRequestSignature(PrivateKey privateKey) throws Exception {
-//        byte[] presignature = getTransactionRequestPresignature();
-//        signature = ECDSA.calculateECDSASignature(privateKey, presignature);
-//    }
-//
-//
-//
-//    public boolean verifyTransactionRequestSignature() throws Exception {
-//        byte[] presignature = getTransactionRequestPresignature();
-//        return ECDSA.verifyECDSASignature(senderPublicKeyAddress, presignature, signature);
-//    }
-//
-//    private byte[] getTransactionRequestPresignature(){
-//        String signatureInputString = Encoder.encode(senderPublicKeyAddress) +
-//                Encoder.encode(recipientPublicKeyAddress) +
-//                transactionValue;
-//        return signatureInputString.getBytes();
-//    }

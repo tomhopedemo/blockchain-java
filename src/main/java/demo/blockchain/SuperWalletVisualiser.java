@@ -1,8 +1,11 @@
 package demo.blockchain;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import demo.encoding.Encoder;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SuperWalletVisualiser {
 
@@ -14,11 +17,8 @@ public class SuperWalletVisualiser {
 
     public void visualise(){
         List<Wallet> wallets = walletStore.get();
-        for (Wallet wallet : wallets) {
-            String privateKeyJson = Encoder.encode(wallet.privateKey);
-            String publicKeyJson = Encoder.encode(wallet.publicKeyAddress);
-            System.out.println(privateKeyJson);
-            System.out.println(publicKeyJson);
-        }
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String json = gson.toJson(wallets);
+        System.out.println(json);
     }
 }

@@ -1,6 +1,14 @@
 package demo.blockchain;
 
+import demo.encoding.Encoder;
+import demo.objects.Block;
+
+import java.nio.charset.StandardCharsets;
 import java.security.Security;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class WalletBlockchainTechnologyMain {
 
@@ -37,9 +45,25 @@ public class WalletBlockchainTechnologyMain {
         SuperBlockchainValidator superBlockchainValidator = new SuperBlockchainValidator(blockchainStore);
         superBlockchainValidator.validate();
 
+        //Serialisation
+        String serialisedBlockchain = new BlockchainSerialiser(blockchain).serialise();
+        Blockchain deserialisedBlockchain = new BlockchainDeserialiser(serialisedBlockchain).deserialise();
+
         //Visualization
+        new BlockchainVisualiser(blockchain).visualise();
+        new BlockchainVisualiser(deserialisedBlockchain).visualise();
         new SuperBlockchainVisualiser(blockchainStore).visualise();
         new SuperTransactionOutputVisualiser(transactionCache).visualise();
         new SuperWalletVisualiser(walletStore).visualise();
+    }
+
+    List<TransactionInput> reconstructTransactionInputs(String inputTransactionDatas){
+        List<TransactionInput> transactionInputs = new ArrayList<>();
+        String[] inputTransactionSerialised = inputTransactionDatas.split(" ");
+        for (String line : inputTransactionSerialised) {
+            String[] split = line.split("\\?"); //probably would be best for this to just be jsonified.
+            transactionInputs.add(new TransactionInput(split[0], split[1].getBytes(UTF_8)));
+        }
+        return transactionInputs;
     }
 }

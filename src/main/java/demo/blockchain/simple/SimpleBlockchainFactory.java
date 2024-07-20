@@ -2,6 +2,7 @@ package demo.blockchain.simple;
 
 import demo.blockchain.BlockMiner;
 import demo.blockchain.Blockchain;
+import demo.blockchain.StringHashable;
 import demo.objects.Block;
 
 public class SimpleBlockchainFactory {
@@ -13,7 +14,7 @@ public class SimpleBlockchainFactory {
     }
 
     public Blockchain createBlockchainWithGenesisBlock(int blockchainId) throws Exception {
-        Block block = new Block("abcde", "abcde", "");
+        Block block = new Block(new StringHashable("abcde"), "");
         BlockMiner blockMiner = new BlockMiner(block);
         blockMiner.mineBlockHash("0".repeat(difficulty));
         Blockchain blockchain = new Blockchain(String.valueOf(blockchainId));

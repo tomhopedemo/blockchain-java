@@ -2,6 +2,7 @@ package demo.blockchain;
 
 import demo.cryptography.ECDSA;
 import demo.encoding.Encoder;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class TransactionRequestFactory {
         this.transactionCache = transactionCache;
     }
 
-    public TransactionRequest sendFunds(Wallet wallet, PublicKey recipient, long transactionValue) throws Exception {
+    public TransactionRequest sendFunds(Wallet wallet, String recipientPublicKeyAddress, long transactionValue) throws Exception {
         Map<String, TransactionOutput> transactionOutputsById = getTransactionOutputsById(wallet);
         long balance = transactionOutputsById.values().stream().map(transactionOutput -> transactionOutput.getValue()).mapToLong(Long::longValue).sum();
         if (balance < transactionValue) {
@@ -33,7 +34,7 @@ public class TransactionRequestFactory {
         for (Map.Entry<String, TransactionOutput> entry: transactionOutputsById.entrySet()){
             String transactionOutputHash = entry.getKey();
             byte[] preSignature = transactionOutputHash.getBytes(UTF_8);
-            byte[] signature = ECDSA.calculateECDSASignature(wallet.privateKey, preSignature);
+            byte[] signature = ECDSA.calculateECDSASignature(Encoder.decodeToPrivateKey(wallet.privateKey), preSignature);
             transactionInputs.add(new TransactionInput(transactionOutputHash, signature));
             TransactionOutput transactionOutput = entry.getValue();
             total += transactionOutput.getValue();
@@ -41,20 +42,19 @@ public class TransactionRequestFactory {
         }
 
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
-        transactionOutputs.add(new TransactionOutput(recipient, transactionValue));
+        transactionOutputs.add(new TransactionOutput(recipientPublicKeyAddress, transactionValue));
         transactionOutputs.add(new TransactionOutput(wallet.publicKeyAddress, total - transactionValue));
-        TransactionRequest transactionRequest = new TransactionRequest(wallet, recipient, transactionValue, transactionInputs, transactionOutputs);
-        String transactionRequestHash = Encoder.encodeToHexadecimal(transactionRequest.getHash());
+        TransactionRequest transactionRequest = new TransactionRequest(wallet.publicKeyAddress, recipientPublicKeyAddress, transactionValue, transactionInputs, transactionOutputs);
 
         for (TransactionInput transactionInput : transactionInputs) {
             String transactionOutputHash = transactionInput.getTransactionOutputHash();
             TransactionOutput transactionOutput = transactionCache.get(transactionOutputHash);
-            boolean verified = ECDSA.verifyECDSASignature(transactionOutput.recipient, transactionOutputHash.getBytes(UTF_8), transactionInput.getSignature());
+            boolean verified = ECDSA.verifyECDSASignature(Encoder.decodeToPublicKey(transactionOutput.recipient), transactionOutputHash.getBytes(UTF_8), Hex.decode(transactionInput.getSignature()));
             System.out.println("Input Verification : " + verified);
         }
 
         for (TransactionOutput transactionOutput : transactionOutputs) {
-            transactionCache.put(transactionOutput.generateTransactionOutputHash(transactionRequestHash), transactionOutput);
+            transactionCache.put(transactionOutput.generateTransactionOutputHash(transactionRequest.getTransactionRequestHash()), transactionOutput);
         }
         for (TransactionInput transactionInput : transactionInputs) {
             transactionCache.remove(transactionInput.getTransactionOutputHash());
@@ -76,9 +76,8 @@ public class TransactionRequestFactory {
     public TransactionRequest genesisTransaction(Wallet genesisWallet, Wallet walletA, long genesisTransactionValue) throws Exception {
         TransactionOutput genesisTransactionOutput = new TransactionOutput(walletA.publicKeyAddress, 100);
         List<TransactionOutput> transactionOutputs = List.of(genesisTransactionOutput);
-        TransactionRequest genesisTransactionRequest = new TransactionRequest(genesisWallet, walletA.publicKeyAddress, genesisTransactionValue, new ArrayList<>(), transactionOutputs);
-        String transactionRequestHash = Encoder.encodeToHexadecimal(genesisTransactionRequest.getHash());
-        String transactionOutputHash = genesisTransactionOutput.generateTransactionOutputHash(transactionRequestHash);
+        TransactionRequest genesisTransactionRequest = new TransactionRequest(genesisWallet.publicKeyAddress, walletA.publicKeyAddress, genesisTransactionValue, new ArrayList<>(), transactionOutputs);
+        String transactionOutputHash = genesisTransactionOutput.generateTransactionOutputHash(genesisTransactionRequest.getTransactionRequestHash());
         transactionCache.put(transactionOutputHash, genesisTransactionOutput);
         return genesisTransactionRequest;
     }

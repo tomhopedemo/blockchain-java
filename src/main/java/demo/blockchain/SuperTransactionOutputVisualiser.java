@@ -21,7 +21,6 @@ public class SuperTransactionOutputVisualiser {
     }
 
     //modify wallets visualisation to json
-    //deserialise
 
     static class TransactionOutputVisualised {
         public String transactionOutputValue;
@@ -29,7 +28,7 @@ public class SuperTransactionOutputVisualiser {
 
         public TransactionOutputVisualised(TransactionOutput transactionOutput) {
             this.transactionOutputValue = String.valueOf(transactionOutput.getValue());
-            this.recipientEncoded = Encoder.encode(transactionOutput.getRecipient());
+            this.recipientEncoded = transactionOutput.getRecipient();
         }
     }
 

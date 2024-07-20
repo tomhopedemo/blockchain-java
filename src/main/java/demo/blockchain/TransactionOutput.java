@@ -6,11 +6,11 @@ import demo.hashing.Hashing;
 import java.security.PublicKey;
 
 public class TransactionOutput {
-    PublicKey recipient;
+    String recipient;
     long value;
 
-    public TransactionOutput(PublicKey recipient, long value) {
-        this.recipient = recipient;
+    public TransactionOutput(String recipientPublicKeyAddress, long value) {
+        this.recipient = recipientPublicKeyAddress;
         this.value = value;
     }
 
@@ -18,27 +18,19 @@ public class TransactionOutput {
         return value;
     }
 
-    public PublicKey getRecipient(){
+    public String getRecipient(){
         return recipient;
     }
 
     public String generateTransactionOutputHash(String transactionRequestHash) throws Exception {
-        String preHash = Encoder.encode(recipient) + transactionRequestHash + value;
+        String preHash = recipient + transactionRequestHash + value;
         byte[] hash = Hashing.hash(preHash);
         return Encoder.encodeToHexadecimal(hash);
     }
 
-    public record TransactionOutputData (
-            String recipientPublicKeyAddressEncoded,
-            String value
-    ){}
-
     public String serialise(){
-        TransactionOutputData transactionOutputData = new TransactionOutputData(Encoder.encode(this.recipient), String.valueOf(this.value));
-        return transactionOutputData.recipientPublicKeyAddressEncoded() + transactionOutputData.value();
+        return this.recipient + this.value;
     }
-
-    //deserialise
 
 }
 

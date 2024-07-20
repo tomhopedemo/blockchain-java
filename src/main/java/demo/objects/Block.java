@@ -1,5 +1,7 @@
 package demo.objects;
 
+import demo.blockchain.BlockHashable;
+
 import java.security.MessageDigest;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -13,9 +15,14 @@ public class Block {
     public int nonce;
     public String blockHashId;
 
-    public Block(Object dataObject, String dataAsString, String previousHashId) {
-        this.dataObject = dataObject;
-        this.dataString = dataAsString;
+
+    //the block needs to be deterministically converted into a datastring for the hash
+    //but it doesn't need to be converted back. //so we can have a function
+    // to create the blockhash from the dataObject
+
+    public Block(BlockHashable blockhashable, String previousHashId) throws Exception {
+        this.dataObject = blockhashable;
+        this.dataString = blockhashable.blockhash();
         this.previousBlockHashId = previousHashId;
     }
 

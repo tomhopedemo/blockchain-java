@@ -2,7 +2,7 @@ package demo.blockchain.simple;
 
 import demo.blockchain.Blockchain;
 import demo.blockchain.BlockchainStore;
-import demo.objects.Block;
+import demo.blockchain.Block;
 
 public class SimpleSuperBlockMining {
 

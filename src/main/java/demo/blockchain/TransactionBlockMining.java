@@ -2,7 +2,6 @@ package demo.blockchain;
 
 import demo.cryptography.ECDSA;
 import demo.encoding.Encoder;
-import demo.objects.Block;
 import org.bouncycastle.util.encoders.Hex;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -23,6 +22,7 @@ public class TransactionBlockMining {
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
 
+        //Verification
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
             String transactionOutputHash = transactionInput.getTransactionOutputHash();
             TransactionOutput transactionOutput = transactionCache.get(transactionOutputHash);
@@ -32,6 +32,13 @@ public class TransactionBlockMining {
             }
         }
 
+        //Create block
+        Block block = new Block(transactionRequest, previousBlockHash);
+        BlockMiner blockMiner = new BlockMiner(block);
+        blockMiner.mineBlockHash("0".repeat(difficulty));
+        blockchain.add(block);
+
+        //Update Caches
         for (TransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
             transactionCache.put(transactionOutput.generateTransactionOutputHash(transactionRequest.getTransactionRequestHash()), transactionOutput);
         }
@@ -39,10 +46,6 @@ public class TransactionBlockMining {
             transactionCache.remove(transactionInput.getTransactionOutputHash());
         }
 
-        Block block = new Block(transactionRequest, previousBlockHash);
-        BlockMiner blockMiner = new BlockMiner(block);
-        blockMiner.mineBlockHash("0".repeat(difficulty));
-        blockchain.add(block);
     }
 
 }

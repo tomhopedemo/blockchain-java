@@ -23,10 +23,6 @@ public class TransactionCache {
         return unspentOutputsById.entrySet();
     }
 
-    public Collection<TransactionOutput> values(){
-        return unspentOutputsById.values();
-    }
-
     public TransactionOutput get(String transactionOutputHash){
         return unspentOutputsById.get(transactionOutputHash);
     }

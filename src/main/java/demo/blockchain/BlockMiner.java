@@ -2,7 +2,6 @@ package demo.blockchain;
 
 import demo.encoding.Encoder;
 import demo.hashing.Hashing;
-import demo.objects.Block;
 
 public class BlockMiner {
 

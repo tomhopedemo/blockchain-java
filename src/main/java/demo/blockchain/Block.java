@@ -1,15 +1,10 @@
-package demo.objects;
+package demo.blockchain;
 
-import demo.blockchain.BlockDataHashable;
-import demo.blockchain.TransactionRequest;
-
-import java.security.MessageDigest;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
+import demo.encoding.Encoder;
+import demo.hashing.Hashing;
 
 public class Block {
-    public Object blockData; //i don't want to do this, it's only for gson
-    //is there some way around this - e.g. a transaction request block.
+    public Object blockData;
     public String blockDataHash;
     public String previousBlockHashId;
 
@@ -31,19 +26,17 @@ public class Block {
         return getPreHash(nonce);
     }
 
+    //CSVtoJson etc. can be moved to a different project.
+    //create a new project - playground2 for this
+    //do we use this/need to use this in the blockchainvalidation
     public boolean validateHash() throws Exception {
         String hash = calculateHash(this.nonce);
         return hash.equals(this.blockHashId);
     }
 
     public String calculateHash(int nonce) throws Exception {
-        byte[] prehash = (this.previousBlockHashId + nonce + blockDataHash).getBytes(UTF_8);
-        byte[] hash = MessageDigest.getInstance("SHA-256").digest(prehash);
-        StringBuilder hashStringRepresentation = new StringBuilder();
-        for (byte b : hash) {
-            hashStringRepresentation.append(String.format("%02x", b));
-        }
-        return hashStringRepresentation.toString();
+        byte[] hash = Hashing.hash(this.previousBlockHashId + nonce + blockDataHash);
+        return Encoder.encodeToHexadecimal(hash);
     }
 
     public void setNonce(int nonce){
@@ -52,10 +45,6 @@ public class Block {
 
     public void setBlockHashId(String blockHashId){
         this.blockHashId = blockHashId;
-    }
-
-    public String getDataString(){
-        return blockDataHash;
     }
 
     public String getPreviousBlockHashId(){

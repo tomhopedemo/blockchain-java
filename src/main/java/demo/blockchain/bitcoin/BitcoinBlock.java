@@ -1,5 +1,8 @@
 package demo.blockchain.bitcoin;
 
+/**
+ * For reference
+ */
 public class BitcoinBlock {
 
     long nonce; //

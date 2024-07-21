@@ -2,8 +2,7 @@ package demo.blockchain.simple;
 
 import demo.blockchain.BlockMiner;
 import demo.blockchain.Blockchain;
-import demo.blockchain.StringHashable;
-import demo.objects.Block;
+import demo.blockchain.Block;
 
 public class SimpleBlockchainFactory {
 

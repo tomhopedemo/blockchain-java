@@ -6,7 +6,7 @@ public class TransactionalBlockchainTechnologyMain {
 
 
     public static void main(String[] args) throws Exception {
-        int difficulty = 1;
+        int difficulty = 4;
         long genesisTransactionValue = 100;
 
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());

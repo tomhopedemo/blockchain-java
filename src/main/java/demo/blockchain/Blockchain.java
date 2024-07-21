@@ -1,7 +1,5 @@
 package demo.blockchain;
 
-import demo.objects.Block;
-
 import java.util.ArrayList;
 import java.util.List;
 

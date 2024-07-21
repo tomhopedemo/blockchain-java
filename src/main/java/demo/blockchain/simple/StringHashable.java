@@ -1,4 +1,6 @@
-package demo.blockchain;
+package demo.blockchain.simple;
+
+import demo.blockchain.BlockDataHashable;
 
 public class StringHashable implements BlockDataHashable {
 

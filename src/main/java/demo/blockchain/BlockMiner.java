@@ -14,10 +14,9 @@ public class BlockMiner {
     public void mineBlockHash(String blockHashPrefixMatch) throws Exception {
         int nonce = 0;
         while (true){
-            byte[] blockHash = Hashing.hash(block.getPreHash(++nonce));
-            String blockHashHexEncoding = Encoder.encodeToHexadecimal(blockHash);
-            if (blockHashHexEncoding.startsWith(blockHashPrefixMatch)){
-                block.setBlockHashId(blockHashHexEncoding);
+            String blockHash = block.calculateHash(++nonce);
+            if (blockHash.startsWith(blockHashPrefixMatch)){
+                block.setBlockHashId(blockHash);
                 block.setNonce(nonce);
                 return;
             }

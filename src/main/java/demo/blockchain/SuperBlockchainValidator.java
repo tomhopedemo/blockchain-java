@@ -19,8 +19,8 @@ public class SuperBlockchainValidator {
                     blockchain.valid = false;
                 }
 
-                byte[] blockHash = Hashing.hash(block.getPreHash());
-                if (!Encoder.encodeToHexadecimal(blockHash).equals(block.getBlockHashId())){
+                String blockHash  = block.calculateHash();
+                if (!blockHash.equals(block.getBlockHashId())){
                     blockchain.valid = false;
                 }
             }

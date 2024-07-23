@@ -22,7 +22,7 @@ public class TransactionBlockMining {
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
 
-        //Verification
+        //Verification on inputs
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
             String transactionOutputHash = transactionInput.getTransactionOutputHash();
             TransactionOutput transactionOutput = transactionCache.get(transactionOutputHash);
@@ -30,6 +30,11 @@ public class TransactionBlockMining {
             if (!verified){
                 return;
             }
+        }
+
+        boolean check = checkInputSumEqualToOutputSum(transactionRequest);
+        if (!check){
+            return;
         }
 
         //Create block
@@ -46,6 +51,23 @@ public class TransactionBlockMining {
             transactionCache.remove(transactionInput.getTransactionOutputHash());
         }
 
+    }
+
+    private boolean checkInputSumEqualToOutputSum(TransactionRequest transactionRequest) {
+        long sumOfInputs = 0L;
+        long sumOfOutputs = 0L;
+        for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
+            TransactionOutput transactionOutput = transactionCache.get(transactionInput.getTransactionOutputHash());
+            long transactionOutputValue = Long.parseLong(transactionOutput.value);
+            sumOfInputs += transactionOutputValue;
+        }
+
+        for (TransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
+            long transactionOutputValue = Long.parseLong(transactionOutput.value);
+            sumOfOutputs += transactionOutputValue;
+        }
+
+        return sumOfInputs == sumOfOutputs;
     }
 
 }

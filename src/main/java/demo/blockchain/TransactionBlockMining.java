@@ -11,29 +11,24 @@ public class TransactionBlockMining {
     public int difficulty;
     public Blockchain blockchain;
     public TransactionCache transactionCache;
+    public TransactionVerification transactionVerification;
 
     public TransactionBlockMining(Blockchain blockchain, int difficulty, TransactionCache transactionCache) {
         this.difficulty = difficulty;
         this.blockchain = blockchain;
         this.transactionCache = transactionCache;
+        this.transactionVerification = new TransactionVerification(transactionCache);
+
     }
 
     public void mineNextBlock(TransactionRequest transactionRequest) throws Exception {
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
+        boolean skipEqualityCheck = mostRecentBlock == null;
 
         //Verification on inputs
-        for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
-            String transactionOutputHash = transactionInput.getTransactionOutputHash();
-            TransactionOutput transactionOutput = transactionCache.get(transactionOutputHash);
-            boolean verified = ECDSA.verifyECDSASignature(Encoder.decodeToPublicKey(transactionOutput.recipient), transactionOutputHash.getBytes(UTF_8), Hex.decode(transactionInput.getSignature()));
-            if (!verified){
-                return;
-            }
-        }
-
-        boolean check = checkInputSumEqualToOutputSum(transactionRequest);
-        if (!check){
+        boolean verified = transactionVerification.verify(transactionRequest, skipEqualityCheck);
+        if (!verified){
             return;
         }
 
@@ -51,23 +46,6 @@ public class TransactionBlockMining {
             transactionCache.remove(transactionInput.getTransactionOutputHash());
         }
 
-    }
-
-    private boolean checkInputSumEqualToOutputSum(TransactionRequest transactionRequest) {
-        long sumOfInputs = 0L;
-        long sumOfOutputs = 0L;
-        for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
-            TransactionOutput transactionOutput = transactionCache.get(transactionInput.getTransactionOutputHash());
-            long transactionOutputValue = Long.parseLong(transactionOutput.value);
-            sumOfInputs += transactionOutputValue;
-        }
-
-        for (TransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
-            long transactionOutputValue = Long.parseLong(transactionOutput.value);
-            sumOfOutputs += transactionOutputValue;
-        }
-
-        return sumOfInputs == sumOfOutputs;
     }
 
 }

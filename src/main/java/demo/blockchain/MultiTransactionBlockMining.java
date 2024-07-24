@@ -4,7 +4,9 @@ import demo.cryptography.ECDSA;
 import demo.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -13,31 +15,37 @@ public class MultiTransactionBlockMining {
     public int difficulty;
     public Blockchain blockchain;
     public TransactionCache transactionCache;
+    public TransactionVerification transactionVerification;
 
     public MultiTransactionBlockMining(Blockchain blockchain, int difficulty, TransactionCache transactionCache) {
         this.difficulty = difficulty;
         this.blockchain = blockchain;
         this.transactionCache = transactionCache;
+        this.transactionVerification = new TransactionVerification(transactionCache);
     }
 
     public void mineNextBlock(TransactionRequests transactionRequests) throws Exception {
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
+        boolean skipEqualityCheck = mostRecentBlock == null; //indicative of genesis block - will tidy
 
-        //Verification
+        //Individual Transaction Verification
+        for (TransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
+            boolean verified = transactionVerification.verify(transactionRequest, skipEqualityCheck);
+            if (!verified){
+                return;
+            }
+        }
+
+        //Overall Verification
+        Set<String> inputs = new HashSet<>();
         for (TransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
             for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
-                String transactionOutputHash = transactionInput.getTransactionOutputHash();
-                TransactionOutput transactionOutput = transactionCache.get(transactionOutputHash);
-                boolean verified = ECDSA.verifyECDSASignature(Encoder.decodeToPublicKey(transactionOutput.recipient), transactionOutputHash.getBytes(UTF_8), Hex.decode(transactionInput.getSignature()));
-                if (!verified){
+                if (inputs.contains(transactionInput.getTransactionOutputHash())){
                     return;
+                } else {
+                    inputs.add(transactionInput.getTransactionOutputHash());
                 }
-            }
-
-            boolean check = checkInputSumEqualToOutputSum(transactionRequest);
-            if (!check){
-                return;
             }
         }
 

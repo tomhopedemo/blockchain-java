@@ -1,7 +1,6 @@
 package demo.blockchain;
 
 import java.security.Security;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MultiTransactionalBlockchainTechnologyMain {
@@ -28,6 +27,9 @@ public class MultiTransactionalBlockchainTechnologyMain {
         TransactionRequest genesisTransactionRequest = transactionRequestFactory.genesisTransaction(walletA, genesisTransactionValue);
         transactionBlockMining.mineNextBlock(new TransactionRequests(List.of(genesisTransactionRequest)));
 
+
+        //because you can transac multi to multi, it may be okay to have the block miner just select one
+        //and push the other one.
         TransactionRequest transactionRequest1 = transactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, 5);
         TransactionRequest transactionRequest2 = transactionRequestFactory.createTransactionRequest(walletA, walletC.publicKeyAddress, 7);
         transactionBlockMining.mineNextBlock(new TransactionRequests(List.of(transactionRequest1, transactionRequest2)));

@@ -6,10 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Control {
-    final static boolean VISUALIZE_IN_CONSOLE = true;
-    static String executionBlock = "b";
+    public final static boolean VISUALIZE_IN_CONSOLE = false;
+    static String executionBlock = "m";
+    static boolean RUN_ALL = true;
 
-    static Map<String, ExecutionControl> blocks = createExecutionBlocks();
+    static Map<String, ExecutionControl> executionControls = createExecutionBlocks();
 
     static Map<String, ExecutionControl> createExecutionBlocks() {
         Map<String, ExecutionControl> blocks = new HashMap<>();
@@ -20,7 +21,13 @@ public class Control {
     }
 
     public static void main(String[] args) throws Exception {
-        blocks.get(executionBlock).execute();
+        if (RUN_ALL){
+            for (ExecutionControl executionControl : executionControls.values()) {
+                executionControl.execute();
+            }
+        } else {
+            executionControls.get(executionBlock).execute();
+        }
         System.exit(0);
     }
 

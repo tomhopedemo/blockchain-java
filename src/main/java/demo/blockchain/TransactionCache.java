@@ -26,4 +26,8 @@ public class TransactionCache {
     public TransactionOutput get(String transactionOutputHash){
         return unspentOutputsById.get(transactionOutputHash);
     }
+
+    public boolean contains(String transactionOutputHash){
+        return unspentOutputsById.containsKey(transactionOutputHash);
+    }
 }

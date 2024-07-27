@@ -29,11 +29,20 @@ public class MultiTransactionBlockMining {
                 continue;
             }
 
-            //consider for inclusion
+            //consider for inclusion in this block.
             List<String> transactionInputsToAdd = new ArrayList<>();
             boolean include = true;
             for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
-                if (transactionInputsToAdd.contains(transactionInput.getTransactionOutputHash()) || inputsToInclude.contains(transactionInput.getTransactionOutputHash())){
+                 //check if input has already been used in this same transaction request
+                if (transactionInputsToAdd.contains(transactionInput.getTransactionOutputHash())){
+                    include = false;
+                    break;
+                //check if input is already added to the set of transactions for this block;
+                } else if (inputsToInclude.contains(transactionInput.getTransactionOutputHash())){
+                    include = false;
+                    break;
+                //check if input is available
+                } else if (!transactionCache.contains(transactionInput.getTransactionOutputHash())) {
                     include = false;
                     break;
                 } else {

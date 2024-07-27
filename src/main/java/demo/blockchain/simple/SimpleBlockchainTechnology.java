@@ -25,8 +25,11 @@ public class SimpleBlockchainTechnology {
         superBlockchainValidator.validate();
 
         //Visualization
-        Visualiser visualiser = new Visualiser();
-        visualiser.visualise(blockchainStore);
+        if (Control.VISUALIZE_IN_CONSOLE) {
+            Visualiser visualiser = new Visualiser();
+            visualiser.visualise(blockchainStore);
+        }
+        System.out.println("Complete.");
     }
 
 }

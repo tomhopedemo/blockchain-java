@@ -5,13 +5,9 @@ import java.util.List;
 
 import static demo.blockchain.Control.VISUALIZE_IN_CONSOLE;
 
+//1. Visualize exceptions more clearly.
+
 public class MultiTransactionalBlockchainTechnology {
-
-    //1. additional transactionality input checking - how do we ensure that the input hasn't been
-    //used anywhere in the blockchain before.
-
-    //3. Test suite to ensure existing technologies run without Exceptions - piggyback off Control iterating
-    //over the different executions.
 
     public MultiTransactionalBlockchainTechnology() {
     }

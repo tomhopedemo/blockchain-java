@@ -3,22 +3,20 @@ package demo.blockchain;
 import java.security.Security;
 import java.util.List;
 
-public class MultiTransactionalBlockchainTechnologyMain {
+import static demo.blockchain.Control.VISUALIZE_IN_CONSOLE;
+
+public class MultiTransactionalBlockchainTechnology {
 
     //1. additional transactionality input checking - how do we ensure that the input hasn't been
     //used anywhere in the blockchain before.
 
-    //2. output visualization switch
+    //3. Test suite to ensure existing technologies run without Exceptions - piggyback off Control iterating
+    //over the different executions.
 
-    //3. Test suite to ensure existing technologies run without Exceptions.
+    public MultiTransactionalBlockchainTechnology() {
+    }
 
-    //4. singular point of control for shared parameters
-
-    final static boolean VISUALIZE_IN_CONSOLE = true;
-
-    public static void main(String[] args) throws Exception {
-        int difficulty = 4;
-        long genesisTransactionValue = 100;
+    public void execute(int difficulty, long genesisTransactionValue) throws Exception {
 
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 

@@ -2,14 +2,12 @@ package demo.blockchain;
 
 import java.security.Security;
 
-public class TransactionalBlockchainTechnologyMain {
+public class TransactionalBlockchainTechnology {
 
-    final static boolean VISUALIZE_IN_CONSOLE = true;
+    public TransactionalBlockchainTechnology() {
+    }
 
-    public static void main(String[] args) throws Exception {
-        int difficulty = 3;
-        long genesisTransactionValue = 100;
-
+    public void execute(int difficulty, long genesisTransactionValue) throws Exception {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
         //Construction
@@ -44,7 +42,7 @@ public class TransactionalBlockchainTechnologyMain {
         }
 
         //Visualization
-        if (VISUALIZE_IN_CONSOLE) {
+        if (Control.VISUALIZE_IN_CONSOLE) {
             Visualiser visualiser = new Visualiser();
             visualiser.visualise(blockchain);
             visualiser.visualise(transactionCache);

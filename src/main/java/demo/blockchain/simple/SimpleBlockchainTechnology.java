@@ -4,20 +4,20 @@ import demo.blockchain.*;
 
 import java.security.Security;
 
-public class SimpleBlockchainTechnologyMain {
+public class SimpleBlockchainTechnology {
 
-    private record RunParameters (int difficulty, int numBlockchains, int numBlocksToMine) { }
+    public SimpleBlockchainTechnology() {
+    }
 
-    public static void main(String[] args) throws Exception {
-        RunParameters runParameters = new RunParameters(1, 2, 4);
+    public void execute(int difficulty, int numBlockchains, int numBlocksToMine) throws Exception {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
         //Construction
-        SimpleBlockchainSuperFactory simpleBlockchainSuperFactory = new SimpleBlockchainSuperFactory(runParameters.difficulty(), runParameters.numBlockchains());
+        SimpleBlockchainSuperFactory simpleBlockchainSuperFactory = new SimpleBlockchainSuperFactory(difficulty, numBlockchains);
         BlockchainStore blockchainStore = simpleBlockchainSuperFactory.construct();
 
         //Mining
-        SimpleSuperBlockMining simpleSuperBlockMining = new SimpleSuperBlockMining(runParameters.numBlocksToMine(), runParameters.difficulty());
+        SimpleSuperBlockMining simpleSuperBlockMining = new SimpleSuperBlockMining(numBlocksToMine, difficulty);
         simpleSuperBlockMining.mine(blockchainStore);
 
         //Validation

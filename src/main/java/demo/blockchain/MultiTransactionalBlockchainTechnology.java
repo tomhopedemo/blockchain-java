@@ -1,7 +1,9 @@
 package demo.blockchain;
 
 import java.security.Security;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static demo.blockchain.Control.VISUALIZE_IN_CONSOLE;
 
@@ -11,9 +13,6 @@ public class MultiTransactionalBlockchainTechnology {
     }
 
     public void execute(int difficulty, long genesisTransactionValue) throws BlockchainException {
-
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-
         //Construction
         Blockchain blockchain = new Blockchain("0");
         WalletStore walletStore = new WalletStoreFactory(3).generate();
@@ -29,12 +28,20 @@ public class MultiTransactionalBlockchainTechnology {
         TransactionRequest genesisTransactionRequest = transactionRequestFactory.genesisTransaction(walletA, genesisTransactionValue);
         transactionBlockMining.mineNextBlock(new TransactionRequests(List.of(genesisTransactionRequest)));
 
-        TransactionRequest transactionRequest1 = transactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, 5).get();
-        TransactionRequest transactionRequest2 = transactionRequestFactory.createTransactionRequest(walletA, walletC.publicKeyAddress, 7).get();
-        List<TransactionRequest> transactionRequests = List.of(transactionRequest1, transactionRequest2);
 
-        TransactionRequests transactionRequestsForNextBlock = transactionBlockMining.constructTransactionRequestsForNextBlock(transactionRequests);
-        transactionBlockMining.mineNextBlock(transactionRequestsForNextBlock);
+        //Example transaction stream and processing
+        List<TransactionRequest> transactionRequestsQueue = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            createAndRegisterSimpleTransactionRequest(transactionRequestFactory, walletA, walletB, transactionRequestsQueue, 5);
+            if (transactionRequestsQueue.isEmpty()) {
+                break;
+            }
+            Optional<TransactionRequests> transactionRequestsForNextBlock = transactionBlockMining.constructTransactionRequestsForNextBlock(transactionRequestsQueue);
+            if (transactionRequestsForNextBlock.isPresent()) {
+                transactionBlockMining.mineNextBlock(transactionRequestsForNextBlock.get());
+                transactionRequestsQueue.removeAll(transactionRequestsForNextBlock.get().getTransactionRequests());
+            }
+        }
 
         //Validation
         BlockchainStore blockchainStore = new BlockchainStore();
@@ -44,11 +51,11 @@ public class MultiTransactionalBlockchainTechnology {
 
         //Serialisation
         BlockchainSerialisation blockchainSerialisation = new BlockchainSerialisation();
-
         boolean stable = blockchainSerialisation.checkSerializationStable(blockchain);
         if (!stable){
             throw new BlockchainException("Unstable Blockchain Serialization");
         }
+
         //Visualization
         if (VISUALIZE_IN_CONSOLE) {
             Visualiser visualiser = new Visualiser();
@@ -57,5 +64,13 @@ public class MultiTransactionalBlockchainTechnology {
             visualiser.visualise(walletStore);
         }
         System.out.println("Complete.");
+    }
+
+    private static void createAndRegisterSimpleTransactionRequest(TransactionRequestFactory transactionRequestFactory, Wallet walletA, Wallet walletB, List<TransactionRequest> transactionRequestsQueue, int value) {
+        Optional<TransactionRequest> transactionRequestOptional = transactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, value);
+        if (transactionRequestOptional.isPresent()){
+            TransactionRequest transactionRequest = transactionRequestOptional.get();
+            transactionRequestsQueue.add(transactionRequest);
+        }
     }
 }

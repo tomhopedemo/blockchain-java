@@ -1,15 +1,11 @@
 package demo.blockchain;
 
-import java.security.Security;
-
 public class TransactionalBlockchainTechnology {
 
     public TransactionalBlockchainTechnology() {
     }
 
     public void execute(int difficulty, long genesisTransactionValue) throws BlockchainException {
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-
         //Construction
         Blockchain blockchain = new Blockchain("0");
         WalletStore walletStore = new WalletStoreFactory(2).generate();
@@ -46,8 +42,9 @@ public class TransactionalBlockchainTechnology {
             Visualiser visualiser = new Visualiser();
             visualiser.visualise(blockchain);
             visualiser.visualise(transactionCache);
-            visualiser.visualise(walletStore);
+            visualiser.visualise(walletStore); //multivisualizer?
         }
+
         System.out.println("Complete.");
     }
 }

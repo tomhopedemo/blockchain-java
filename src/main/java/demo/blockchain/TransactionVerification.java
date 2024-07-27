@@ -21,6 +21,9 @@ public class TransactionVerification {
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
             String transactionOutputHash = transactionInput.getTransactionOutputHash();
             TransactionOutput transactionOutput = transactionCache.get(transactionOutputHash);
+            if (transactionOutput == null){
+                return false;
+            }
             boolean verified;
             try {
                 PublicKey publicKey = Encoder.decodeToPublicKey(transactionOutput.recipient);

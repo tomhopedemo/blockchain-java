@@ -2,14 +2,15 @@ package demo.blockchain;
 
 import demo.blockchain.simple.SimpleBlockchainTechnology;
 
+import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Control {
-    public final static boolean VISUALIZE_IN_CONSOLE = false;
+    public final static boolean VISUALIZE_IN_CONSOLE = true;
     static String executionBlock = "m";
     static int difficulty = 3;
-    static boolean RUN_ALL = true;
+    static boolean RUN_ALL = false;
 
     static Map<String, ExecutionControl> executionControls = createExecutionBlocks();
 
@@ -22,6 +23,7 @@ public class Control {
     }
 
     public static void main(String[] args) throws Exception {
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
         if (RUN_ALL){
             for (ExecutionControl executionControl : executionControls.values()) {
                 executionControl.execute();

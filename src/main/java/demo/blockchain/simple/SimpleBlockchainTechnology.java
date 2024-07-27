@@ -10,8 +10,6 @@ public class SimpleBlockchainTechnology {
     }
 
     public void execute(int difficulty, int numBlockchains, int numBlocksToMine) {
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-
         //Construction
         SimpleBlockchainSuperFactory simpleBlockchainSuperFactory = new SimpleBlockchainSuperFactory(difficulty, numBlockchains);
         BlockchainStore blockchainStore = simpleBlockchainSuperFactory.construct();

@@ -1,9 +1,6 @@
 package demo.blockchain;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class MultiTransactionBlockMining {
 
@@ -19,7 +16,7 @@ public class MultiTransactionBlockMining {
         this.transactionVerification = new TransactionVerification(transactionCache);
     }
 
-    public TransactionRequests constructTransactionRequestsForNextBlock(List<TransactionRequest> availableTransactionRequests) {
+    public Optional<TransactionRequests> constructTransactionRequestsForNextBlock(List<TransactionRequest> availableTransactionRequests) {
         Set<String> inputsToInclude = new HashSet<>();
         List<TransactionRequest> transactionRequestsToInclude = new ArrayList<>();
         for (TransactionRequest transactionRequest : availableTransactionRequests) {
@@ -54,7 +51,11 @@ public class MultiTransactionBlockMining {
                 inputsToInclude.addAll(transactionRequest.getTransactionInputs().stream().map(t -> t.getTransactionOutputHash()).toList());
             }
         }
-        return new TransactionRequests(transactionRequestsToInclude);
+        if (transactionRequestsToInclude.isEmpty()){
+            return Optional.empty();
+        } else {
+            return Optional.of(new TransactionRequests(transactionRequestsToInclude));
+        }
     }
 
     public void mineNextBlock(TransactionRequests transactionRequests) {

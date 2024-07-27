@@ -5,9 +5,11 @@ import com.google.gson.GsonBuilder;
 
 public class Visualiser {
 
-    public void visualise(Object object){
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(object);
-        System.out.println(json);
+    public void visualise(Object... objects){
+        for (Object object : objects) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String json = gson.toJson(object);
+            System.out.println(json);
+        }
     }
 }

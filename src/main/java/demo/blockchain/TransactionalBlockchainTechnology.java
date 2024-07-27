@@ -2,9 +2,6 @@ package demo.blockchain;
 
 public class TransactionalBlockchainTechnology {
 
-    public TransactionalBlockchainTechnology() {
-    }
-
     public void execute(int difficulty, long genesisTransactionValue) throws BlockchainException {
         //Construction
         Blockchain blockchain = new Blockchain("0");
@@ -23,7 +20,6 @@ public class TransactionalBlockchainTechnology {
         TransactionRequest transactionRequest = transactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, 5).get();
         transactionBlockMining.mineNextBlock(transactionRequest);
 
-
         //Validation
         BlockchainStore blockchainStore = new BlockchainStore();
         blockchainStore.add(blockchain);
@@ -31,18 +27,11 @@ public class TransactionalBlockchainTechnology {
         superBlockchainValidator.validate();
 
         //Serialisation
-        BlockchainSerialisation blockchainSerialisation = new BlockchainSerialisation();
-        boolean stable = blockchainSerialisation.checkSerializationStable(blockchain);
-        if (!stable){
-            throw new BlockchainException("Unstable Blockchain Serialization");
-        }
+        new BlockchainSerialisation().checkSerializationStable(blockchain);
 
         //Visualization
         if (Control.VISUALIZE_IN_CONSOLE) {
-            Visualiser visualiser = new Visualiser();
-            visualiser.visualise(blockchain);
-            visualiser.visualise(transactionCache);
-            visualiser.visualise(walletStore); //multivisualizer?
+            new Visualiser().visualise(blockchain, transactionCache, walletStore);
         }
 
         System.out.println("Complete.");

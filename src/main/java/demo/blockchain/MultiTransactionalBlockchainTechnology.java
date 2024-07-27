@@ -9,9 +9,6 @@ import static demo.blockchain.Control.VISUALIZE_IN_CONSOLE;
 
 public class MultiTransactionalBlockchainTechnology {
 
-    public MultiTransactionalBlockchainTechnology() {
-    }
-
     public void execute(int difficulty, long genesisTransactionValue) throws BlockchainException {
         //Construction
         Blockchain blockchain = new Blockchain("0");
@@ -50,19 +47,14 @@ public class MultiTransactionalBlockchainTechnology {
         superBlockchainValidator.validate();
 
         //Serialisation
-        BlockchainSerialisation blockchainSerialisation = new BlockchainSerialisation();
-        boolean stable = blockchainSerialisation.checkSerializationStable(blockchain);
-        if (!stable){
-            throw new BlockchainException("Unstable Blockchain Serialization");
-        }
+        new BlockchainSerialisation().checkSerializationStable(blockchain);
 
         //Visualization
         if (VISUALIZE_IN_CONSOLE) {
             Visualiser visualiser = new Visualiser();
-            visualiser.visualise(blockchain);
-            visualiser.visualise(transactionCache);
-            visualiser.visualise(walletStore);
+            visualiser.visualise(blockchain, transactionCache, walletStore);
         }
+
         System.out.println("Complete.");
     }
 

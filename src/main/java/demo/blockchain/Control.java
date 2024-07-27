@@ -10,7 +10,7 @@ public class Control {
     public final static boolean VISUALIZE_IN_CONSOLE = true;
     static String executionBlock = "m";
     static int difficulty = 3;
-    static boolean RUN_ALL = false;
+    static boolean RUN_ALL = true;
 
     static Map<String, ExecutionControl> executionControls = createExecutionBlocks();
 

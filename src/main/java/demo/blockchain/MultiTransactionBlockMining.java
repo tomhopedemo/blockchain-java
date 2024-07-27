@@ -2,6 +2,8 @@ package demo.blockchain;
 
 import java.util.*;
 
+//ensure that outputs are positive and the same checks are happening on creation of transaction request
+//as well as by the mining agent.
 public class MultiTransactionBlockMining {
 
     public int difficulty;
@@ -21,7 +23,7 @@ public class MultiTransactionBlockMining {
         List<TransactionRequest> transactionRequestsToInclude = new ArrayList<>();
         for (TransactionRequest transactionRequest : availableTransactionRequests) {
             //verify signature
-            boolean verified = transactionVerification.verify(transactionRequest, false);
+            boolean verified = transactionVerification.verifySignature(transactionRequest, false);
             if (!verified){
                 continue;
             }
@@ -65,7 +67,7 @@ public class MultiTransactionBlockMining {
 
         //Individual Transaction Verification
         for (TransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
-            boolean verified = transactionVerification.verify(transactionRequest, skipEqualityCheck);
+            boolean verified = transactionVerification.verifySignature(transactionRequest, skipEqualityCheck);
             if (!verified){
                 return;
             }

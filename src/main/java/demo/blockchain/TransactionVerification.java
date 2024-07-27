@@ -17,28 +17,27 @@ public class TransactionVerification {
         this.transactionCache = transactionCache;
     }
 
-    public boolean verify(TransactionRequest transactionRequest, boolean skipEqualityCheckForGenesisTransactions) {
+    public boolean verifySignature(TransactionRequest transactionRequest, boolean skipEqualityCheckForGenesisTransactions) {
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
             String transactionOutputHash = transactionInput.getTransactionOutputHash();
             TransactionOutput transactionOutput = transactionCache.get(transactionOutputHash);
             if (transactionOutput == null){
                 return false;
             }
-            boolean verified;
             try {
                 PublicKey publicKey = Encoder.decodeToPublicKey(transactionOutput.recipient);
-                verified = ECDSA.verifyECDSASignature(publicKey, transactionOutputHash.getBytes(UTF_8), Hex.decode(transactionInput.getSignature()));
+                boolean verified = ECDSA.verifyECDSASignature(publicKey, transactionOutputHash.getBytes(UTF_8), Hex.decode(transactionInput.getSignature()));
+                if (!verified){
+                    return false;
+                }
             } catch (GeneralSecurityException e){
-                return false;
-            }
-            if (!verified){
                 return false;
             }
         }
 
         if (!skipEqualityCheckForGenesisTransactions) {
-            boolean check = checkInputSumEqualToOutputSum(transactionRequest);
-            if (!check) {
+            boolean inputSumEqualToOutputSum = isInputSumEqualToOutputSum(transactionRequest);
+            if (!inputSumEqualToOutputSum) {
                 return false;
             }
         }
@@ -46,19 +45,15 @@ public class TransactionVerification {
         return true;
     }
 
-    private boolean checkInputSumEqualToOutputSum(TransactionRequest transactionRequest) {
-        long sumOfInputs = 0L;
-        long sumOfOutputs = 0L;
+    private boolean isInputSumEqualToOutputSum(TransactionRequest transactionRequest) {
+        long sum = 0L;
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
             TransactionOutput transactionOutput = transactionCache.get(transactionInput.getTransactionOutputHash());
-            long transactionOutputValue = Long.parseLong(transactionOutput.value);
-            sumOfInputs += transactionOutputValue;
+            sum += Long.parseLong(transactionOutput.value);
         }
-
         for (TransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
-            long transactionOutputValue = Long.parseLong(transactionOutput.value);
-            sumOfOutputs += transactionOutputValue;
+            sum -= Long.parseLong(transactionOutput.value);
         }
-        return sumOfInputs == sumOfOutputs;
+        return sum == 0L;
     }
 }

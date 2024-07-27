@@ -1,11 +1,5 @@
 package demo.blockchain;
 
-import demo.cryptography.ECDSA;
-import demo.encoding.Encoder;
-import org.bouncycastle.util.encoders.Hex;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 public class TransactionBlockMining {
 
     public int difficulty;
@@ -27,7 +21,7 @@ public class TransactionBlockMining {
         boolean skipEqualityCheck = mostRecentBlock == null;
 
         //Verification on inputs
-        boolean verified = transactionVerification.verify(transactionRequest, skipEqualityCheck);
+        boolean verified = transactionVerification.verifySignature(transactionRequest, skipEqualityCheck);
         if (!verified){
             return;
         }

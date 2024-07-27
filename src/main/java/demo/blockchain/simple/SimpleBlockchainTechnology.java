@@ -6,9 +6,6 @@ import java.security.Security;
 
 public class SimpleBlockchainTechnology {
 
-    public SimpleBlockchainTechnology() {
-    }
-
     public void execute(int difficulty, int numBlockchains, int numBlocksToMine) {
         //Construction
         SimpleBlockchainSuperFactory simpleBlockchainSuperFactory = new SimpleBlockchainSuperFactory(difficulty, numBlockchains);
@@ -24,9 +21,9 @@ public class SimpleBlockchainTechnology {
 
         //Visualization
         if (Control.VISUALIZE_IN_CONSOLE) {
-            Visualiser visualiser = new Visualiser();
-            visualiser.visualise(blockchainStore);
+             new Visualiser().visualise(blockchainStore);
         }
+
         System.out.println("Complete.");
     }
 

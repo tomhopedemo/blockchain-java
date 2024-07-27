@@ -19,9 +19,12 @@ public class BlockchainSerialisation {
         return gson.toJson(blockchain);
     }
 
-    public boolean checkSerializationStable(Blockchain blockchain){
+    public void checkSerializationStable(Blockchain blockchain) throws BlockchainException {
         String serialisedBlockchain = serialise(blockchain);
         Blockchain deserialisedBlockchain = deserialise(serialisedBlockchain);
-        return serialisedBlockchain.equals(serialise(deserialisedBlockchain));
+        boolean stable = serialisedBlockchain.equals(serialise(deserialisedBlockchain));
+        if (!stable){
+            throw new BlockchainException("Unstable Blockchain Serialization");
+        }
     }
 }

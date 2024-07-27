@@ -13,7 +13,7 @@ public class SimpleBlockchainSuperFactory {
         this.numBlockchains = numBlockchains;
     }
 
-    public BlockchainStore construct() throws Exception {
+    public BlockchainStore construct()  {
         SimpleBlockchainFactory blockchainFactory = new SimpleBlockchainFactory(difficulty);
         BlockchainStore blockchainStore = new BlockchainStore();
         for (int i = 0; i < numBlockchains; i++) {

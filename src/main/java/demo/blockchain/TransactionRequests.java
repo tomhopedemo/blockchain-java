@@ -18,7 +18,7 @@ public class TransactionRequests implements BlockDataHashable {
     }
 
     @Override
-    public String blockDataHash() throws Exception {
+    public String blockDataHash()  {
         String preHash = String.join("", transactionRequests.stream().map(transactionRequest -> transactionRequest.getTransactionRequestHash()).toList());
         byte[] hash = Hashing.hash(preHash);
         return Encoder.encodeToHexadecimal(hash);

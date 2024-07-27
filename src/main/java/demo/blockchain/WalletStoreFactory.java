@@ -14,7 +14,7 @@ public class WalletStoreFactory {
         this.numWallets = numWallets;
     }
 
-    public WalletStore generate() throws Exception {
+    public WalletStore generate() {
         WalletStore walletStore = new WalletStore();
         for (int i = 0; i < numWallets; i++) {
             KeyPair keyPair = ECDSA.generateKeyPair();

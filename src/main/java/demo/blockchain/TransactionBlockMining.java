@@ -21,7 +21,7 @@ public class TransactionBlockMining {
 
     }
 
-    public void mineNextBlock(TransactionRequest transactionRequest) throws Exception {
+    public void mineNextBlock(TransactionRequest transactionRequest) {
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
         boolean skipEqualityCheck = mostRecentBlock == null;

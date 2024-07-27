@@ -20,7 +20,7 @@ public class TransactionOutput {
         return recipient;
     }
 
-    public String generateTransactionOutputHash(String transactionRequestHash) throws Exception {
+    public String generateTransactionOutputHash(String transactionRequestHash) {
         String preHash = recipient + transactionRequestHash + value;
         byte[] hash = Hashing.hash(preHash);
         return Encoder.encodeToHexadecimal(hash);

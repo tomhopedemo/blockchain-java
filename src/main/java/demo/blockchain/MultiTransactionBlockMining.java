@@ -19,7 +19,7 @@ public class MultiTransactionBlockMining {
         this.transactionVerification = new TransactionVerification(transactionCache);
     }
 
-    public TransactionRequests constructTransactionRequestsForNextBlock(List<TransactionRequest> availableTransactionRequests) throws Exception {
+    public TransactionRequests constructTransactionRequestsForNextBlock(List<TransactionRequest> availableTransactionRequests) {
         Set<String> inputsToInclude = new HashSet<>();
         List<TransactionRequest> transactionRequestsToInclude = new ArrayList<>();
         for (TransactionRequest transactionRequest : availableTransactionRequests) {
@@ -57,7 +57,7 @@ public class MultiTransactionBlockMining {
         return new TransactionRequests(transactionRequestsToInclude);
     }
 
-    public void mineNextBlock(TransactionRequests transactionRequests) throws Exception {
+    public void mineNextBlock(TransactionRequests transactionRequests) {
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
         boolean skipEqualityCheck = mostRecentBlock == null; //indicative of genesis block - will tidy

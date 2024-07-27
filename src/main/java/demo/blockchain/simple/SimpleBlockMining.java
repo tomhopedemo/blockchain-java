@@ -14,7 +14,7 @@ public class SimpleBlockMining {
         this.difficulty = difficulty;
     }
 
-    public Block mineNextBlock(Blockchain blockchain) throws Exception {
+    public Block mineNextBlock(Blockchain blockchain) {
         Block mostRecentBlock = blockchain.getMostRecent();
         StringHashable data = getData();
         Block nextBlock = new Block(data, mostRecentBlock.blockHashId);

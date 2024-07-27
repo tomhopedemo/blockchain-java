@@ -5,14 +5,12 @@ import java.util.List;
 
 import static demo.blockchain.Control.VISUALIZE_IN_CONSOLE;
 
-//1. Visualize exceptions more clearly.
-
 public class MultiTransactionalBlockchainTechnology {
 
     public MultiTransactionalBlockchainTechnology() {
     }
 
-    public void execute(int difficulty, long genesisTransactionValue) throws Exception {
+    public void execute(int difficulty, long genesisTransactionValue) throws BlockchainException {
 
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
@@ -31,8 +29,8 @@ public class MultiTransactionalBlockchainTechnology {
         TransactionRequest genesisTransactionRequest = transactionRequestFactory.genesisTransaction(walletA, genesisTransactionValue);
         transactionBlockMining.mineNextBlock(new TransactionRequests(List.of(genesisTransactionRequest)));
 
-        TransactionRequest transactionRequest1 = transactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, 5);
-        TransactionRequest transactionRequest2 = transactionRequestFactory.createTransactionRequest(walletA, walletC.publicKeyAddress, 7);
+        TransactionRequest transactionRequest1 = transactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, 5).get();
+        TransactionRequest transactionRequest2 = transactionRequestFactory.createTransactionRequest(walletA, walletC.publicKeyAddress, 7).get();
         List<TransactionRequest> transactionRequests = List.of(transactionRequest1, transactionRequest2);
 
         TransactionRequests transactionRequestsForNextBlock = transactionBlockMining.constructTransactionRequestsForNextBlock(transactionRequests);

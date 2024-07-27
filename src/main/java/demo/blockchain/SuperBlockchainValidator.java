@@ -11,7 +11,7 @@ public class SuperBlockchainValidator {
         this.blockchainStore = blockchainStore;
     }
 
-    public void validate() throws Exception {
+    public void validate() {
         for (Blockchain blockchain : blockchainStore.getBlockchains()) {
             for (int i = 0; i < blockchain.blocks.size(); i++) {
                 Block block = blockchain.get(i);

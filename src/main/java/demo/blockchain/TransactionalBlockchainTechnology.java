@@ -7,7 +7,7 @@ public class TransactionalBlockchainTechnology {
     public TransactionalBlockchainTechnology() {
     }
 
-    public void execute(int difficulty, long genesisTransactionValue) throws Exception {
+    public void execute(int difficulty, long genesisTransactionValue) throws BlockchainException {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
         //Construction
@@ -24,7 +24,7 @@ public class TransactionalBlockchainTechnology {
         TransactionRequest genesisTransactionRequest = transactionRequestFactory.genesisTransaction(walletA, genesisTransactionValue);
         transactionBlockMining.mineNextBlock(genesisTransactionRequest);
 
-        TransactionRequest transactionRequest = transactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, 5);
+        TransactionRequest transactionRequest = transactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, 5).get();
         transactionBlockMining.mineNextBlock(transactionRequest);
 
 

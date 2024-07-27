@@ -4,6 +4,9 @@ import demo.cryptography.ECDSA;
 import demo.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.security.GeneralSecurityException;
+import java.security.PublicKey;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class TransactionVerification {
@@ -14,11 +17,17 @@ public class TransactionVerification {
         this.transactionCache = transactionCache;
     }
 
-    public boolean verify(TransactionRequest transactionRequest, boolean skipEqualityCheckForGenesisTransactions) throws Exception {
+    public boolean verify(TransactionRequest transactionRequest, boolean skipEqualityCheckForGenesisTransactions) {
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
             String transactionOutputHash = transactionInput.getTransactionOutputHash();
             TransactionOutput transactionOutput = transactionCache.get(transactionOutputHash);
-            boolean verified = ECDSA.verifyECDSASignature(Encoder.decodeToPublicKey(transactionOutput.recipient), transactionOutputHash.getBytes(UTF_8), Hex.decode(transactionInput.getSignature()));
+            boolean verified;
+            try {
+                PublicKey publicKey = Encoder.decodeToPublicKey(transactionOutput.recipient);
+                verified = ECDSA.verifyECDSASignature(publicKey, transactionOutputHash.getBytes(UTF_8), Hex.decode(transactionInput.getSignature()));
+            } catch (GeneralSecurityException e){
+                return false;
+            }
             if (!verified){
                 return false;
             }

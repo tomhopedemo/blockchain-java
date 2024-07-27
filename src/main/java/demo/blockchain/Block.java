@@ -12,19 +12,19 @@ public class Block {
     public int nonce;
     public String blockHashId;
 
-    public Block(BlockDataHashable blockDataHashable, String previousHashId) throws Exception {
+    public Block(BlockDataHashable blockDataHashable, String previousHashId) {
         this.blockData =  blockDataHashable;
         this.blockDataHash = blockDataHashable.blockDataHash();
         this.previousBlockHashId = previousHashId;
     }
 
-    public String calculateHash(int nonce) throws Exception {
+    public String calculateHash(int nonce) {
         String preHash = previousBlockHashId + nonce + blockDataHash;
         byte[] hash = Hashing.hash(preHash);
         return Encoder.encodeToHexadecimal(hash);
     }
 
-    public String calculateHash() throws Exception {
+    public String calculateHash() {
         return calculateHash(this.nonce);
     }
 

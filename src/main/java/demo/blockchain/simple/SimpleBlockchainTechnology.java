@@ -9,7 +9,7 @@ public class SimpleBlockchainTechnology {
     public SimpleBlockchainTechnology() {
     }
 
-    public void execute(int difficulty, int numBlockchains, int numBlocksToMine) throws Exception {
+    public void execute(int difficulty, int numBlockchains, int numBlocksToMine) {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
         //Construction

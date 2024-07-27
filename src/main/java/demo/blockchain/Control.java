@@ -8,15 +8,16 @@ import java.util.Map;
 public class Control {
     public final static boolean VISUALIZE_IN_CONSOLE = false;
     static String executionBlock = "m";
+    static int difficulty = 3;
     static boolean RUN_ALL = true;
 
     static Map<String, ExecutionControl> executionControls = createExecutionBlocks();
 
     static Map<String, ExecutionControl> createExecutionBlocks() {
         Map<String, ExecutionControl> blocks = new HashMap<>();
-        blocks.put("m", new MultiX(3, 100L));
-        blocks.put("s", new SingleX(3, 100L));
-        blocks.put("b", new BlockX(3, 2, 5));
+        blocks.put("m", new MultiX(difficulty, 100L));
+        blocks.put("s", new SingleX(difficulty, 100L));
+        blocks.put("b", new BlockX(difficulty, 2, 5));
         return blocks;
     }
 

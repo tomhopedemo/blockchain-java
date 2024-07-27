@@ -11,7 +11,7 @@ public class BlockMiner {
         this.block = block;
     }
 
-    public void mineBlockHash(String blockHashPrefixMatch) throws Exception {
+    public void mineBlockHash(String blockHashPrefixMatch) {
         int nonce = 0;
         while (true){
             String blockHash = block.calculateHash(++nonce);

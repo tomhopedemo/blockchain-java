@@ -2,10 +2,8 @@ package demo.encoding;
 
 import org.bouncycastle.util.encoders.Hex;
 
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -17,17 +15,27 @@ public class Encoder {
         return Base64.getEncoder().encodeToString(encodedKey);
     }
 
-    public static PublicKey decodeToPublicKey(String encodedAsString) throws Exception {
+    public static PublicKey decodeToPublicKey(String encodedAsString) throws GeneralSecurityException {
         byte[] encodedAsByteArray = Base64.getDecoder().decode(encodedAsString);
         X509EncodedKeySpec spec = new X509EncodedKeySpec(encodedAsByteArray);
-        KeyFactory factory = KeyFactory.getInstance("ECDSA", "BC");
+        KeyFactory factory;
+        try {
+            factory = KeyFactory.getInstance("ECDSA", "BC");
+        } catch (GeneralSecurityException e){
+            throw new RuntimeException();
+        }
         return factory.generatePublic(spec);
     }
 
-    public static PrivateKey decodeToPrivateKey(String encodedAsString) throws Exception {
+    public static PrivateKey decodeToPrivateKey(String encodedAsString) throws InvalidKeySpecException {
         byte[] encodedAsByteArray = Base64.getDecoder().decode(encodedAsString);
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(encodedAsByteArray);
-        KeyFactory kf = KeyFactory.getInstance("ECDSA", "BC");
+        KeyFactory kf;
+        try {
+            kf = KeyFactory.getInstance("ECDSA", "BC");
+        } catch (GeneralSecurityException e){
+            throw new RuntimeException(e);
+        }
         return kf.generatePrivate(spec);
     }
 

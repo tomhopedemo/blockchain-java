@@ -11,13 +11,13 @@ public class TransactionRequest implements BlockDataHashable {
     public List<TransactionOutput> transactionOutputs;
     public String transactionRequestHashHex;
 
-    public TransactionRequest(List<TransactionInput> transactionInputs, List<TransactionOutput> transactionOutputs) throws Exception {
+    public TransactionRequest(List<TransactionInput> transactionInputs, List<TransactionOutput> transactionOutputs) {
         this.transactionInputs = transactionInputs;
         this.transactionOutputs = transactionOutputs;
         this.transactionRequestHashHex = Encoder.encodeToHexadecimal(calculateTransactionHash());
     }
 
-    private byte[] calculateTransactionHash() throws Exception {
+    private byte[] calculateTransactionHash() {
         String preHash = String.join("", getTransactionInputs().stream().map(transactionInput -> transactionInput.serialise()).toList()) +
                 String.join("", getTransactionOutputs().stream().map(transactionOutput -> transactionOutput.serialise()).toList());
         return Hashing.hash(preHash);

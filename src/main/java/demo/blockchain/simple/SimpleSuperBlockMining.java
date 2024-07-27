@@ -14,7 +14,7 @@ public class SimpleSuperBlockMining {
         this.difficulty = difficulty;
     }
 
-    public void mine(BlockchainStore blockchainStore) throws Exception {
+    public void mine(BlockchainStore blockchainStore) {
         for (int i = 0; i < numBlocksToMine; i++) {
             for (Blockchain blockchain : blockchainStore.blockchains) {
                 SimpleBlockMining simpleBlockMining = new SimpleBlockMining(difficulty);

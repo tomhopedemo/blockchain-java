@@ -4,16 +4,13 @@ import demo.cryptography.ECDSA;
 import demo.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
+import java.security.spec.InvalidKeySpecException;
+import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-
-//next implementation will be to allow multiple transactions per block with the blockhash on the
-//group of transactions.
 public class TransactionRequestFactory {
 
     WalletStore walletStore;
@@ -24,19 +21,25 @@ public class TransactionRequestFactory {
         this.transactionCache = transactionCache;
     }
 
-    public TransactionRequest createTransactionRequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue) throws Exception {
-        Map<String, TransactionOutput> transactionOutputsById = getTransactionOutputsById(wallet);
-        long balance = transactionOutputsById.values().stream().map(transactionOutput -> transactionOutput.getValue()).mapToLong(Long::longValue).sum();
+    public Optional<TransactionRequest> createTransactionRequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue) {
+        Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(wallet);
+        long balance = getBalance(unspentTransactionOutputsById);
         if (balance < transactionValue) {
-            throw new Exception();
+            return Optional.empty();
         }
 
         List<TransactionInput> transactionInputs = new ArrayList<>();
         long total = 0;
-        for (Map.Entry<String, TransactionOutput> entry: transactionOutputsById.entrySet()){
+        for (Map.Entry<String, TransactionOutput> entry: unspentTransactionOutputsById.entrySet()){
             String transactionOutputHash = entry.getKey();
             byte[] preSignature = transactionOutputHash.getBytes(UTF_8);
-            byte[] signature = ECDSA.calculateECDSASignature(Encoder.decodeToPrivateKey(wallet.privateKey), preSignature);
+            byte[] signature;
+            try {
+                PrivateKey privateKey = Encoder.decodeToPrivateKey(wallet.privateKey);
+                signature = ECDSA.calculateECDSASignature(privateKey, preSignature);
+            } catch (GeneralSecurityException e){
+                return Optional.empty();
+            }
             transactionInputs.add(new TransactionInput(transactionOutputHash, signature));
             TransactionOutput transactionOutput = entry.getValue();
             total += transactionOutput.getValue();
@@ -47,7 +50,12 @@ public class TransactionRequestFactory {
         transactionOutputs.add(new TransactionOutput(recipientPublicKeyAddress, transactionValue));
         transactionOutputs.add(new TransactionOutput(wallet.publicKeyAddress, total - transactionValue));
         TransactionRequest transactionRequest = new TransactionRequest(transactionInputs, transactionOutputs);
-        return transactionRequest;
+        return Optional.of(transactionRequest);
+    }
+
+    private static long getBalance(Map<String, TransactionOutput> transactionOutputsById) {
+        long balance = transactionOutputsById.values().stream().map(transactionOutput -> transactionOutput.getValue()).mapToLong(Long::longValue).sum();
+        return balance;
     }
 
     public Map<String, TransactionOutput> getTransactionOutputsById(Wallet wallet) {
@@ -61,7 +69,7 @@ public class TransactionRequestFactory {
         return transactionOutputsById;
     }
 
-    public TransactionRequest genesisTransaction(Wallet walletA, long genesisTransactionValue) throws Exception {
+    public TransactionRequest genesisTransaction(Wallet walletA, long genesisTransactionValue) {
         TransactionOutput genesisTransactionOutput = new TransactionOutput(walletA.publicKeyAddress, genesisTransactionValue);
         List<TransactionOutput> transactionOutputs = List.of(genesisTransactionOutput);
         TransactionRequest genesisTransactionRequest = new TransactionRequest(new ArrayList<>(), transactionOutputs);

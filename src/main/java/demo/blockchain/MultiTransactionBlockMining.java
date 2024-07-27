@@ -1,14 +1,9 @@
 package demo.blockchain;
 
-import demo.cryptography.ECDSA;
-import demo.encoding.Encoder;
-import org.bouncycastle.util.encoders.Hex;
-
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class MultiTransactionBlockMining {
 
@@ -22,6 +17,35 @@ public class MultiTransactionBlockMining {
         this.blockchain = blockchain;
         this.transactionCache = transactionCache;
         this.transactionVerification = new TransactionVerification(transactionCache);
+    }
+
+    public TransactionRequests constructTransactionRequestsForNextBlock(List<TransactionRequest> availableTransactionRequests) throws Exception {
+        Set<String> inputsToInclude = new HashSet<>();
+        List<TransactionRequest> transactionRequestsToInclude = new ArrayList<>();
+        for (TransactionRequest transactionRequest : availableTransactionRequests) {
+            //verify signature
+            boolean verified = transactionVerification.verify(transactionRequest, false);
+            if (!verified){
+                continue;
+            }
+
+            //consider for inclusion
+            List<String> transactionInputsToAdd = new ArrayList<>();
+            boolean include = true;
+            for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
+                if (transactionInputsToAdd.contains(transactionInput.getTransactionOutputHash()) || inputsToInclude.contains(transactionInput.getTransactionOutputHash())){
+                    include = false;
+                    break;
+                } else {
+                    transactionInputsToAdd.add(transactionInput.getTransactionOutputHash());
+                }
+            }
+            if (include) {
+                transactionRequestsToInclude.add(transactionRequest);
+                inputsToInclude.addAll(transactionRequest.getTransactionInputs().stream().map(t -> t.getTransactionOutputHash()).toList());
+            }
+        }
+        return new TransactionRequests(transactionRequestsToInclude);
     }
 
     public void mineNextBlock(TransactionRequests transactionRequests) throws Exception {

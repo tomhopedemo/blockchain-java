@@ -14,7 +14,7 @@ public class TransactionVerification {
         this.transactionCache = transactionCache;
     }
 
-    public boolean verify(TransactionRequest transactionRequest, boolean skipEqualityCheck) throws Exception {
+    public boolean verify(TransactionRequest transactionRequest, boolean skipEqualityCheckForGenesisTransactions) throws Exception {
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
             String transactionOutputHash = transactionInput.getTransactionOutputHash();
             TransactionOutput transactionOutput = transactionCache.get(transactionOutputHash);
@@ -24,7 +24,7 @@ public class TransactionVerification {
             }
         }
 
-        if (!skipEqualityCheck) {
+        if (!skipEqualityCheckForGenesisTransactions) {
             boolean check = checkInputSumEqualToOutputSum(transactionRequest);
             if (!check) {
                 return false;
@@ -47,7 +47,6 @@ public class TransactionVerification {
             long transactionOutputValue = Long.parseLong(transactionOutput.value);
             sumOfOutputs += transactionOutputValue;
         }
-        System.out.println(sumOfInputs + "    " + sumOfOutputs);
         return sumOfInputs == sumOfOutputs;
     }
 }

@@ -40,7 +40,7 @@ public class TransactionRequestFactory {
             transactionInputs.add(new TransactionInput(transactionOutputHash, signature));
             TransactionOutput transactionOutput = entry.getValue();
             total += transactionOutput.getValue();
-            if (total > transactionValue) break;
+            if (total >= transactionValue) break;
         }
 
         List<TransactionOutput> transactionOutputs = new ArrayList<>();

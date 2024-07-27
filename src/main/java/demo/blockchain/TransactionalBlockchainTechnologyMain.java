@@ -4,9 +4,10 @@ import java.security.Security;
 
 public class TransactionalBlockchainTechnologyMain {
 
+    final static boolean VISUALIZE_IN_CONSOLE = true;
 
     public static void main(String[] args) throws Exception {
-        int difficulty = 4;
+        int difficulty = 3;
         long genesisTransactionValue = 100;
 
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
@@ -38,12 +39,17 @@ public class TransactionalBlockchainTechnologyMain {
         //Serialisation
         BlockchainSerialisation blockchainSerialisation = new BlockchainSerialisation();
         boolean stable = blockchainSerialisation.checkSerializationStable(blockchain);
-        System.out.println("serialization stable:" + stable);
+        if (!stable){
+            throw new BlockchainException("Unstable Blockchain Serialization");
+        }
 
         //Visualization
-        Visualiser visualiser = new Visualiser();
-        visualiser.visualise(blockchain);
-        visualiser.visualise(transactionCache);
-        visualiser.visualise(walletStore);
+        if (VISUALIZE_IN_CONSOLE) {
+            Visualiser visualiser = new Visualiser();
+            visualiser.visualise(blockchain);
+            visualiser.visualise(transactionCache);
+            visualiser.visualise(walletStore);
+        }
+        System.out.println("Complete.");
     }
 }

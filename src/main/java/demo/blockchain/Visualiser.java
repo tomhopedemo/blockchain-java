@@ -7,8 +7,12 @@ public class Visualiser {
 
     public void visualise(Object... objects){
         for (Object object : objects) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = new GsonBuilder().create();
             String json = gson.toJson(object);
+            System.out.println(json);
+
+            gson = new GsonBuilder().setPrettyPrinting().create();
+            json = gson.toJson(object);
             System.out.println(json);
         }
     }

@@ -1,15 +1,22 @@
 package demo.blockchain;
 
+import demo.blockchain.account.AccountBasedBlockchainTechnology;
 import demo.blockchain.simple.SimpleBlockchainTechnology;
 
 import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
 
+
+/**
+ *  1. multi version of account based
+ */
+
 public class Control {
+
     public final static boolean VISUALIZE_IN_CONSOLE = true;
-    static String executionBlock = "m";
-    static int difficulty = 3;
+    static String executionBlock = "a";
+    static int difficulty = 1;
     static boolean RUN_ALL = true;
 
     static Map<String, ExecutionControl> executionControls = createExecutionBlocks();
@@ -18,6 +25,7 @@ public class Control {
         Map<String, ExecutionControl> blocks = new HashMap<>();
         blocks.put("m", new MultiX(difficulty, 100L));
         blocks.put("s", new SingleX(difficulty, 100L));
+        blocks.put("a", new AccountX(difficulty, 100L));
         blocks.put("b", new BlockX(difficulty, 2, 5));
         return blocks;
     }
@@ -35,52 +43,25 @@ public class Control {
     }
 
 
-    static public class BlockX implements ExecutionControl {
-
-        int difficulty;
-        int numBlockchains;
-        int numBlocksToMine;
-
-        public BlockX(int difficulty, int numBlockchains, int numBlocksToMine) {
-            this.difficulty = difficulty;
-            this.numBlockchains = numBlockchains;
-            this.numBlocksToMine = numBlocksToMine;
-        }
-
-        @Override
-        public void execute() throws Exception {
+    public record BlockX  (int difficulty, int numBlockchains, int numBlocksToMine) implements ExecutionControl {
+        public void execute() {
             new SimpleBlockchainTechnology().execute(difficulty, numBlockchains, numBlocksToMine);
         }
     }
 
-
-    static public class SingleX implements ExecutionControl {
-
-        int difficulty;
-        long genesisTransactionValue;
-
-        public SingleX(int difficulty, long genesisTransactionValue) {
-            this.difficulty = difficulty;
-            this.genesisTransactionValue = genesisTransactionValue;
+    public record AccountX (int difficulty, long genesisTransactionValue) implements ExecutionControl {
+        public void execute() throws Exception {
+            new AccountBasedBlockchainTechnology().execute(difficulty, genesisTransactionValue);
         }
+    }
 
-        @Override
+    public record SingleX (int difficulty, long genesisTransactionValue) implements ExecutionControl {
         public void execute() throws Exception {
             new TransactionalBlockchainTechnology().execute(difficulty, genesisTransactionValue);
         }
     }
 
-    static public class MultiX implements ExecutionControl {
-
-        int difficulty;
-        long genesisTransactionValue;
-
-        public MultiX(int difficulty, long genesisTransactionValue) {
-            this.difficulty = difficulty;
-            this.genesisTransactionValue = genesisTransactionValue;
-        }
-
-        @Override
+    public record MultiX (int difficulty, long genesisTransactionValue) implements ExecutionControl {
         public void execute() throws Exception {
             new MultiTransactionalBlockchainTechnology().execute(difficulty, genesisTransactionValue);
         }

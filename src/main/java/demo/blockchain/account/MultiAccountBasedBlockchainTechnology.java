@@ -1,4 +1,6 @@
-package demo.blockchain;
+package demo.blockchain.account;
+
+import demo.blockchain.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +8,7 @@ import java.util.Optional;
 
 import static demo.blockchain.Control.VISUALIZE_IN_CONSOLE;
 
-public class MultiTransactionalBlockchainTechnology {
+public class MultiAccountBasedBlockchainTechnology {
 
     public void execute(int difficulty, long genesisTransactionValue) throws BlockchainException {
         //Construction
@@ -14,25 +16,24 @@ public class MultiTransactionalBlockchainTechnology {
         WalletStore walletStore = new WalletStoreFactory(3).generate();
         Wallet walletA = walletStore.get(0);
         Wallet walletB = walletStore.get(1);
-        Wallet walletC = walletStore.get(2);
 
-        TransactionCache transactionCache = new TransactionCache();
-        MultiTransactionBlockMining transactionBlockMining = new MultiTransactionBlockMining(blockchain, difficulty, transactionCache);
-        TransactionRequestFactory transactionRequestFactory = new TransactionRequestFactory(walletStore, transactionCache);
+        AccountBalanceCache accountBalanceCache = new AccountBalanceCache();
+        MultiAccountBasedBlockMining transactionBlockMining = new MultiAccountBasedBlockMining(blockchain, difficulty, accountBalanceCache);
+        AccountBasedTransactionRequestFactory transactionRequestFactory = new AccountBasedTransactionRequestFactory(walletStore, accountBalanceCache);
 
         //Mining
-        TransactionRequest genesisTransactionRequest = transactionRequestFactory.genesisTransaction(walletA, genesisTransactionValue);
-        transactionBlockMining.mineNextBlock(new TransactionRequests(List.of(genesisTransactionRequest)));
+        AccountBasedTransactionRequest genesisTransactionRequest = transactionRequestFactory.genesisTransaction(walletA, genesisTransactionValue);
+        transactionBlockMining.mineNextBlock(new AccountBasedTransactionRequests(List.of(genesisTransactionRequest)));
 
 
         //Example transaction stream and processing
-        List<TransactionRequest> transactionRequestsQueue = new ArrayList<>();
+        List<AccountBasedTransactionRequest> transactionRequestsQueue = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             createAndRegisterSimpleTransactionRequest(transactionRequestFactory, walletA, walletB, transactionRequestsQueue, 5);
             if (transactionRequestsQueue.isEmpty()) {
                 break;
             }
-            Optional<TransactionRequests> transactionRequestsForNextBlock = transactionBlockMining.constructTransactionRequestsForNextBlock(transactionRequestsQueue);
+            Optional<AccountBasedTransactionRequests> transactionRequestsForNextBlock = transactionBlockMining.constructTransactionRequestsForNextBlock(transactionRequestsQueue);
             if (transactionRequestsForNextBlock.isPresent()) {
                 transactionBlockMining.mineNextBlock(transactionRequestsForNextBlock.get());
                 transactionRequestsQueue.removeAll(transactionRequestsForNextBlock.get().getTransactionRequests());
@@ -51,17 +52,18 @@ public class MultiTransactionalBlockchainTechnology {
         //Visualization
         if (VISUALIZE_IN_CONSOLE) {
             Visualiser visualiser = new Visualiser();
-            visualiser.visualise(blockchain, transactionCache, walletStore);
+            visualiser.visualise(blockchain, accountBalanceCache, walletStore);
         }
 
         System.out.println("Complete.");
     }
 
-    private static void createAndRegisterSimpleTransactionRequest(TransactionRequestFactory transactionRequestFactory, Wallet walletA, Wallet walletB, List<TransactionRequest> transactionRequestsQueue, int value) {
-        Optional<TransactionRequest> transactionRequestOptional = transactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, value);
+    private static void createAndRegisterSimpleTransactionRequest(AccountBasedTransactionRequestFactory transactionRequestFactory, Wallet walletA, Wallet walletB, List<AccountBasedTransactionRequest> transactionRequestsQueue, int value) throws BlockchainException {
+        Optional<AccountBasedTransactionRequest> transactionRequestOptional = transactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, value);
         if (transactionRequestOptional.isPresent()){
-            TransactionRequest transactionRequest = transactionRequestOptional.get();
+            AccountBasedTransactionRequest transactionRequest = transactionRequestOptional.get();
             transactionRequestsQueue.add(transactionRequest);
         }
     }
+
 }

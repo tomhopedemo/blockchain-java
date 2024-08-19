@@ -1,7 +1,5 @@
 package demo.blockchain.account;
 
-import demo.blockchain.TransactionInput;
-import demo.blockchain.TransactionOutput;
 import demo.cryptography.ECDSA;
 import demo.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;

@@ -39,6 +39,7 @@ public class MultiAccountBasedBlockMining {
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
         boolean isGenesis =  mostRecentBlock == null;
+
         //Individual Transaction Verification
         if (!isGenesis) {
             for (AccountBasedTransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
@@ -48,6 +49,16 @@ public class MultiAccountBasedBlockMining {
                 }
             }
         }
+
+        //Overall Verification (no repeat accounts)
+        Set<String> accounts = new HashSet<>();
+        for (AccountBasedTransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
+            if (accounts.contains(transactionRequest.getPublicKeyAddress())){
+                return;
+            }
+            accounts.add(transactionRequest.getPublicKeyAddress());
+        }
+
 
         //Create block
         Block block = new Block(transactionRequests, previousBlockHash);

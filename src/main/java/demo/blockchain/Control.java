@@ -10,9 +10,11 @@ import java.util.Map;
 
 
 /**
- *  1. ensure checkInputSumEqualToOutputSum is being applied in the right place
- *  2. accoutn bsed -> Overall Verification (to implement) - would want to check that either there is only one transaction per account or the account covers all
-
+ *
+ *  1. visualization of all four blockchain types in FE
+ *  2. implement staking + leader identification
+ *  3. accoutn bsed -> Overall Verification (account balance) - would want to check that either there is only one transaction per account or the account covers all
+ *
  */
 
 public class Control {

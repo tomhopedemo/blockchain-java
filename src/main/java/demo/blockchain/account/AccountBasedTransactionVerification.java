@@ -17,7 +17,10 @@ public class AccountBasedTransactionVerification {
         this.accountBalanceCache = accountBalanceCache;
     }
 
-    public boolean verifySignature(AccountBasedTransactionRequest transactionRequest, boolean skipEqualityCheckForGenesisTransactions) {
+    /**
+     * skipEqualityCheck used for genesis transactions
+     */
+    public boolean verifySignature(AccountBasedTransactionRequest transactionRequest, boolean skipEqualityCheck) {
         String transactionOutputsHash = transactionRequest.generateTransactionOutputsHash();
         try {
             PublicKey publicKey = Encoder.decodeToPublicKey(transactionRequest.getPublicKeyAddress());
@@ -29,7 +32,7 @@ public class AccountBasedTransactionVerification {
             return false;
         }
 
-        if (!skipEqualityCheckForGenesisTransactions) {
+        if (!skipEqualityCheck) {
             boolean hasBalance = hasBalance(transactionRequest);
             if (!hasBalance) {
                 return false;

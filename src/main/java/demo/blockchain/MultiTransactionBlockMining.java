@@ -71,9 +71,13 @@ public class MultiTransactionBlockMining {
             if (!verified){
                 return;
             }
+            boolean inputSumEqualsOutputSum = checkInputSumEqualToOutputSum(transactionRequest);
+            if (!inputSumEqualsOutputSum){
+                return;
+            }
         }
 
-        //Overall Verification
+        //Overall Verification (no repeats)
         Set<String> inputs = new HashSet<>();
         for (TransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
             for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
@@ -84,6 +88,7 @@ public class MultiTransactionBlockMining {
                 }
             }
         }
+
 
         //Create block
         Block block = new Block(transactionRequests, previousBlockHash);

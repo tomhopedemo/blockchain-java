@@ -2,26 +2,28 @@ package demo.blockchain.simple;
 
 import demo.blockchain.*;
 
-import java.security.Security;
-
 public class SimpleBlockchainTechnology {
 
-    public void execute(int difficulty, int numBlockchains, int numBlocksToMine) {
-        //Construction
-        SimpleBlockchainSuperFactory simpleBlockchainSuperFactory = new SimpleBlockchainSuperFactory(difficulty, numBlockchains);
-        BlockchainStore blockchainStore = simpleBlockchainSuperFactory.construct();
+    public void execute(String id, int difficulty, int numBlocksToMine) {
+
+        SimpleBlockchainFactory simpleBlockchainFactory = new SimpleBlockchainFactory(difficulty);
+        Blockchain blockchain = simpleBlockchainFactory.createBlockchainWithGenesisBlock(id);
 
         //Mining
-        SimpleSuperBlockMining simpleSuperBlockMining = new SimpleSuperBlockMining(numBlocksToMine, difficulty);
-        simpleSuperBlockMining.mine(blockchainStore);
+        SimpleBlockMining simpleBlockMining = new SimpleBlockMining(difficulty);
+        for (int i = 0; i < numBlocksToMine; i++) {
+            Block nextBlock = simpleBlockMining.mineNextBlock(blockchain);
+            blockchain.add(nextBlock);
+        }
 
         //Validation
-        SuperBlockchainValidator superBlockchainValidator = new SuperBlockchainValidator(blockchainStore);
-        superBlockchainValidator.validate();
+        BlockchainValidator blockchainValidator = new BlockchainValidator();
+        blockchainValidator.validate(blockchain);
+
 
         //Visualization
         if (Control.VISUALIZE_IN_CONSOLE) {
-             new Visualiser().visualise(blockchainStore);
+             new Visualiser().visualise(blockchain);
         }
 
         System.out.println("Complete.");

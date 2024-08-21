@@ -1,12 +1,11 @@
-package demo.blockchain;
+package demo.blockchain.utxo;
 
+import demo.blockchain.*;
 import demo.cryptography.ECDSA;
 import demo.encoding.Encoder;
-import org.bouncycastle.util.encoders.Hex;
 
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
-import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;

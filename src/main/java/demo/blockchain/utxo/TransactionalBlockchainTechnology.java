@@ -1,4 +1,6 @@
-package demo.blockchain;
+package demo.blockchain.utxo;
+
+import demo.blockchain.*;
 
 public class TransactionalBlockchainTechnology {
 
@@ -21,10 +23,8 @@ public class TransactionalBlockchainTechnology {
         transactionBlockMining.mineNextBlock(transactionRequest);
 
         //Validation
-        BlockchainStore blockchainStore = new BlockchainStore();
-        blockchainStore.add(blockchain);
-        SuperBlockchainValidator superBlockchainValidator = new SuperBlockchainValidator(blockchainStore);
-        superBlockchainValidator.validate();
+        BlockchainValidator blockchainValidator = new BlockchainValidator();
+        blockchainValidator.validate(blockchain);
 
         //Serialisation
         new BlockchainSerialisation().checkSerializationStable(blockchain);

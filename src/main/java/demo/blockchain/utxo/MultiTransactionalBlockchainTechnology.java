@@ -1,4 +1,6 @@
-package demo.blockchain;
+package demo.blockchain.utxo;
+
+import demo.blockchain.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +42,8 @@ public class MultiTransactionalBlockchainTechnology {
         }
 
         //Validation
-        BlockchainStore blockchainStore = new BlockchainStore();
-        blockchainStore.add(blockchain);
-        SuperBlockchainValidator superBlockchainValidator = new SuperBlockchainValidator(blockchainStore);
-        superBlockchainValidator.validate();
+        BlockchainValidator blockchainValidator = new BlockchainValidator();
+        blockchainValidator.validate(blockchain);
 
         //Serialisation
         new BlockchainSerialisation().checkSerializationStable(blockchain);

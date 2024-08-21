@@ -1,6 +1,7 @@
 package demo.blockchain.account;
 
 import demo.blockchain.*;
+import demo.blockchain.api.BlockchainService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +11,9 @@ import static demo.blockchain.Control.VISUALIZE_IN_CONSOLE;
 
 public class MultiAccountBasedBlockchainTechnology {
 
-    public void execute(int difficulty, long genesisTransactionValue) throws BlockchainException {
+    public void execute(String blockchainId, int difficulty, long genesisTransactionValue) throws BlockchainException {
         //Construction
-        Blockchain blockchain = new Blockchain("0");
+        Blockchain blockchain = new Blockchain(blockchainId);
         WalletStore walletStore = new WalletStoreFactory(3).generate();
         Wallet walletA = walletStore.get(0);
         Wallet walletB = walletStore.get(1);
@@ -41,10 +42,10 @@ public class MultiAccountBasedBlockchainTechnology {
         }
 
         //Validation
-        BlockchainStore blockchainStore = new BlockchainStore();
-        blockchainStore.add(blockchain);
-        SuperBlockchainValidator superBlockchainValidator = new SuperBlockchainValidator(blockchainStore);
-        superBlockchainValidator.validate();
+        BlockchainService.addBlockchain(blockchainId, blockchain);
+
+        BlockchainValidator blockchainValidator = new BlockchainValidator();
+        blockchainValidator.validate(blockchain);
 
         //Serialisation
         new BlockchainSerialisation().checkSerializationStable(blockchain);

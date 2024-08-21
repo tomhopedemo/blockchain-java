@@ -1,4 +1,6 @@
-package demo.blockchain;
+package demo.blockchain.utxo;
+
+import demo.blockchain.*;
 
 public class TransactionBlockMining {
 

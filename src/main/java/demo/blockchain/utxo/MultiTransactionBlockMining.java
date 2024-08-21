@@ -1,4 +1,6 @@
-package demo.blockchain;
+package demo.blockchain.utxo;
+
+import demo.blockchain.*;
 
 import java.util.*;
 
@@ -112,12 +114,12 @@ public class MultiTransactionBlockMining {
         long sumOfOutputs = 0L;
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
             TransactionOutput transactionOutput = transactionCache.get(transactionInput.getTransactionOutputHash());
-            long transactionOutputValue = Long.parseLong(transactionOutput.value);
+            long transactionOutputValue = transactionOutput.getValue();
             sumOfInputs += transactionOutputValue;
         }
 
         for (TransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
-            long transactionOutputValue = Long.parseLong(transactionOutput.value);
+            long transactionOutputValue = transactionOutput.getValue();
             sumOfOutputs += transactionOutputValue;
         }
 

@@ -1,4 +1,4 @@
-package demo.blockchain;
+package demo.blockchain.utxo;
 
 import demo.cryptography.ECDSA;
 import demo.encoding.Encoder;
@@ -25,7 +25,7 @@ public class TransactionVerification {
                 return false;
             }
             try {
-                PublicKey publicKey = Encoder.decodeToPublicKey(transactionOutput.recipient);
+                PublicKey publicKey = Encoder.decodeToPublicKey(transactionOutput.getRecipient());
                 boolean verified = ECDSA.verifyECDSASignature(publicKey, transactionOutputHash.getBytes(UTF_8), Hex.decode(transactionInput.getSignature()));
                 if (!verified){
                     return false;
@@ -49,10 +49,10 @@ public class TransactionVerification {
         long sum = 0L;
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
             TransactionOutput transactionOutput = transactionCache.get(transactionInput.getTransactionOutputHash());
-            sum += Long.parseLong(transactionOutput.value);
+            sum += transactionOutput.getValue();
         }
         for (TransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
-            sum -= Long.parseLong(transactionOutput.value);
+            sum -= transactionOutput.getValue();
         }
         return sum == 0L;
     }

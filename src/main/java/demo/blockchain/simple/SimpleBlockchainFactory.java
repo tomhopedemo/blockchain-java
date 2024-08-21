@@ -12,7 +12,7 @@ public class SimpleBlockchainFactory {
         this.difficulty = difficulty;
     }
 
-    public Blockchain createBlockchainWithGenesisBlock(int blockchainId)  {
+    public Blockchain createBlockchainWithGenesisBlock(String blockchainId)  {
         Block block = new Block(new StringHashable("abcde"), "");
         BlockMiner blockMiner = new BlockMiner(block);
         blockMiner.mineBlockHash("0".repeat(difficulty));

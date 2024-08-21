@@ -1,7 +1,6 @@
 package demo.blockchain.account;
 
 import demo.blockchain.BlockDataHashable;
-import demo.blockchain.TransactionRequest;
 import demo.encoding.Encoder;
 import demo.hashing.Hashing;
 

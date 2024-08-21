@@ -1,4 +1,4 @@
-package demo.blockchain;
+package demo.blockchain.utxo;
 
 import java.util.HashMap;
 import java.util.Map;

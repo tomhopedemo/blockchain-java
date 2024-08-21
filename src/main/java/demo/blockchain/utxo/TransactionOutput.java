@@ -1,4 +1,4 @@
-package demo.blockchain;
+package demo.blockchain.utxo;
 
 import demo.encoding.Encoder;
 import demo.hashing.Hashing;

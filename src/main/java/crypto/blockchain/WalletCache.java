@@ -5,15 +5,9 @@ import java.util.List;
 
 public class WalletCache {
 
-    private final List<Wallet> wallets;
+    private final List<Wallet> wallets = new ArrayList<>();
 
-    private final Wallet genesisWallet;
-
-    public WalletCache(Wallet genesis) {
-        this.wallets = new ArrayList<>();
-        this.wallets.add(genesis);
-        this.genesisWallet = genesis;
-    }
+    private Wallet genesisWallet;
 
     public Wallet getGenesisWallet(){
         return genesisWallet;
@@ -25,5 +19,10 @@ public class WalletCache {
 
     public void addWallet(Wallet wallet){
         wallets.add(wallet);
+    }
+
+    public void addGenesisWallet(Wallet genesis) {
+        genesisWallet = genesis;
+        wallets.add(genesis);
     }
 }

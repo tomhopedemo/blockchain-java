@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Security;
 
-import static crypto.blockchain.Control.VISUALIZE_IN_CONSOLE;
-
 @SpringBootApplication
 @RestController
 public class ApiController {

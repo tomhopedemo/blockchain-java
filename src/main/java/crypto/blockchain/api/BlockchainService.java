@@ -2,11 +2,14 @@ package crypto.blockchain.api;
 
 import crypto.blockchain.Blockchain;
 import crypto.blockchain.BlockchainException;
-import crypto.blockchain.account.AccountBasedBlockchainTech;
-import crypto.blockchain.account.MultiAccountBasedBlockchainTech;
-import crypto.blockchain.simple.SimpleBlockchainTech;
-import crypto.blockchain.utxo.MultiTransactionalBlockchainTech;
-import crypto.blockchain.utxo.TransactionalBlockchainTech;
+import crypto.blockchain.Wallet;
+import crypto.blockchain.account.AccountBasedBlockchain;
+import crypto.blockchain.account.MultiAccountBasedBlockchain;
+import crypto.blockchain.simple.SimpleBlockchain;
+import crypto.blockchain.utxo.MultiTransactionalBlockchain;
+import crypto.blockchain.utxo.TransactionalBlockchain;
+
+import java.util.Objects;
 
 public class BlockchainService {
 
@@ -15,26 +18,28 @@ public class BlockchainService {
     }
 
     public static Blockchain createBlockchain(String id, BlockchainType type, int difficulty, Long genesisValue) throws BlockchainException {
-        Blockchain blockchain = switch(type){
-            case SIMPLE -> SimpleBlockchainTech.execute(id, difficulty);
-            case ACCOUNT -> AccountBasedBlockchainTech.execute(id, difficulty, genesisValue);
-            case MULTI_ACCOUNT -> MultiAccountBasedBlockchainTech.execute(id, difficulty, genesisValue);
-            case UTXO -> TransactionalBlockchainTech.execute(id, difficulty, genesisValue);
-            case MULTI_UTXO -> MultiTransactionalBlockchainTech.execute(id, difficulty, genesisValue);
-        };
+        Blockchain blockchain = new Blockchain(id);
         BlockchainData.addBlockchain(type, blockchain);
+        Wallet genesis = Wallet.generate();
+        switch(type){
+            case SIMPLE -> SimpleBlockchain.genesis(blockchain, difficulty);
+            case ACCOUNT -> AccountBasedBlockchain.genesis(blockchain, difficulty, genesisValue, genesis);
+            case MULTI_ACCOUNT -> MultiAccountBasedBlockchain.genesis(blockchain, difficulty, genesisValue, genesis);
+            case UTXO -> TransactionalBlockchain.genesis(blockchain, difficulty, genesisValue, genesis);
+            case MULTI_UTXO -> MultiTransactionalBlockchain.genesis(blockchain, difficulty, genesisValue, genesis);
+        }
         return blockchain;
     }
 
     public static Blockchain simulateBlocks(BlockchainType blockchainType, String id, int numBlocks, int difficulty) throws BlockchainException {
         Blockchain blockchain = BlockchainData.getBlockchain(blockchainType, id);
-        Blockchain updatedBlockchain = switch(blockchainType){
-            case SIMPLE -> SimpleBlockchainTech.simulate(blockchain, numBlocks, difficulty);
-            case ACCOUNT -> AccountBasedBlockchainTech.simulate(blockchain, BlockchainData.getAccountBalanceCache(blockchain.getId()), numBlocks, difficulty);
-            case MULTI_ACCOUNT -> MultiAccountBasedBlockchainTech.simulate(blockchain, BlockchainData.getAccountBalanceCache(id), numBlocks, difficulty);
-            case UTXO -> TransactionalBlockchainTech.simulate(blockchain, BlockchainData.getTransactionCache(id), numBlocks, difficulty);
-            case MULTI_UTXO -> MultiTransactionalBlockchainTech.simulate(blockchain, BlockchainData.getTransactionCache(id), numBlocks, difficulty);
+        switch(blockchainType){
+            case SIMPLE -> SimpleBlockchain.simulate(blockchain, numBlocks, difficulty);
+            case ACCOUNT -> AccountBasedBlockchain.simulate(blockchain, BlockchainData.getAccountBalanceCache(blockchain.getId()), numBlocks, difficulty);
+            case MULTI_ACCOUNT -> MultiAccountBasedBlockchain.simulate(blockchain, BlockchainData.getAccountBalanceCache(id), numBlocks, difficulty);
+            case UTXO -> TransactionalBlockchain.simulate(blockchain, BlockchainData.getTransactionCache(id), numBlocks, difficulty);
+            case MULTI_UTXO -> MultiTransactionalBlockchain.simulate(blockchain, BlockchainData.getTransactionCache(id), numBlocks, difficulty);
         };
-        return updatedBlockchain;
+        return blockchain;
     }
 }

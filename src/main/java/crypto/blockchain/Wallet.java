@@ -19,4 +19,11 @@ public class Wallet {
         return new Wallet(keyPair.getPrivate(), keyPair.getPublic());
     }
 
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
+    public String getPublicKeyAddress() {
+        return publicKeyAddress;
+    }
 }

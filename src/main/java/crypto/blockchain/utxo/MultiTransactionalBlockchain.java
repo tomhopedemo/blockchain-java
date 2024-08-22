@@ -1,31 +1,23 @@
 package crypto.blockchain.utxo;
 
 import crypto.blockchain.*;
-import crypto.blockchain.account.AccountBalanceCache;
 import crypto.blockchain.api.BlockchainData;
-import crypto.blockchain.api.BlockchainService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class MultiTransactionalBlockchainTech {
+public class MultiTransactionalBlockchain {
 
-    public static Blockchain execute(String id, int difficulty, long genesisTransactionValue) throws BlockchainException {
-        //Construction
-        Blockchain blockchain = new Blockchain(id);
-        Wallet genesis = Wallet.generate();
-
+    public static void genesis(Blockchain blockchain, int difficulty, long genesisTransactionValue, Wallet genesis) throws BlockchainException {
         TransactionCache transactionCache = new TransactionCache();
         MultiTransactionBlockMining transactionBlockMining = new MultiTransactionBlockMining(blockchain, difficulty, transactionCache);
         TransactionRequestFactory transactionRequestFactory = new TransactionRequestFactory(transactionCache);
 
-        //Mining
         TransactionRequest genesisTransactionRequest = transactionRequestFactory.genesisTransaction(genesis, genesisTransactionValue);
         transactionBlockMining.mineNextBlock(new TransactionRequests(List.of(genesisTransactionRequest)));
-        BlockchainData.addTransactionCache(id, transactionCache);
+        BlockchainData.addTransactionCache(blockchain.getId(), transactionCache);
         BlockchainData.addGenesisWallet(blockchain.getId(), genesis);
-        return blockchain;
     }
 
     private static void createAndRegisterSimpleTransactionRequest(TransactionRequestFactory transactionRequestFactory, Wallet walletA, Wallet walletB, List<TransactionRequest> transactionRequestsQueue, int value) {
@@ -36,7 +28,7 @@ public class MultiTransactionalBlockchainTech {
         }
     }
 
-    public static Blockchain simulate(Blockchain blockchain, TransactionCache transactionCache, int numBlocks, int difficulty) {
+    public static void simulate(Blockchain blockchain, TransactionCache transactionCache, int numBlocks, int difficulty) {
         Wallet wallet = Wallet.generate();
         Wallet genesis = BlockchainData.getGenesisWallet(blockchain.getId());
 
@@ -56,6 +48,5 @@ public class MultiTransactionalBlockchainTech {
             }
         }
         BlockchainData.addWallet(blockchain.getId(), wallet);
-        return blockchain;
     }
 }

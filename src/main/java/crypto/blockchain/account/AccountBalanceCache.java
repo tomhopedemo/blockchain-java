@@ -6,9 +6,6 @@ public class AccountBalanceCache {
 
     public ConcurrentHashMap<String, Long> accounts = new ConcurrentHashMap<>();
 
-    public AccountBalanceCache() {
-    }
-
     public void add(String accountPublicKey, Long value){
         accounts.compute(accountPublicKey, (_, v) -> v == null ?  value : v + value);
     }

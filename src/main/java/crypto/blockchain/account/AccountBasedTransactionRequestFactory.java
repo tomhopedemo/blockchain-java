@@ -12,14 +12,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AccountBasedTransactionRequestFactory {
 
-    AccountBalanceCache accountBalanceCache;
-
-    public AccountBasedTransactionRequestFactory(AccountBalanceCache accountBalanceCache) {
-        this.accountBalanceCache = accountBalanceCache;
-    }
-
-    public Optional<AccountBasedTransactionRequest> createTransactionRequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue) throws BlockchainException {
-        Long balance = accountBalanceCache.get(wallet.publicKeyAddress);
+    public static Optional<AccountBasedTransactionRequest> createTransactionRequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue, AccountBalanceCache accountBalanceCache) throws BlockchainException {
+        Long balance = accountBalanceCache.get(wallet.getPublicKeyAddress());
         if (balance < transactionValue) {
             return Optional.empty();
         }
@@ -31,23 +25,20 @@ public class AccountBasedTransactionRequestFactory {
         return Optional.of(transactionRequest);
     }
 
-    public byte[] calculateSignature(AccountBasedTransactionRequest transactionRequest, Wallet wallet) throws BlockchainException{
+    public static byte[] calculateSignature(AccountBasedTransactionRequest transactionRequest, Wallet wallet) throws BlockchainException{
         String transactionOutputsHash = transactionRequest.generateTransactionOutputsHash();
         byte[] preSignature = transactionOutputsHash.getBytes(UTF_8);
         try {
-            PrivateKey privateKey = Encoder.decodeToPrivateKey(wallet.privateKey);
+            PrivateKey privateKey = Encoder.decodeToPrivateKey(wallet.getPrivateKey());
             return ECDSA.calculateECDSASignature(privateKey, preSignature);
         } catch (GeneralSecurityException e){
             throw new BlockchainException(e);
         }
     }
 
-    public AccountBasedTransactionRequest genesisTransaction(Wallet walletA, long genesisTransactionValue) throws BlockchainException {
-        AccountBasedTransactionOutput genesisTransactionOutput = new AccountBasedTransactionOutput(walletA.publicKeyAddress, genesisTransactionValue);
-        List<AccountBasedTransactionOutput> transactionOutputs = List.of(genesisTransactionOutput);
-        AccountBasedTransactionRequest genesisTransactionRequest = new AccountBasedTransactionRequest(null, transactionOutputs);
-        accountBalanceCache.add(walletA.publicKeyAddress, genesisTransactionValue);
-        return genesisTransactionRequest;
+    public static AccountBasedTransactionRequest genesisTransaction(Wallet genesis, long genesisTransactionValue)  {
+        AccountBasedTransactionOutput genesisTransactionOutput = new AccountBasedTransactionOutput(genesis.getPublicKeyAddress(), genesisTransactionValue);
+        return new AccountBasedTransactionRequest(null, List.of(genesisTransactionOutput));
     }
 
 }

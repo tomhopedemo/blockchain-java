@@ -33,7 +33,11 @@ public class BlockchainData {
     }
 
     public static void addGenesisWallet(String id, Wallet genesis) {
-        walletCaches.put(id, new WalletCache(genesis));
+        walletCaches.get(id).addGenesisWallet(genesis);
+    }
+
+    public static void addWalletCache(String id){
+        walletCaches.put(id, new WalletCache());
     }
 
     public static void addWallet(String id, Wallet wallet) {
@@ -46,6 +50,10 @@ public class BlockchainData {
 
     public static void addAccountBalanceCache(String id, AccountBalanceCache accountBalanceCache){
         accountBalanceCaches.put(id, accountBalanceCache);
+    }
+
+    public static void addAccountBalance(String id, Wallet wallet, long balance){
+        accountBalanceCaches.get(id).add(wallet.getPublicKeyAddress(), balance);
     }
 
     public static Blockchain getBlockchain(BlockchainType blockchainType, String id){

@@ -1,5 +1,7 @@
 package crypto.blockchain.account;
 
+import crypto.blockchain.Blockchain;
+import crypto.blockchain.api.BlockchainData;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;
@@ -11,16 +13,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AccountBasedTransactionVerification {
 
-    AccountBalanceCache accountBalanceCache;
-
-    public AccountBasedTransactionVerification(AccountBalanceCache accountBalanceCache) {
-        this.accountBalanceCache = accountBalanceCache;
-    }
-
     /**
      * skipEqualityCheck used for genesis transactions
      */
-    public boolean verifySignature(AccountBasedTransactionRequest transactionRequest, boolean skipEqualityCheck) {
+    public static boolean verifySignature(AccountBasedTransactionRequest transactionRequest, boolean skipEqualityCheck, Blockchain blockchain) {
         String transactionOutputsHash = transactionRequest.generateTransactionOutputsHash();
         try {
             PublicKey publicKey = Encoder.decodeToPublicKey(transactionRequest.getPublicKeyAddress());
@@ -33,7 +29,7 @@ public class AccountBasedTransactionVerification {
         }
 
         if (!skipEqualityCheck) {
-            boolean hasBalance = hasBalance(transactionRequest);
+            boolean hasBalance = hasBalance(transactionRequest, blockchain);
             if (!hasBalance) {
                 return false;
             }
@@ -41,13 +37,13 @@ public class AccountBasedTransactionVerification {
         return true;
     }
 
-    private boolean hasBalance(AccountBasedTransactionRequest transactionRequest) {
+    private static boolean hasBalance(AccountBasedTransactionRequest transactionRequest, Blockchain blockchain) {
         long sum = 0L;
         for (AccountBasedTransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
             sum += transactionOutput.getValue();
         }
 
-        Long balance = accountBalanceCache.get(transactionRequest.getPublicKeyAddress());
+        Long balance = BlockchainData.getAccountBalanceCache(blockchain.getId()).get(transactionRequest.getPublicKeyAddress());
         return balance >= sum;
     }
 

@@ -13,11 +13,11 @@ public class TransactionalBlockchain {
         BlockchainData.addTransactionCache(id);
     }
 
-    public static void genesis(String id, long genesisTransactionValue) {
+    public static void genesis(String id, long value) {
         Wallet genesis = Wallet.generate();
         BlockchainData.addGenesisWallet(id, genesis);
         TransactionCache transactionCache = BlockchainData.getTransactionCache(id);
-        TransactionRequest genesisTransactionRequest = TransactionRequestFactory.genesisTransaction(genesis, genesisTransactionValue, transactionCache);
+        TransactionRequest genesisTransactionRequest = TransactionRequestFactory.genesisTransaction(genesis, value, transactionCache);
         mineNextBlock(genesisTransactionRequest, id, 1);
     }
 

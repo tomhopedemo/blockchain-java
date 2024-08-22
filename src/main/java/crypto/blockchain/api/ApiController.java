@@ -3,6 +3,7 @@ package crypto.blockchain.api;
 import com.google.gson.GsonBuilder;
 import crypto.blockchain.Blockchain;
 import crypto.blockchain.BlockchainException;
+import crypto.blockchain.BlockchainValidator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -42,7 +43,7 @@ public class ApiController {
         try {
             BlockchainType type = BlockchainType.MULTI_ACCOUNT;
             Blockchain blockchain = BlockchainService.getBlockchain(type, id);
-            if (blockchain == null) {
+            if (blockchain != null) {
                 blockchain = BlockchainService.createGenesisBlock(id, type, 100L);
             }
             return new GsonBuilder().create().toJson(blockchain);
@@ -56,7 +57,11 @@ public class ApiController {
     String simulate(@PathVariable("id") String id) {
         try {
             BlockchainType type = BlockchainType.MULTI_ACCOUNT;
-            Blockchain blockchain = BlockchainService.simulateBlocks(type, id, 1, 1);
+            Blockchain blockchain = BlockchainService.getBlockchain(type, id);
+            if (blockchain != null) {
+                blockchain = BlockchainService.simulateBlocks(type, id, 1, 1);
+                BlockchainValidator.validate(blockchain);
+            }
             return new GsonBuilder().create().toJson(blockchain);
         } catch (BlockchainException e){
             return null;

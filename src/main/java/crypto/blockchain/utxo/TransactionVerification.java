@@ -32,7 +32,7 @@ public class TransactionVerification {
         }
 
         if (!skipEqualityCheckForGenesisTransactions) {
-            boolean inputSumEqualToOutputSum = isInputSumEqualToOutputSum(transactionRequest, id);
+            boolean inputSumEqualToOutputSum = isInputSumEqualToOutputSum(transactionRequest, transactionCache);
             if (!inputSumEqualToOutputSum) {
                 return false;
             }
@@ -41,8 +41,7 @@ public class TransactionVerification {
         return true;
     }
 
-    private static boolean isInputSumEqualToOutputSum(TransactionRequest transactionRequest, String id) {
-        TransactionCache transactionCache = BlockchainData.getTransactionCache(id);
+    private static boolean isInputSumEqualToOutputSum(TransactionRequest transactionRequest, TransactionCache transactionCache) {
         long sum = 0L;
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
             TransactionOutput transactionOutput = transactionCache.get(transactionInput.getTransactionOutputHash());

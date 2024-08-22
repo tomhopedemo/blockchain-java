@@ -45,8 +45,8 @@ public class TransactionRequestFactory {
     }
 
     private static long getBalance(Map<String, TransactionOutput> transactionOutputsById) {
-        long balance = transactionOutputsById.values().stream().map(transactionOutput -> transactionOutput.getValue()).mapToLong(Long::longValue).sum();
-        return balance;
+        return transactionOutputsById.values().stream()
+                .map(transactionOutput -> transactionOutput.getValue()).mapToLong(Long::longValue).sum();
     }
 
     public static Map<String, TransactionOutput> getTransactionOutputsById(Wallet wallet, TransactionCache transactionCache) {

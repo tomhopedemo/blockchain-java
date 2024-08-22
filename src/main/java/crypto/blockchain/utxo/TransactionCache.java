@@ -7,9 +7,6 @@ public class TransactionCache {
 
     public HashMap<String, TransactionOutput> unspentOutputsById = new HashMap<>();
 
-    public TransactionCache() {
-    }
-
     public void put(String transactionOutputHash, TransactionOutput transactionOutput) {
         unspentOutputsById.put(transactionOutputHash, transactionOutput);
     }

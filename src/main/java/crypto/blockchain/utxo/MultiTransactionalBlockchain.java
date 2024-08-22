@@ -22,15 +22,6 @@ public class MultiTransactionalBlockchain {
         mineNextBlock(new TransactionRequests(List.of(genesisTransactionRequest)), id, 1);
     }
 
-    private static void createAndRegisterSimpleTransactionRequest(Wallet walletA, Wallet walletB, List<TransactionRequest> transactionRequestsQueue, int value, String id) {
-        TransactionCache transactionCache = BlockchainData.getTransactionCache(id);
-        Optional<TransactionRequest> transactionRequestOptional = TransactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, value, transactionCache);
-        if (transactionRequestOptional.isPresent()){
-            TransactionRequest transactionRequest = transactionRequestOptional.get();
-            transactionRequestsQueue.add(transactionRequest);
-        }
-    }
-
     public static void simulate(String id, int numBlocks, int difficulty) {
         Blockchain blockchain = BlockchainData.getBlockchain(BlockchainType.MULTI_UTXO, id);
         Wallet wallet = Wallet.generate();
@@ -50,6 +41,14 @@ public class MultiTransactionalBlockchain {
         BlockchainData.addWallet(blockchain.getId(), wallet);
     }
 
+    private static void createAndRegisterSimpleTransactionRequest(Wallet walletA, Wallet walletB, List<TransactionRequest> transactionRequestsQueue, int value, String id) {
+        TransactionCache transactionCache = BlockchainData.getTransactionCache(id);
+        Optional<TransactionRequest> transactionRequestOptional = TransactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, value, transactionCache);
+        if (transactionRequestOptional.isPresent()){
+            TransactionRequest transactionRequest = transactionRequestOptional.get();
+            transactionRequestsQueue.add(transactionRequest);
+        }
+    }
 
     public static Optional<TransactionRequests> constructTransactionRequestsForNextBlock(List<TransactionRequest> availableTransactionRequests, String id) {
         Set<String> inputsToInclude = new HashSet<>();

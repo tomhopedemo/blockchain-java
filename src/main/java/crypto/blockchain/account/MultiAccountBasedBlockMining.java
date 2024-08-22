@@ -62,8 +62,7 @@ public class MultiAccountBasedBlockMining {
 
         //Create block
         Block block = new Block(transactionRequests, previousBlockHash);
-        BlockMiner blockMiner = new BlockMiner(block);
-        blockMiner.mineBlockHash("0".repeat(difficulty));
+        BlockMiner.mineBlockHash(block, "0".repeat(difficulty));
         blockchain.add(block);
 
         //Update Caches

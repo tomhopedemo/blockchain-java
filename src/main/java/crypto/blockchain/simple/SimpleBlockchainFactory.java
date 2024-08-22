@@ -6,17 +6,10 @@ import crypto.blockchain.Block;
 
 public class SimpleBlockchainFactory {
 
-    int difficulty;
-
-    public SimpleBlockchainFactory(int difficulty) {
-        this.difficulty = difficulty;
-    }
-
-    public Blockchain createBlockchainWithGenesisBlock(String blockchainId)  {
+    public static Blockchain createBlockchainWithGenesisBlock(String blockchainId, int difficulty)  {
         Block block = new Block(new StringHashable("abcde"), "");
-        BlockMiner blockMiner = new BlockMiner(block);
-        blockMiner.mineBlockHash("0".repeat(difficulty));
-        Blockchain blockchain = new Blockchain(String.valueOf(blockchainId));
+        BlockMiner.mineBlockHash(block, "0".repeat(difficulty));
+        Blockchain blockchain = new Blockchain(blockchainId);
         blockchain.add(block);
         return blockchain;
     }

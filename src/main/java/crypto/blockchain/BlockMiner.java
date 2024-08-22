@@ -2,13 +2,7 @@ package crypto.blockchain;
 
 public class BlockMiner {
 
-    public Block block;
-
-    public BlockMiner(Block block) {
-        this.block = block;
-    }
-
-    public void mineBlockHash(String blockHashPrefixMatch) {
+    public static void mineBlockHash(Block block, String blockHashPrefixMatch) {
         int nonce = 0;
         while (true){
             String blockHash = block.calculateHash(++nonce);

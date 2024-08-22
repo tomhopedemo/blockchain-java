@@ -1,24 +1,18 @@
 package crypto.blockchain;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class BlockchainSerialisation {
 
-    public BlockchainSerialisation() {
+    public static Blockchain deserialise(String serialisedBlockchain){
+        return new GsonBuilder().setPrettyPrinting().create().fromJson(serialisedBlockchain, Blockchain.class);
     }
 
-    public Blockchain deserialise(String serialisedBlockchain){
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.fromJson(serialisedBlockchain, Blockchain.class);
+    public static String serialise(Blockchain blockchain){
+        return new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
     }
 
-    public String serialise(Blockchain blockchain){
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(blockchain);
-    }
-
-    public void checkSerializationStable(Blockchain blockchain) throws BlockchainException {
+    public static void checkSerializationStable(Blockchain blockchain) throws BlockchainException {
         String serialisedBlockchain = serialise(blockchain);
         Blockchain deserialisedBlockchain = deserialise(serialisedBlockchain);
         boolean stable = serialisedBlockchain.equals(serialise(deserialisedBlockchain));

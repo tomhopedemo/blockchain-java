@@ -12,11 +12,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AccountBasedTransactionRequestFactory {
 
-    WalletStore walletStore;
     AccountBalanceCache accountBalanceCache;
 
-    public AccountBasedTransactionRequestFactory(WalletStore walletStore, AccountBalanceCache accountBalanceCache) {
-        this.walletStore = walletStore;
+    public AccountBasedTransactionRequestFactory(AccountBalanceCache accountBalanceCache) {
         this.accountBalanceCache = accountBalanceCache;
     }
 

@@ -17,29 +17,66 @@ public class BlockchainService {
         return BlockchainData.getBlockchain(type, id);
     }
 
-    public static Blockchain createBlockchain(String id, BlockchainType type, int difficulty, Long genesisValue) throws BlockchainException {
-        Blockchain blockchain = new Blockchain(id);
-        BlockchainData.addBlockchain(type, blockchain);
-        Wallet genesis = Wallet.generate();
+    public static Blockchain createBlockchain(String id, BlockchainType type) throws BlockchainException {
         switch(type){
-            case SIMPLE -> SimpleBlockchain.genesis(blockchain, difficulty);
-            case ACCOUNT -> AccountBasedBlockchain.genesis(blockchain, difficulty, genesisValue, genesis);
-            case MULTI_ACCOUNT -> MultiAccountBasedBlockchain.genesis(blockchain, difficulty, genesisValue, genesis);
-            case UTXO -> TransactionalBlockchain.genesis(blockchain, difficulty, genesisValue, genesis);
-            case MULTI_UTXO -> MultiTransactionalBlockchain.genesis(blockchain, difficulty, genesisValue, genesis);
+            case SIMPLE -> {
+                SimpleBlockchain.create(id);
+            }
+            case ACCOUNT -> {
+                AccountBasedBlockchain.create(id);
+            }
+            case MULTI_ACCOUNT -> {
+                MultiAccountBasedBlockchain.create(id);
+            }
+            case UTXO -> {
+                TransactionalBlockchain.create(id);
+            }
+            case MULTI_UTXO -> {
+                MultiTransactionalBlockchain.create(id);
+            }
         }
-        return blockchain;
+        return BlockchainData.getBlockchain(type, id);
     }
 
-    public static Blockchain simulateBlocks(BlockchainType blockchainType, String id, int numBlocks, int difficulty) throws BlockchainException {
-        Blockchain blockchain = BlockchainData.getBlockchain(blockchainType, id);
-        switch(blockchainType){
-            case SIMPLE -> SimpleBlockchain.simulate(blockchain, numBlocks, difficulty);
-            case ACCOUNT -> AccountBasedBlockchain.simulate(blockchain, BlockchainData.getAccountBalanceCache(blockchain.getId()), numBlocks, difficulty);
-            case MULTI_ACCOUNT -> MultiAccountBasedBlockchain.simulate(blockchain, BlockchainData.getAccountBalanceCache(id), numBlocks, difficulty);
-            case UTXO -> TransactionalBlockchain.simulate(blockchain, BlockchainData.getTransactionCache(id), numBlocks, difficulty);
-            case MULTI_UTXO -> MultiTransactionalBlockchain.simulate(blockchain, BlockchainData.getTransactionCache(id), numBlocks, difficulty);
+    public static Blockchain createGenesisBlock(String id, BlockchainType type, Long genesisValue) throws BlockchainException {
+        switch(type){
+            case SIMPLE -> {
+                SimpleBlockchain.genesis(id);
+            }
+            case ACCOUNT -> {
+                AccountBasedBlockchain.genesis(id, genesisValue);
+            }
+            case MULTI_ACCOUNT -> {
+                MultiAccountBasedBlockchain.genesis(id, genesisValue);
+            }
+            case UTXO -> {
+                TransactionalBlockchain.genesis(id, genesisValue);
+            }
+            case MULTI_UTXO -> {
+                MultiTransactionalBlockchain.genesis(id, genesisValue);
+            }
+        }
+        return BlockchainData.getBlockchain(type, id);
+    }
+
+    public static Blockchain simulateBlocks(BlockchainType type, String id, int numBlocks, int difficulty) throws BlockchainException {
+        switch(type){
+            case SIMPLE -> {
+                SimpleBlockchain.simulate(id, numBlocks, difficulty);
+            }
+            case ACCOUNT -> {
+                AccountBasedBlockchain.simulate(id, numBlocks, difficulty);
+            }
+            case MULTI_ACCOUNT -> {
+                MultiAccountBasedBlockchain.simulate(id, numBlocks, difficulty);
+            }
+            case UTXO -> {
+                TransactionalBlockchain.simulate(id, difficulty);
+            }
+            case MULTI_UTXO -> {
+                MultiTransactionalBlockchain.simulate(id, numBlocks, difficulty);
+            }
         };
-        return blockchain;
+        return BlockchainData.getBlockchain(type, id);
     }
 }

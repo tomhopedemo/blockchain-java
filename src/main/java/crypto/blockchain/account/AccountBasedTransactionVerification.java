@@ -16,7 +16,7 @@ public class AccountBasedTransactionVerification {
     /**
      * skipEqualityCheck used for genesis transactions
      */
-    public static boolean verifySignature(AccountBasedTransactionRequest transactionRequest, boolean skipEqualityCheck, Blockchain blockchain) {
+    public static boolean verifySignature(AccountTransactionRequest transactionRequest, boolean skipEqualityCheck, Blockchain blockchain) {
         String transactionOutputsHash = transactionRequest.generateTransactionOutputsHash();
         try {
             PublicKey publicKey = Encoder.decodeToPublicKey(transactionRequest.getPublicKeyAddress());
@@ -37,9 +37,9 @@ public class AccountBasedTransactionVerification {
         return true;
     }
 
-    private static boolean hasBalance(AccountBasedTransactionRequest transactionRequest, Blockchain blockchain) {
+    private static boolean hasBalance(AccountTransactionRequest transactionRequest, Blockchain blockchain) {
         long sum = 0L;
-        for (AccountBasedTransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
+        for (AccountTransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
             sum += transactionOutput.getValue();
         }
 

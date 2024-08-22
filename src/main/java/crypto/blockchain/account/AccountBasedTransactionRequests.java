@@ -8,13 +8,13 @@ import java.util.List;
 
 public class AccountBasedTransactionRequests implements BlockDataHashable {
 
-    List<AccountBasedTransactionRequest> transactionRequests;
+    List<AccountTransactionRequest> transactionRequests;
 
-    public AccountBasedTransactionRequests(List<AccountBasedTransactionRequest> transactionRequests) {
+    public AccountBasedTransactionRequests(List<AccountTransactionRequest> transactionRequests) {
         this.transactionRequests = transactionRequests;
     }
 
-    public List<AccountBasedTransactionRequest> getTransactionRequests() {
+    public List<AccountTransactionRequest> getTransactionRequests() {
         return transactionRequests;
     }
 

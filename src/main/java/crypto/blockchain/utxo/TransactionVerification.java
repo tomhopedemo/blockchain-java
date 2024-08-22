@@ -1,5 +1,6 @@
 package crypto.blockchain.utxo;
 
+import crypto.blockchain.api.BlockchainData;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;
@@ -11,13 +12,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class TransactionVerification {
 
-    TransactionCache transactionCache;
-
-    public TransactionVerification(TransactionCache transactionCache) {
-        this.transactionCache = transactionCache;
-    }
-
-    public boolean verifySignature(TransactionRequest transactionRequest, boolean skipEqualityCheckForGenesisTransactions) {
+    public static boolean verifySignature(TransactionRequest transactionRequest, boolean skipEqualityCheckForGenesisTransactions, String id) {
+        TransactionCache transactionCache = BlockchainData.getTransactionCache(id);
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
             String transactionOutputHash = transactionInput.getTransactionOutputHash();
             TransactionOutput transactionOutput = transactionCache.get(transactionOutputHash);
@@ -36,7 +32,7 @@ public class TransactionVerification {
         }
 
         if (!skipEqualityCheckForGenesisTransactions) {
-            boolean inputSumEqualToOutputSum = isInputSumEqualToOutputSum(transactionRequest);
+            boolean inputSumEqualToOutputSum = isInputSumEqualToOutputSum(transactionRequest, id);
             if (!inputSumEqualToOutputSum) {
                 return false;
             }
@@ -45,7 +41,8 @@ public class TransactionVerification {
         return true;
     }
 
-    private boolean isInputSumEqualToOutputSum(TransactionRequest transactionRequest) {
+    private static boolean isInputSumEqualToOutputSum(TransactionRequest transactionRequest, String id) {
+        TransactionCache transactionCache = BlockchainData.getTransactionCache(id);
         long sum = 0L;
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
             TransactionOutput transactionOutput = transactionCache.get(transactionInput.getTransactionOutputHash());

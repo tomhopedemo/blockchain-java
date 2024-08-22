@@ -22,13 +22,28 @@ public class ApiController {
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
-    @GetMapping("/blockchain/{id}")
-    String blockchain(@PathVariable("id") String id) {
+    @GetMapping("/create/{id}")
+    String create(@PathVariable("id") String id) {
         try {
             BlockchainType type = BlockchainType.MULTI_ACCOUNT;
             Blockchain blockchain = BlockchainService.getBlockchain(type, id);
             if (blockchain == null) {
-                blockchain = BlockchainService.createBlockchain(id, type, 1, 100L);
+                blockchain = BlockchainService.createBlockchain(id, type);
+            }
+            return new GsonBuilder().create().toJson(blockchain);
+        } catch (BlockchainException e){
+            return null;
+        }
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping("/genesis/{id}")
+    String genesis(@PathVariable("id") String id) {
+        try {
+            BlockchainType type = BlockchainType.MULTI_ACCOUNT;
+            Blockchain blockchain = BlockchainService.getBlockchain(type, id);
+            if (blockchain == null) {
+                blockchain = BlockchainService.createGenesisBlock(id, type, 100L);
             }
             return new GsonBuilder().create().toJson(blockchain);
         } catch (BlockchainException e){

@@ -12,14 +12,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class TransactionRequestFactory {
 
-    TransactionCache transactionCache;
-
-    public TransactionRequestFactory(TransactionCache transactionCache) {
-        this.transactionCache = transactionCache;
-    }
-
-    public Optional<TransactionRequest> createTransactionRequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue) {
-        Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(wallet);
+    public static Optional<TransactionRequest> createTransactionRequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue, TransactionCache transactionCache) {
+        Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(wallet, transactionCache);
         long balance = getBalance(unspentTransactionOutputsById);
         if (balance < transactionValue) {
             return Optional.empty();
@@ -55,7 +49,7 @@ public class TransactionRequestFactory {
         return balance;
     }
 
-    public Map<String, TransactionOutput> getTransactionOutputsById(Wallet wallet) {
+    public static Map<String, TransactionOutput> getTransactionOutputsById(Wallet wallet, TransactionCache transactionCache) {
         Map<String, TransactionOutput> transactionOutputsById = new HashMap<>();
         for (Map.Entry<String, TransactionOutput> item: transactionCache.entrySet()){
             TransactionOutput transactionOutput = item.getValue();
@@ -66,7 +60,7 @@ public class TransactionRequestFactory {
         return transactionOutputsById;
     }
 
-    public TransactionRequest genesisTransaction(Wallet walletA, long genesisTransactionValue) {
+    public static TransactionRequest genesisTransaction(Wallet walletA, long genesisTransactionValue, TransactionCache transactionCache) {
         TransactionOutput genesisTransactionOutput = new TransactionOutput(walletA.publicKeyAddress, genesisTransactionValue);
         List<TransactionOutput> transactionOutputs = List.of(genesisTransactionOutput);
         TransactionRequest genesisTransactionRequest = new TransactionRequest(new ArrayList<>(), transactionOutputs);

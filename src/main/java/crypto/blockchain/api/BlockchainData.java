@@ -44,8 +44,8 @@ public class BlockchainData {
         walletCaches.get(id).addWallet(wallet);
     }
 
-    public static void addTransactionCache(String id, TransactionCache transactionCache){
-        transactionCaches.put(id, transactionCache);
+    public static void addTransactionCache(String id){
+        transactionCaches.put(id, new TransactionCache());
     }
 
     public static void addAccountBalanceCache(String id, AccountBalanceCache accountBalanceCache){

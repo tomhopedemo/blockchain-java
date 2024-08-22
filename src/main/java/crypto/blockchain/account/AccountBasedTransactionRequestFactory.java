@@ -1,6 +1,7 @@
 package crypto.blockchain.account;
 
 import crypto.blockchain.*;
+import crypto.blockchain.api.BlockchainData;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 
@@ -12,20 +13,21 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AccountBasedTransactionRequestFactory {
 
-    public static Optional<AccountBasedTransactionRequest> createTransactionRequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue, AccountBalanceCache accountBalanceCache) throws BlockchainException {
+    public static Optional<AccountTransactionRequest> createTransactionRequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue, String id) throws BlockchainException {
+        AccountBalanceCache accountBalanceCache = BlockchainData.getAccountBalanceCache(id);
         Long balance = accountBalanceCache.get(wallet.getPublicKeyAddress());
         if (balance < transactionValue) {
             return Optional.empty();
         }
-        List<AccountBasedTransactionOutput> transactionOutputs = new ArrayList<>();
-        transactionOutputs.add(new AccountBasedTransactionOutput(recipientPublicKeyAddress, transactionValue));
-        AccountBasedTransactionRequest transactionRequest = new AccountBasedTransactionRequest(wallet.publicKeyAddress, transactionOutputs);
+        List<AccountTransactionOutput> transactionOutputs = new ArrayList<>();
+        transactionOutputs.add(new AccountTransactionOutput(recipientPublicKeyAddress, transactionValue));
+        AccountTransactionRequest transactionRequest = new AccountTransactionRequest(wallet.publicKeyAddress, transactionOutputs);
         byte[] signature = calculateSignature(transactionRequest, wallet);
         transactionRequest.setSignature(signature);
         return Optional.of(transactionRequest);
     }
 
-    public static byte[] calculateSignature(AccountBasedTransactionRequest transactionRequest, Wallet wallet) throws BlockchainException{
+    public static byte[] calculateSignature(AccountTransactionRequest transactionRequest, Wallet wallet) throws BlockchainException{
         String transactionOutputsHash = transactionRequest.generateTransactionOutputsHash();
         byte[] preSignature = transactionOutputsHash.getBytes(UTF_8);
         try {
@@ -36,9 +38,9 @@ public class AccountBasedTransactionRequestFactory {
         }
     }
 
-    public static AccountBasedTransactionRequest genesisTransaction(Wallet genesis, long genesisTransactionValue)  {
-        AccountBasedTransactionOutput genesisTransactionOutput = new AccountBasedTransactionOutput(genesis.getPublicKeyAddress(), genesisTransactionValue);
-        return new AccountBasedTransactionRequest(null, List.of(genesisTransactionOutput));
+    public static AccountTransactionRequest genesisTransaction(Wallet genesis, long genesisTransactionValue)  {
+        AccountTransactionOutput genesisTransactionOutput = new AccountTransactionOutput(genesis.getPublicKeyAddress(), genesisTransactionValue);
+        return new AccountTransactionRequest(null, List.of(genesisTransactionOutput));
     }
 
 }

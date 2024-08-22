@@ -6,14 +6,14 @@ import crypto.hashing.Hashing;
 
 import java.util.List;
 
-public class AccountBasedTransactionRequest implements BlockDataHashable {
+public class AccountTransactionRequest implements BlockDataHashable {
 
     public String publicKeyAddress;
-    public List<AccountBasedTransactionOutput> transactionOutputs;
+    public List<AccountTransactionOutput> transactionOutputs;
     public String transactionRequestHashHex;
     public String signature;
 
-    public AccountBasedTransactionRequest(String publicKeyAddress, List<AccountBasedTransactionOutput> transactionOutputs) {
+    public AccountTransactionRequest(String publicKeyAddress, List<AccountTransactionOutput> transactionOutputs) {
         this.publicKeyAddress = publicKeyAddress;
         this.transactionOutputs = transactionOutputs;
         this.transactionRequestHashHex = Encoder.encodeToHexadecimal(calculateTransactionHash());
@@ -25,7 +25,7 @@ public class AccountBasedTransactionRequest implements BlockDataHashable {
         return Hashing.hash(preHash);
     }
 
-    public List<AccountBasedTransactionOutput> getTransactionOutputs() {
+    public List<AccountTransactionOutput> getTransactionOutputs() {
         return transactionOutputs;
     }
 

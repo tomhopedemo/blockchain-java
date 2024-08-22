@@ -4,12 +4,12 @@ import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
 
 
-public class AccountBasedTransactionOutput {
+public class AccountTransactionOutput {
 
     String recipient;
     String value;
 
-    public AccountBasedTransactionOutput(String recipientPublicKeyAddress, long value) {
+    public AccountTransactionOutput(String recipientPublicKeyAddress, long value) {
         this.recipient = recipientPublicKeyAddress;
         this.value = String.valueOf(value);
     }

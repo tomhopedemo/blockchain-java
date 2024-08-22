@@ -38,9 +38,4 @@ public class AccountBasedTransactionRequestFactory {
         }
     }
 
-    public static AccountTransactionRequest genesisTransaction(Wallet genesis, long genesisTransactionValue)  {
-        AccountTransactionOutput genesisTransactionOutput = new AccountTransactionOutput(genesis.getPublicKeyAddress(), genesisTransactionValue);
-        return new AccountTransactionRequest(null, List.of(genesisTransactionOutput));
-    }
-
 }

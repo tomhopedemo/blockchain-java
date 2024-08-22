@@ -13,10 +13,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AccountBasedTransactionVerification {
 
-    /**
-     * skipEqualityCheck used for genesis transactions
-     */
-    public static boolean verifySignature(AccountTransactionRequest transactionRequest, boolean skipEqualityCheck, Blockchain blockchain) {
+    public static boolean verifySignature(AccountTransactionRequest transactionRequest, boolean skipEqualityCheck, String id) {
         String transactionOutputsHash = transactionRequest.generateTransactionOutputsHash();
         try {
             PublicKey publicKey = Encoder.decodeToPublicKey(transactionRequest.getPublicKeyAddress());
@@ -28,8 +25,8 @@ public class AccountBasedTransactionVerification {
             return false;
         }
 
-        if (!skipEqualityCheck) {
-            boolean hasBalance = hasBalance(transactionRequest, blockchain);
+        if (!skipEqualityCheck) { //genesis transactions
+            boolean hasBalance = hasBalance(transactionRequest, id);
             if (!hasBalance) {
                 return false;
             }
@@ -37,13 +34,13 @@ public class AccountBasedTransactionVerification {
         return true;
     }
 
-    private static boolean hasBalance(AccountTransactionRequest transactionRequest, Blockchain blockchain) {
+    private static boolean hasBalance(AccountTransactionRequest transactionRequest, String id) {
         long sum = 0L;
         for (AccountTransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
             sum += transactionOutput.getValue();
         }
 
-        Long balance = BlockchainData.getAccountBalanceCache(blockchain.getId()).get(transactionRequest.getPublicKeyAddress());
+        Long balance = BlockchainData.getAccountBalanceCache(id).get(transactionRequest.getPublicKeyAddress());
         return balance >= sum;
     }
 

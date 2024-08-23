@@ -3,6 +3,7 @@ package crypto.blockchain.api;
 import crypto.blockchain.Blockchain;
 import crypto.blockchain.BlockchainException;
 import crypto.blockchain.ComboBlockchain;
+import crypto.blockchain.Wallet;
 import crypto.blockchain.account.AccountBlockchain;
 import crypto.blockchain.account.MultiAccountBasedBlockchain;
 import crypto.blockchain.simple.SimpleBlockchain;
@@ -27,21 +28,21 @@ public class BlockchainService {
         return Data.getBlockchain(id);
     }
 
-    public static Blockchain createGenesisBlock(String id, BlockchainType type, Long genesisValue) throws BlockchainException {
+    public static Blockchain createGenesisBlock(String id, BlockchainType type, Long genesisValue, String publicKey) throws BlockchainException {
         switch(type){
             case SIMPLE -> SimpleBlockchain.genesis(id);
-            case ACCOUNT -> AccountBlockchain.genesis(id, genesisValue);
-            case MULTI_ACCOUNT -> MultiAccountBasedBlockchain.genesis(id, genesisValue);
-            case UTXO ->  TransactionBlockchain.genesis(id, genesisValue);
-            case MULTI_UTXO -> MultiTransactionalBlockchain.genesis(id, genesisValue);
+            case ACCOUNT -> AccountBlockchain.genesis(id, genesisValue, publicKey);
+            case MULTI_ACCOUNT -> MultiAccountBasedBlockchain.genesis(id, genesisValue, publicKey);
+            case UTXO ->  TransactionBlockchain.genesis(id, genesisValue, publicKey);
+            case MULTI_UTXO -> MultiTransactionalBlockchain.genesis(id, genesisValue, publicKey);
         }
         return Data.getBlockchain(id);
     }
 
-    public static Blockchain simulateBlocks(BlockchainType type, String id, int numBlocks, int difficulty) throws BlockchainException {
+    public static Blockchain simulateBlocks(BlockchainType type, String id, int numBlocks, int difficulty, Wallet from) throws BlockchainException {
         switch(type){
             case SIMPLE -> SimpleBlockchain.simulate(id, numBlocks, difficulty);
-            case ACCOUNT -> AccountBlockchain.simulate(id, numBlocks, difficulty);
+            case ACCOUNT -> AccountBlockchain.simulate(id, numBlocks, difficulty, from);
             case MULTI_ACCOUNT -> MultiAccountBasedBlockchain.simulate(id, numBlocks, difficulty);
             case UTXO -> TransactionBlockchain.simulate(id, difficulty);
             case MULTI_UTXO -> MultiTransactionalBlockchain.simulate(id, numBlocks, difficulty);

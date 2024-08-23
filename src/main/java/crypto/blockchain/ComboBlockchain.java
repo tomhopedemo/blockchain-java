@@ -12,17 +12,10 @@ public class ComboBlockchain {
         Data.addWalletCache(id);
     }
 
-
-    //multiple genesis accounts - and so we're no longer going to maintain genesis.
-    //the generation of genesis account will require a genesis key to be sent/will return the key.
-    public static void genesis(String id, long value) throws BlockchainException {
-        Wallet genesis = Wallet.generate();
-        Data.addGenesisWallet(id, genesis);
-
+    public static void genesis(String id, long value, String genesisKey) throws BlockchainException {
         TransactionCache transactionCache = Data.getTransactionCache(id);
-        TransactionRequest transactionRequest = TransactionRequestFactory.genesisTransaction(genesis, value, transactionCache);
+        TransactionRequest transactionRequest = TransactionRequestFactory.genesisTransaction(genesisKey, value, transactionCache);
         TransactionBlockchain.mineNextBlock(transactionRequest, id, 1);
     }
-
 
 }

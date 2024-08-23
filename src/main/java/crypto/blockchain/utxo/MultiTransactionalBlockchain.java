@@ -14,11 +14,9 @@ public class MultiTransactionalBlockchain {
         Data.addWalletCache(id);
     }
 
-    public static void genesis(String id, long value) throws BlockchainException {
-        Wallet genesis = Wallet.generate();
-        Data.addGenesisWallet(id, genesis);
+    public static void genesis(String id, long value, String genesisKey) throws BlockchainException {
         TransactionCache transactionCache = Data.getTransactionCache(id);
-        TransactionRequest genesisTransactionRequest = TransactionRequestFactory.genesisTransaction(genesis, value, transactionCache);
+        TransactionRequest genesisTransactionRequest = TransactionRequestFactory.genesisTransaction(genesisKey, value, transactionCache);
         mineNextBlock(new TransactionRequests(List.of(genesisTransactionRequest)), id, 1);
     }
 

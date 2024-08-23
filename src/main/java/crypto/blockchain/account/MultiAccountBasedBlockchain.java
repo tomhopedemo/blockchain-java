@@ -14,10 +14,8 @@ public class MultiAccountBasedBlockchain {
         Data.addWalletCache(blockchain.getId());
     }
 
-    public static void genesis(String id, long value) throws BlockchainException {
-        Wallet wallet = Wallet.generate();
-        Data.addGenesisWallet(id, wallet);
-        AccountTransactionOutput transactionOutput = new AccountTransactionOutput(wallet.getPublicKeyAddress(), value);
+    public static void genesis(String id, long value, String genesisKey) throws BlockchainException {
+        AccountTransactionOutput transactionOutput = new AccountTransactionOutput(genesisKey, value);
         AccountTransactionRequests requests = new AccountTransactionRequests(List.of(new AccountTransactionRequest(null, List.of(transactionOutput))));
         mineNextBlock(requests, id, 1);
     }

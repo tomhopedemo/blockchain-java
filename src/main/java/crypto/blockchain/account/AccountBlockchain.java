@@ -14,20 +14,17 @@ public class AccountBlockchain {
         Data.addAccountBalanceCache(blockchain.getId());
     }
 
-    public static void genesis(String id, long value) throws BlockchainException {
-        Wallet wallet = Wallet.generate();
-        Data.addGenesisWallet(id, wallet);
-        AccountTransactionOutput transactionOutput = new AccountTransactionOutput(wallet.getPublicKeyAddress(), value);
+    public static void genesis(String id, long value, String genesisKey) throws BlockchainException {
+        AccountTransactionOutput transactionOutput = new AccountTransactionOutput(genesisKey, value);
         AccountTransactionRequest request = new AccountTransactionRequest(null, List.of(transactionOutput));
         mineNextBlock(request, id, 1);
     }
 
-    public static void simulate(String id, int numBlocks, int difficulty) throws BlockchainException {
+    public static void simulate(String id, int numBlocks, int difficulty, Wallet from) throws BlockchainException {
         Wallet wallet = Wallet.generate();
         Data.addWallet(id, wallet);
-        Wallet genesis = Data.getGenesisWallet(id); //simulate will require a key to be passed in
         for (int i = 0; i < numBlocks; i++) {
-            AccountTransactionRequest transactionRequest = AccountTransactionRequestFactory.createTransactionRequest(genesis, wallet.publicKeyAddress, 5, id).get();
+            AccountTransactionRequest transactionRequest = AccountTransactionRequestFactory.createTransactionRequest(from, wallet.getPublicKeyAddress(), 5, id).get();
             mineNextBlock(transactionRequest, id, difficulty);
         }
     }

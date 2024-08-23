@@ -4,12 +4,10 @@ import com.google.gson.GsonBuilder;
 import crypto.blockchain.Blockchain;
 import crypto.blockchain.BlockchainException;
 import crypto.blockchain.BlockchainValidator;
+import crypto.blockchain.Wallet;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Security;
 /**
@@ -30,7 +28,7 @@ public class ApiController {
 
 
     @CrossOrigin(origins = "http://localhost:3000")
-    @GetMapping("/create/{id}")
+    @GetMapping("/combo/{id}")
     String combo(@PathVariable("id") String id) {
         try {
             BlockchainType type = BlockchainType.COMBO;
@@ -42,6 +40,13 @@ public class ApiController {
         } catch (BlockchainException e){
             return null;
         }
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping("/wallet")
+    String wallet() {
+        Wallet wallet = Wallet.generate();
+        return new GsonBuilder().create().toJson(wallet);
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
@@ -61,12 +66,12 @@ public class ApiController {
 
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/genesis/{id}")
-    String genesis(@PathVariable("id") String id) {
+    String genesis(@PathVariable("id") String id, @RequestParam("publicKey") String publicKey) {
         try {
             BlockchainType type = BlockchainType.MULTI_ACCOUNT;
             Blockchain blockchain = BlockchainService.getBlockchain(id);
             if (blockchain != null) {
-                blockchain = BlockchainService.createGenesisBlock(id, type, 100L);
+                blockchain = BlockchainService.createGenesisBlock(id, type, 100L, publicKey);
             }
             return new GsonBuilder().create().toJson(blockchain);
         } catch (BlockchainException e){
@@ -81,7 +86,8 @@ public class ApiController {
             BlockchainType type = BlockchainType.MULTI_ACCOUNT;
             Blockchain blockchain = BlockchainService.getBlockchain(id);
             if (blockchain != null) {
-                blockchain = BlockchainService.simulateBlocks(type, id, 1, 1);
+                Wallet from = Data.getGenesisWallet(id);
+                blockchain = BlockchainService.simulateBlocks(type, id, 1, 1, from);
                 BlockchainValidator.validate(blockchain);
             }
             return new GsonBuilder().create().toJson(blockchain);

@@ -60,8 +60,8 @@ public class TransactionRequestFactory {
         return transactionOutputsById;
     }
 
-    public static TransactionRequest genesisTransaction(Wallet walletA, long genesisTransactionValue, TransactionCache transactionCache) {
-        TransactionOutput genesisTransactionOutput = new TransactionOutput(walletA.publicKeyAddress, genesisTransactionValue);
+    public static TransactionRequest genesisTransaction(String genesisKey, long genesisTransactionValue, TransactionCache transactionCache) {
+        TransactionOutput genesisTransactionOutput = new TransactionOutput(genesisKey, genesisTransactionValue);
         List<TransactionOutput> transactionOutputs = List.of(genesisTransactionOutput);
         TransactionRequest genesisTransactionRequest = new TransactionRequest(new ArrayList<>(), transactionOutputs);
         String transactionOutputHash = genesisTransactionOutput.generateTransactionOutputHash(genesisTransactionRequest.getTransactionRequestHash());

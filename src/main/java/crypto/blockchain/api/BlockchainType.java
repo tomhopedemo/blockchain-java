@@ -5,5 +5,6 @@ public enum BlockchainType {
     ACCOUNT,
     MULTI_ACCOUNT,
     UTXO,
-    MULTI_UTXO
+    MULTI_UTXO,
+    COMBO
 }

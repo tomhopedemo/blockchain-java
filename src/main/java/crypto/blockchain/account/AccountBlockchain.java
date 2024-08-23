@@ -1,23 +1,22 @@
 package crypto.blockchain.account;
 
 import crypto.blockchain.*;
-import crypto.blockchain.api.BlockchainData;
-import crypto.blockchain.api.BlockchainType;
+import crypto.blockchain.api.Data;
 
 import java.util.List;
 
-public class AccountBasedBlockchain {
+public class AccountBlockchain {
 
     public static void create(String id){
         Blockchain blockchain = new Blockchain(id);
-        BlockchainData.addBlockchain(BlockchainType.ACCOUNT, blockchain);
-        BlockchainData.addWalletCache(blockchain.getId());
-        BlockchainData.addAccountBalanceCache(blockchain.getId());
+        Data.addBlockchain(blockchain);
+        Data.addWalletCache(blockchain.getId());
+        Data.addAccountBalanceCache(blockchain.getId());
     }
 
     public static void genesis(String id, long value) throws BlockchainException {
         Wallet wallet = Wallet.generate();
-        BlockchainData.addGenesisWallet(id, wallet);
+        Data.addGenesisWallet(id, wallet);
         AccountTransactionOutput transactionOutput = new AccountTransactionOutput(wallet.getPublicKeyAddress(), value);
         AccountTransactionRequest request = new AccountTransactionRequest(null, List.of(transactionOutput));
         mineNextBlock(request, id, 1);
@@ -25,22 +24,22 @@ public class AccountBasedBlockchain {
 
     public static void simulate(String id, int numBlocks, int difficulty) throws BlockchainException {
         Wallet wallet = Wallet.generate();
-        BlockchainData.addWallet(id, wallet);
-        Wallet genesis = BlockchainData.getGenesisWallet(id);
+        Data.addWallet(id, wallet);
+        Wallet genesis = Data.getGenesisWallet(id); //simulate will require a key to be passed in
         for (int i = 0; i < numBlocks; i++) {
-            AccountTransactionRequest transactionRequest = AccountBasedTransactionRequestFactory.createTransactionRequest(genesis, wallet.publicKeyAddress, 5, id).get();
+            AccountTransactionRequest transactionRequest = AccountTransactionRequestFactory.createTransactionRequest(genesis, wallet.publicKeyAddress, 5, id).get();
             mineNextBlock(transactionRequest, id, difficulty);
         }
     }
 
     public static void mineNextBlock(AccountTransactionRequest transactionRequest, String id, int difficulty) {
-        Blockchain blockchain = BlockchainData.getBlockchain(BlockchainType.ACCOUNT, id);
+        Blockchain blockchain = Data.getBlockchain(id);
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
         boolean isGenesis = mostRecentBlock == null;
         //Verification on inputs
         if (!isGenesis){
-            boolean verified = AccountBasedTransactionVerification.verifySignature(transactionRequest, false, id);
+            boolean verified = AccountTransactionVerification.verifySignature(transactionRequest, false, id);
             if (!verified){
                 return;
             }
@@ -52,9 +51,9 @@ public class AccountBasedBlockchain {
 
         //Update Caches
         for (AccountTransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
-            BlockchainData.getAccountBalanceCache(blockchain.getId()).add(transactionOutput.getRecipient(), transactionOutput.getValue());
+            Data.getAccountBalanceCache(blockchain.getId()).add(transactionOutput.getRecipient(), transactionOutput.getValue());
             if (!isGenesis) {
-                BlockchainData.getAccountBalanceCache(blockchain.getId()).subtract(transactionRequest.getPublicKeyAddress(), transactionOutput.getValue());
+                Data.getAccountBalanceCache(blockchain.getId()).subtract(transactionRequest.getPublicKeyAddress(), transactionOutput.getValue());
             }
         }
     }

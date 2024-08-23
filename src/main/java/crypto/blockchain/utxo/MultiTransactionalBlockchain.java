@@ -1,7 +1,7 @@
 package crypto.blockchain.utxo;
 
 import crypto.blockchain.*;
-import crypto.blockchain.api.BlockchainData;
+import crypto.blockchain.api.Data;
 import crypto.blockchain.api.BlockchainType;
 
 import java.util.*;
@@ -9,23 +9,23 @@ import java.util.*;
 public class MultiTransactionalBlockchain {
 
     public static void create(String id){
-        BlockchainData.addBlockchain(BlockchainType.MULTI_UTXO, new Blockchain(id));
-        BlockchainData.addTransactionCache(id);
-        BlockchainData.addWalletCache(id);
+        Data.addBlockchain(new Blockchain(id));
+        Data.addTransactionCache(id);
+        Data.addWalletCache(id);
     }
 
     public static void genesis(String id, long value) throws BlockchainException {
         Wallet genesis = Wallet.generate();
-        BlockchainData.addGenesisWallet(id, genesis);
-        TransactionCache transactionCache = BlockchainData.getTransactionCache(id);
+        Data.addGenesisWallet(id, genesis);
+        TransactionCache transactionCache = Data.getTransactionCache(id);
         TransactionRequest genesisTransactionRequest = TransactionRequestFactory.genesisTransaction(genesis, value, transactionCache);
         mineNextBlock(new TransactionRequests(List.of(genesisTransactionRequest)), id, 1);
     }
 
     public static void simulate(String id, int numBlocks, int difficulty) {
-        Blockchain blockchain = BlockchainData.getBlockchain(BlockchainType.MULTI_UTXO, id);
+        Blockchain blockchain = Data.getBlockchain(id);
         Wallet wallet = Wallet.generate();
-        Wallet genesis = BlockchainData.getGenesisWallet(id);
+        Wallet genesis = Data.getGenesisWallet(id);
         List<TransactionRequest> transactionRequestsQueue = new ArrayList<>();
         for (int i = 0; i < numBlocks; i++) {
             createAndRegisterSimpleTransactionRequest(genesis, wallet, transactionRequestsQueue, 5, id);
@@ -38,11 +38,11 @@ public class MultiTransactionalBlockchain {
                 transactionRequestsQueue.removeAll(transactionRequestsForNextBlock.get().getTransactionRequests());
             }
         }
-        BlockchainData.addWallet(blockchain.getId(), wallet);
+        Data.addWallet(blockchain.getId(), wallet);
     }
 
     private static void createAndRegisterSimpleTransactionRequest(Wallet walletA, Wallet walletB, List<TransactionRequest> transactionRequestsQueue, int value, String id) {
-        TransactionCache transactionCache = BlockchainData.getTransactionCache(id);
+        TransactionCache transactionCache = Data.getTransactionCache(id);
         Optional<TransactionRequest> transactionRequestOptional = TransactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, value, transactionCache);
         if (transactionRequestOptional.isPresent()){
             TransactionRequest transactionRequest = transactionRequestOptional.get();
@@ -53,7 +53,7 @@ public class MultiTransactionalBlockchain {
     public static Optional<TransactionRequests> constructTransactionRequestsForNextBlock(List<TransactionRequest> availableTransactionRequests, String id) {
         Set<String> inputsToInclude = new HashSet<>();
         List<TransactionRequest> transactionRequestsToInclude = new ArrayList<>();
-        TransactionCache transactionCache = BlockchainData.getTransactionCache(id);
+        TransactionCache transactionCache = Data.getTransactionCache(id);
         for (TransactionRequest transactionRequest : availableTransactionRequests) {
             //verify signature
             boolean verified = TransactionVerification.verifySignature(transactionRequest, false, id);
@@ -94,8 +94,8 @@ public class MultiTransactionalBlockchain {
     }
 
     public static void mineNextBlock(TransactionRequests transactionRequests, String id, int difficulty) {
-        Blockchain blockchain = BlockchainData.getBlockchain(BlockchainType.MULTI_UTXO, id);
-        TransactionCache transactionCache = BlockchainData.getTransactionCache(id);
+        Blockchain blockchain = Data.getBlockchain(id);
+        TransactionCache transactionCache = Data.getTransactionCache(id);
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
         boolean skipEqualityCheck = mostRecentBlock == null; //indicative of genesis block - will tidy
@@ -142,7 +142,7 @@ public class MultiTransactionalBlockchain {
     }
 
     private static boolean checkInputSumEqualToOutputSum(TransactionRequest transactionRequest, String id) {
-        TransactionCache transactionCache = BlockchainData.getTransactionCache(id);
+        TransactionCache transactionCache = Data.getTransactionCache(id);
         long sumOfInputs = 0L;
         long sumOfOutputs = 0L;
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {

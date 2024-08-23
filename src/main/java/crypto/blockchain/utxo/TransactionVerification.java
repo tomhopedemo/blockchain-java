@@ -1,6 +1,6 @@
 package crypto.blockchain.utxo;
 
-import crypto.blockchain.api.BlockchainData;
+import crypto.blockchain.api.Data;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;
@@ -13,7 +13,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class TransactionVerification {
 
     public static boolean verifySignature(TransactionRequest transactionRequest, boolean skipEqualityCheckForGenesisTransactions, String id) {
-        TransactionCache transactionCache = BlockchainData.getTransactionCache(id);
+        TransactionCache transactionCache = Data.getTransactionCache(id);
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
             String transactionOutputHash = transactionInput.getTransactionOutputHash();
             TransactionOutput transactionOutput = transactionCache.get(transactionOutputHash);

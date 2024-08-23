@@ -9,27 +9,23 @@ import crypto.blockchain.utxo.TransactionCache;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class BlockchainData {
+public class Data {
 
-    static Map<BlockchainType, Map<String, Blockchain>> blockchains;
-
+    static Map<String, Blockchain> blockchains;
     static Map<String, AccountBalanceCache> accountBalanceCaches;
     static Map<String, TransactionCache> transactionCaches;
     static Map<String, WalletCache> walletCaches;
 
     static {
         blockchains = new ConcurrentHashMap<>();
-        for (BlockchainType blockchainType : BlockchainType.values()) {
-            blockchains.put(blockchainType, new ConcurrentHashMap<>());
-        }
         accountBalanceCaches = new ConcurrentHashMap<>();
         transactionCaches = new ConcurrentHashMap<>();
         walletCaches = new ConcurrentHashMap<>();
     }
 
 
-    public static void addBlockchain(BlockchainType type, Blockchain blockchain) {
-        blockchains.get(type).put(blockchain.id, blockchain);
+    public static void addBlockchain(Blockchain blockchain) {
+        blockchains.put(blockchain.id, blockchain);
     }
 
     public static void addGenesisWallet(String id, Wallet genesis) {
@@ -52,8 +48,8 @@ public class BlockchainData {
         accountBalanceCaches.put(id, new AccountBalanceCache());
     }
 
-    public static Blockchain getBlockchain(BlockchainType blockchainType, String id){
-        return blockchains.get(blockchainType).get(id);
+    public static Blockchain getBlockchain(String id){
+        return blockchains.get(id);
     }
 
     public static TransactionCache getTransactionCache(String id){

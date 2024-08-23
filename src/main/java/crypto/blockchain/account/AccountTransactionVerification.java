@@ -1,7 +1,6 @@
 package crypto.blockchain.account;
 
-import crypto.blockchain.Blockchain;
-import crypto.blockchain.api.BlockchainData;
+import crypto.blockchain.api.Data;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;
@@ -11,7 +10,7 @@ import java.security.PublicKey;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class AccountBasedTransactionVerification {
+public class AccountTransactionVerification {
 
     public static boolean verifySignature(AccountTransactionRequest transactionRequest, boolean skipEqualityCheck, String id) {
         String transactionOutputsHash = transactionRequest.generateTransactionOutputsHash();
@@ -40,7 +39,7 @@ public class AccountBasedTransactionVerification {
             sum += transactionOutput.getValue();
         }
 
-        Long balance = BlockchainData.getAccountBalanceCache(id).get(transactionRequest.getPublicKeyAddress());
+        Long balance = Data.getAccountBalanceCache(id).get(transactionRequest.getPublicKeyAddress());
         return balance >= sum;
     }
 

@@ -6,11 +6,11 @@ import crypto.hashing.Hashing;
 
 import java.util.List;
 
-public class AccountBasedTransactionRequests implements BlockDataHashable {
+public class AccountTransactionRequests implements BlockDataHashable {
 
     List<AccountTransactionRequest> transactionRequests;
 
-    public AccountBasedTransactionRequests(List<AccountTransactionRequest> transactionRequests) {
+    public AccountTransactionRequests(List<AccountTransactionRequest> transactionRequests) {
         this.transactionRequests = transactionRequests;
     }
 

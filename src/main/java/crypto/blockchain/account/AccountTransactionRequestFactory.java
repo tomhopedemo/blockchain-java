@@ -1,7 +1,7 @@
 package crypto.blockchain.account;
 
 import crypto.blockchain.*;
-import crypto.blockchain.api.BlockchainData;
+import crypto.blockchain.api.Data;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 
@@ -11,10 +11,10 @@ import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class AccountBasedTransactionRequestFactory {
+public class AccountTransactionRequestFactory {
 
     public static Optional<AccountTransactionRequest> createTransactionRequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue, String id) throws BlockchainException {
-        AccountBalanceCache accountBalanceCache = BlockchainData.getAccountBalanceCache(id);
+        AccountBalanceCache accountBalanceCache = Data.getAccountBalanceCache(id);
         Long balance = accountBalanceCache.get(wallet.getPublicKeyAddress());
         if (balance < transactionValue) {
             return Optional.empty();

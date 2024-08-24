@@ -3,32 +3,32 @@ package crypto.blockchain.utxo;
 import crypto.blockchain.*;
 import crypto.blockchain.api.Data;
 
-public class TransactionBlockchain {
+public record TransactionChain(String id) {
 
-    public static void create(String id){
+    public void create(){
         Blockchain blockchain = new Blockchain(id);
         Data.addBlockchain(blockchain);
         Data.addWalletCache(id);
         Data.addTransactionCache(id);
     }
 
-    public static void genesis(String id, long value, String genesisKey) {
+    public void genesis(long value, String genesisKey) {
         TransactionCache transactionCache = Data.getTransactionCache(id);
         TransactionRequest genesisTransactionRequest = TransactionRequestFactory.genesisTransaction(genesisKey, value, transactionCache);
-        mineNextBlock(genesisTransactionRequest, id);
+        mineNextBlock(genesisTransactionRequest);
     }
 
-    public static void simulate(String id) {
+    public void simulate() {
         Wallet wallet = Wallet.generate();
         Wallet genesis = Data.getGenesisWallet(id);
         Blockchain blockchain = Data.getBlockchain(id);
         TransactionCache transactionCache = Data.getTransactionCache(id);
         TransactionRequest transactionRequest = TransactionRequestFactory.createTransactionRequest(genesis, wallet.getPublicKeyAddress(), 5, transactionCache).get();
-        mineNextBlock(transactionRequest, id);
+        mineNextBlock(transactionRequest);
         Data.addWallet(blockchain.getId(), wallet);
     }
 
-    public static void mineNextBlock(TransactionRequest transactionRequest, String id) {
+    public void mineNextBlock(TransactionRequest transactionRequest) {
         Blockchain blockchain = Data.getBlockchain(id);
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();

@@ -2,25 +2,24 @@ package crypto.blockchain.utxo;
 
 import crypto.blockchain.*;
 import crypto.blockchain.api.Data;
-import crypto.blockchain.api.BlockchainType;
 
 import java.util.*;
 
-public class MultiTransactionalBlockchain {
+public record MultiTransactionChain(String id){
 
-    public static void create(String id){
+    public void create(){
         Data.addBlockchain(new Blockchain(id));
         Data.addTransactionCache(id);
         Data.addWalletCache(id);
     }
 
-    public static void genesis(String id, long value, String genesisKey) throws BlockchainException {
+    public void genesis(long value, String genesisKey) throws BlockchainException {
         TransactionCache transactionCache = Data.getTransactionCache(id);
         TransactionRequest genesisTransactionRequest = TransactionRequestFactory.genesisTransaction(genesisKey, value, transactionCache);
         mineNextBlock(new TransactionRequests(List.of(genesisTransactionRequest)), id, 1);
     }
 
-    public static void simulate(String id) {
+    public void simulate() {
         Blockchain blockchain = Data.getBlockchain(id);
         Wallet wallet = Wallet.generate();
         Wallet genesis = Data.getGenesisWallet(id);

@@ -5,7 +5,7 @@ import crypto.blockchain.api.Data;
 
 import java.util.List;
 
-public record AccountBlockchain (String id){
+public record AccountChain(String id){
 
     public void create(){
         Blockchain blockchain = new Blockchain(id);

@@ -1,6 +1,6 @@
 package crypto.blockchain;
 
-import crypto.blockchain.account.AccountBlockchain;
+import crypto.blockchain.account.AccountChain;
 import crypto.blockchain.account.AccountTransactionOutput;
 import crypto.blockchain.account.AccountTransactionRequest;
 import crypto.blockchain.account.AccountTransactionRequestFactory;
@@ -21,18 +21,18 @@ public record ComboBlockchain (String id){
     public void genesis(long value, String genesisKey) throws BlockchainException {
         TransactionCache transactionCache = Data.getTransactionCache(id);
         TransactionRequest transactionRequest = TransactionRequestFactory.genesisTransaction(genesisKey, value, transactionCache);
-        TransactionBlockchain.mineNextBlock(transactionRequest, id);
+        new TransactionChain(id).mineNextBlock(transactionRequest);
 
         AccountTransactionOutput transactionOutput = new AccountTransactionOutput(genesisKey, value);
         AccountTransactionRequest request = new AccountTransactionRequest(null, List.of(transactionOutput));
-        new AccountBlockchain(id).mineNextBlock(request, 1);
+        new AccountChain(id).mineNextBlock(request, 1);
     }
 
     public void simulate(Wallet from) throws BlockchainException {
         Wallet wallet = Wallet.generate();
         Data.addWallet(id, wallet);
         AccountTransactionRequest transactionRequest = AccountTransactionRequestFactory.createTransactionRequest(from, wallet.getPublicKeyAddress(), 5, id).get();
-        new AccountBlockchain(id).mineNextBlock(transactionRequest, 1);
+        new AccountChain(id).mineNextBlock(transactionRequest, 1);
     }
 
 }

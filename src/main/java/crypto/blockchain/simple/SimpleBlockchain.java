@@ -5,27 +5,27 @@ import crypto.blockchain.api.Data;
 
 import java.util.Random;
 
-public class SimpleBlockchain {
+public record SimpleBlockchain (String id) {
 
-    public static void create(String id){
+    public void create(){
         Blockchain blockchain = new Blockchain(id);
         Data.addBlockchain(blockchain);
     }
 
-    public static void genesis(String id) {
+    public void genesis() {
         Blockchain blockchain = Data.getBlockchain(id);
         Block block = new Block(new StringHashable("abcde"), "");
         BlockMiner.mineBlockHash(block, "0".repeat(1));
         blockchain.add(block);
     }
 
-    public static void simulate(String id) {
+    public void simulate() {
         Blockchain blockchain = Data.getBlockchain(id);
         Block nextBlock = mineNextBlock(blockchain);
         blockchain.add(nextBlock);
     }
 
-    public static Block mineNextBlock(Blockchain blockchain) {
+    public Block mineNextBlock(Blockchain blockchain) {
         Block mostRecentBlock = blockchain.getMostRecent();
         StringHashable data = constructData();
         Block nextBlock = new Block(data, mostRecentBlock.blockHashId);
@@ -33,7 +33,7 @@ public class SimpleBlockchain {
         return nextBlock;
     }
 
-    private static StringHashable constructData() {
+    private StringHashable constructData() {
         Random r = new Random();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 5; i++) {

@@ -5,22 +5,22 @@ import crypto.blockchain.api.Data;
 
 import java.util.*;
 
-public class MultiAccountBasedBlockchain {
+public record MultiAccountChain(String id){
 
-    public static void create(String id){
+    public void create(){
         Blockchain blockchain = new Blockchain(id);
         Data.addBlockchain(blockchain);
         Data.addAccountBalanceCache(blockchain.getId());
         Data.addWalletCache(blockchain.getId());
     }
 
-    public static void genesis(String id, long value, String genesisKey) throws BlockchainException {
+    public void genesis(long value, String genesisKey) throws BlockchainException {
         AccountTransactionOutput transactionOutput = new AccountTransactionOutput(genesisKey, value);
         AccountTransactionRequests requests = new AccountTransactionRequests(List.of(new AccountTransactionRequest(null, List.of(transactionOutput))));
         mineNextBlock(requests, id);
     }
 
-    private static void createAndRegisterSimpleTransactionRequest(Wallet walletA, Wallet walletB, List<AccountTransactionRequest> transactionRequestsQueue, int value, String id) throws BlockchainException {
+    private void createAndRegisterSimpleTransactionRequest(Wallet walletA, Wallet walletB, List<AccountTransactionRequest> transactionRequestsQueue, int value, String id) throws BlockchainException {
         Optional<AccountTransactionRequest> transactionRequestOptional = AccountTransactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, value, id);
         if (transactionRequestOptional.isPresent()){
             AccountTransactionRequest transactionRequest = transactionRequestOptional.get();
@@ -28,7 +28,7 @@ public class MultiAccountBasedBlockchain {
         }
     }
 
-    public static void simulate(String id) throws BlockchainException {
+    public void simulate() throws BlockchainException {
         Blockchain blockchain = Data.getBlockchain(id);
         Wallet wallet = Wallet.generate();
         Wallet genesis = Data.getGenesisWallet(blockchain.getId());

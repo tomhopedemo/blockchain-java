@@ -17,7 +17,7 @@ public class MultiAccountBasedBlockchain {
     public static void genesis(String id, long value, String genesisKey) throws BlockchainException {
         AccountTransactionOutput transactionOutput = new AccountTransactionOutput(genesisKey, value);
         AccountTransactionRequests requests = new AccountTransactionRequests(List.of(new AccountTransactionRequest(null, List.of(transactionOutput))));
-        mineNextBlock(requests, id, 1);
+        mineNextBlock(requests, id);
     }
 
     private static void createAndRegisterSimpleTransactionRequest(Wallet walletA, Wallet walletB, List<AccountTransactionRequest> transactionRequestsQueue, int value, String id) throws BlockchainException {
@@ -28,29 +28,25 @@ public class MultiAccountBasedBlockchain {
         }
     }
 
-    public static void simulate(String id, int numBlocks, int difficulty) throws BlockchainException {
+    public static void simulate(String id) throws BlockchainException {
         Blockchain blockchain = Data.getBlockchain(id);
-
         Wallet wallet = Wallet.generate();
         Wallet genesis = Data.getGenesisWallet(blockchain.getId());
 
-        //Example transaction stream and processing
         List<AccountTransactionRequest> transactionRequestsQueue = new ArrayList<>();
-        for (int i = 0; i < numBlocks; i++) {
-            createAndRegisterSimpleTransactionRequest(genesis, wallet, transactionRequestsQueue, 5, id);
-            if (transactionRequestsQueue.isEmpty()) {
-                break;
-            }
+        createAndRegisterSimpleTransactionRequest(genesis, wallet, transactionRequestsQueue, 5, id);
+        if (!transactionRequestsQueue.isEmpty()) {
             Optional<AccountTransactionRequests> transactionRequestsForNextBlock = constructTransactionRequestsForNextBlock(transactionRequestsQueue, id);
             if (transactionRequestsForNextBlock.isPresent()) {
-                mineNextBlock(transactionRequestsForNextBlock.get(), id, difficulty);
+                mineNextBlock(transactionRequestsForNextBlock.get(), id);
                 transactionRequestsQueue.removeAll(transactionRequestsForNextBlock.get().getTransactionRequests());
             }
         }
+
         Data.addWallet(blockchain.getId(), wallet);
     }
 
-    public static void mineNextBlock(AccountTransactionRequests transactionRequests, String id, int difficulty) {
+    public static void mineNextBlock(AccountTransactionRequests transactionRequests, String id) {
         Blockchain blockchain = Data.getBlockchain(id);
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
@@ -78,7 +74,7 @@ public class MultiAccountBasedBlockchain {
 
         //Create block
         Block block = new Block(transactionRequests, previousBlockHash);
-        BlockMiner.mineBlockHash(block, "0".repeat(difficulty));
+        BlockMiner.mineBlockHash(block, "0".repeat(1));
         blockchain.add(block);
 
         AccountBalanceCache accountBalanceCache = Data.getAccountBalanceCache(id);

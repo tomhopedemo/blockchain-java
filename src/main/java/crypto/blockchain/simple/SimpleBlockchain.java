@@ -19,19 +19,17 @@ public class SimpleBlockchain {
         blockchain.add(block);
     }
 
-    public static void simulate(String id, int numBlocks, int difficulty) {
+    public static void simulate(String id) {
         Blockchain blockchain = Data.getBlockchain(id);
-        for (int i = 0; i < numBlocks; i++) {
-            Block nextBlock = mineNextBlock(blockchain, difficulty);
-            blockchain.add(nextBlock);
-        }
+        Block nextBlock = mineNextBlock(blockchain);
+        blockchain.add(nextBlock);
     }
 
-    public static Block mineNextBlock(Blockchain blockchain, int difficulty) {
+    public static Block mineNextBlock(Blockchain blockchain) {
         Block mostRecentBlock = blockchain.getMostRecent();
         StringHashable data = constructData();
         Block nextBlock = new Block(data, mostRecentBlock.blockHashId);
-        BlockMiner.mineBlockHash(nextBlock, "0".repeat(difficulty));
+        BlockMiner.mineBlockHash(nextBlock, "0".repeat(1));
         return nextBlock;
     }
 

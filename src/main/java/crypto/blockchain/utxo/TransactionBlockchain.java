@@ -15,20 +15,20 @@ public class TransactionBlockchain {
     public static void genesis(String id, long value, String genesisKey) {
         TransactionCache transactionCache = Data.getTransactionCache(id);
         TransactionRequest genesisTransactionRequest = TransactionRequestFactory.genesisTransaction(genesisKey, value, transactionCache);
-        mineNextBlock(genesisTransactionRequest, id, 1);
+        mineNextBlock(genesisTransactionRequest, id);
     }
 
-    public static void simulate(String id, int difficulty) {
+    public static void simulate(String id) {
         Wallet wallet = Wallet.generate();
         Wallet genesis = Data.getGenesisWallet(id);
         Blockchain blockchain = Data.getBlockchain(id);
         TransactionCache transactionCache = Data.getTransactionCache(id);
         TransactionRequest transactionRequest = TransactionRequestFactory.createTransactionRequest(genesis, wallet.getPublicKeyAddress(), 5, transactionCache).get();
-        mineNextBlock(transactionRequest, id, difficulty);
+        mineNextBlock(transactionRequest, id);
         Data.addWallet(blockchain.getId(), wallet);
     }
 
-    public static void mineNextBlock(TransactionRequest transactionRequest, String id, int difficulty) {
+    public static void mineNextBlock(TransactionRequest transactionRequest, String id) {
         Blockchain blockchain = Data.getBlockchain(id);
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
@@ -42,7 +42,7 @@ public class TransactionBlockchain {
 
         //Create block
         Block block = new Block(transactionRequest, previousBlockHash);
-        BlockMiner.mineBlockHash(block, "0".repeat(difficulty));
+        BlockMiner.mineBlockHash(block, "0".repeat(1));
         blockchain.add(block);
 
         //Update Caches

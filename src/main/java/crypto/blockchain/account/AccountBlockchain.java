@@ -5,31 +5,29 @@ import crypto.blockchain.api.Data;
 
 import java.util.List;
 
-public class AccountBlockchain {
+public record AccountBlockchain (String id){
 
-    public static void create(String id){
+    public void create(){
         Blockchain blockchain = new Blockchain(id);
         Data.addBlockchain(blockchain);
-        Data.addWalletCache(blockchain.getId());
-        Data.addAccountBalanceCache(blockchain.getId());
+        Data.addWalletCache(id);
+        Data.addAccountBalanceCache(id);
     }
 
-    public static void genesis(String id, long value, String genesisKey) throws BlockchainException {
+    public void genesis(long value, String genesisKey) throws BlockchainException {
         AccountTransactionOutput transactionOutput = new AccountTransactionOutput(genesisKey, value);
         AccountTransactionRequest request = new AccountTransactionRequest(null, List.of(transactionOutput));
-        mineNextBlock(request, id, 1);
+        mineNextBlock(request, 1);
     }
 
-    public static void simulate(String id, int numBlocks, int difficulty, Wallet from) throws BlockchainException {
+    public void simulate(Wallet from) throws BlockchainException {
         Wallet wallet = Wallet.generate();
         Data.addWallet(id, wallet);
-        for (int i = 0; i < numBlocks; i++) {
-            AccountTransactionRequest transactionRequest = AccountTransactionRequestFactory.createTransactionRequest(from, wallet.getPublicKeyAddress(), 5, id).get();
-            mineNextBlock(transactionRequest, id, difficulty);
-        }
+        AccountTransactionRequest transactionRequest = AccountTransactionRequestFactory.createTransactionRequest(from, wallet.getPublicKeyAddress(), 5, id).get();
+        mineNextBlock(transactionRequest, 1);
     }
 
-    public static void mineNextBlock(AccountTransactionRequest transactionRequest, String id, int difficulty) {
+    public void mineNextBlock(AccountTransactionRequest transactionRequest, int difficulty) {
         Blockchain blockchain = Data.getBlockchain(id);
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();

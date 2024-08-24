@@ -20,19 +20,16 @@ public class MultiTransactionalBlockchain {
         mineNextBlock(new TransactionRequests(List.of(genesisTransactionRequest)), id, 1);
     }
 
-    public static void simulate(String id, int numBlocks, int difficulty) {
+    public static void simulate(String id) {
         Blockchain blockchain = Data.getBlockchain(id);
         Wallet wallet = Wallet.generate();
         Wallet genesis = Data.getGenesisWallet(id);
         List<TransactionRequest> transactionRequestsQueue = new ArrayList<>();
-        for (int i = 0; i < numBlocks; i++) {
-            createAndRegisterSimpleTransactionRequest(genesis, wallet, transactionRequestsQueue, 5, id);
-            if (transactionRequestsQueue.isEmpty()) {
-                break;
-            }
+        createAndRegisterSimpleTransactionRequest(genesis, wallet, transactionRequestsQueue, 5, id);
+        if (!transactionRequestsQueue.isEmpty()) {
             Optional<TransactionRequests> transactionRequestsForNextBlock = constructTransactionRequestsForNextBlock(transactionRequestsQueue, id);
             if (transactionRequestsForNextBlock.isPresent()) {
-                mineNextBlock(transactionRequestsForNextBlock.get(), id, difficulty);
+                mineNextBlock(transactionRequestsForNextBlock.get(), id, 1);
                 transactionRequestsQueue.removeAll(transactionRequestsForNextBlock.get().getTransactionRequests());
             }
         }

@@ -1,7 +1,7 @@
 package crypto.blockchain.utxo;
 
 import crypto.blockchain.*;
-import crypto.blockchain.api.Data;
+import crypto.blockchain.Data;
 
 public record TransactionChain(String id) {
 

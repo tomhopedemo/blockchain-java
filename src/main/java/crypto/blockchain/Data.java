@@ -1,12 +1,11 @@
-package crypto.blockchain.api;
+package crypto.blockchain;
 
-import crypto.blockchain.Blockchain;
-import crypto.blockchain.Wallet;
-import crypto.blockchain.WalletCache;
 import crypto.blockchain.account.AccountBalanceCache;
 import crypto.blockchain.utxo.TransactionCache;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Data {
@@ -14,6 +13,7 @@ public class Data {
     static Map<String, Blockchain> blockchains;
     static Map<String, AccountBalanceCache> accountBalanceCaches;
     static Map<String, TransactionCache> transactionCaches;
+
     static Map<String, WalletCache> walletCaches;
 
     static {
@@ -65,4 +65,11 @@ public class Data {
         return walletCaches.get(id).getGenesisWallet();
     }
 
+    public static List<String> getKeys(String id) {
+        return walletCaches.get(id).getWallets().stream().map(w -> w.publicKeyAddress).toList();
+    }
+
+    public static Optional<Wallet> getWallet(String id, String from) {
+        return walletCaches.get(id).getWallet(from);
+    }
 }

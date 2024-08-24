@@ -1,7 +1,7 @@
 package crypto.blockchain.account;
 
 import crypto.blockchain.*;
-import crypto.blockchain.api.Data;
+import crypto.blockchain.Data;
 
 import java.util.*;
 

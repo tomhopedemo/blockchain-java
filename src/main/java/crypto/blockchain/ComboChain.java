@@ -4,12 +4,11 @@ import crypto.blockchain.account.AccountChain;
 import crypto.blockchain.account.AccountTransactionOutput;
 import crypto.blockchain.account.AccountTransactionRequest;
 import crypto.blockchain.account.AccountTransactionRequestFactory;
-import crypto.blockchain.api.Data;
 import crypto.blockchain.utxo.*;
 
 import java.util.List;
 
-public record ComboBlockchain (String id){
+public record ComboChain(String id){
 
     public void create(){
         Data.addBlockchain(new Blockchain(id));

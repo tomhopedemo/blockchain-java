@@ -1,6 +1,6 @@
-package crypto.blockchain.api;
+package crypto.blockchain.api.chain;
 
-public enum BlockchainType {
+public enum ChainType {
     SIMPLE,
     ACCOUNT,
     MULTI_ACCOUNT,

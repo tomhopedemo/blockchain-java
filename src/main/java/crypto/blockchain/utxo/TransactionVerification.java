@@ -1,6 +1,6 @@
 package crypto.blockchain.utxo;
 
-import crypto.blockchain.api.Data;
+import crypto.blockchain.Data;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;

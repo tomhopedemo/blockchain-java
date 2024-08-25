@@ -1,6 +1,5 @@
 package crypto.blockchain.api;
 
-import crypto.blockchain.BlockchainException;
 import crypto.blockchain.service.ChainService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +17,7 @@ public class ChainAPI {
     String create(@RequestParam("id") String id) {
         ChainService chainService = new ChainService();
         if (!chainService.exists(id)) {
-            chainService.createBlockchain(id);
+            chainService.createChain(id);
             return id;
         }
         return null;

@@ -2,11 +2,9 @@ package crypto.blockchain;
 
 import crypto.blockchain.account.AccountBalanceCache;
 import crypto.blockchain.utxo.TransactionCache;
+import crypto.blockchain.utxo.TransactionOutput;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Data {
@@ -26,29 +24,42 @@ public class Data {
     }
 
 
-    public static void addBlockchain(Blockchain blockchain) {
+    public static void addChain(Blockchain blockchain) {
         blockchains.put(blockchain.id, blockchain);
     }
 
-    public static void addGenesisWallet(String id, Wallet genesis) {
-        walletCaches.get(id).addGenesisWallet(genesis);
-    }
-
-    public static void addWalletCache(String id){
-        walletCaches.put(id, new WalletCache());
-    }
-
     public static void addWallet(String id, Wallet wallet) {
+        walletCaches.putIfAbsent(id, new WalletCache());
         walletCaches.get(id).addWallet(wallet);
     }
 
-    public static void addTransactionCache(String id){
-        transactionCaches.put(id, new TransactionCache());
+    public static void addTransaction(String id, String transactionOutputHash, TransactionOutput genesisTransactionOutput) {
+        transactionCaches.putIfAbsent(id, new TransactionCache());
+        transactionCaches.get(id).put(transactionOutputHash, genesisTransactionOutput);
     }
 
-    public static void addAccountBalanceCache(String id){
-        accountBalanceCaches.put(id, new AccountBalanceCache());
+    public static void addAccountTransaction(String id, String transactionOutputHash, TransactionOutput genesisTransactionOutput) {
+        transactionCaches.putIfAbsent(id, new TransactionCache());
+        transactionCaches.get(id).put(transactionOutputHash, genesisTransactionOutput);
     }
+
+    public static void addAccountBalance(String id, String recipient, long value) {
+        accountBalanceCaches.putIfAbsent(id, new AccountBalanceCache());
+        accountBalanceCaches.get(id).add(recipient, value);
+    }
+
+    public static void subtractAccountBalance(String id, String from, long value) {
+        accountBalanceCaches.putIfAbsent(id, new AccountBalanceCache());
+        accountBalanceCaches.get(id).subtract(from, value);
+    }
+
+    public static void addType(String id, BlockType type) {
+        allowedBlocktypes.putIfAbsent(id, new HashSet<>());
+        allowedBlocktypes.get(id).add(type);
+    }
+
+
+
 
     public static Blockchain getBlockchain(String id){
         return blockchains.get(id);
@@ -62,7 +73,6 @@ public class Data {
         return accountBalanceCaches.get(id);
     }
 
-
     public static Wallet getGenesisWallet(String id) {
         return walletCaches.get(id).getGenesisWallet();
     }
@@ -75,7 +85,4 @@ public class Data {
         return walletCaches.get(id).getWallet(from);
     }
 
-    public static void addType(String id, BlockType type) {
-        allowedBlocktypes.get(id).add(type);
-    }
 }

@@ -5,17 +5,10 @@ import crypto.blockchain.Data;
 
 import java.util.*;
 
-public record MultiTransactionChain(String id){
+public record UTXOChain(String id){
 
-    public void create(){
-        Data.addBlockchain(new Blockchain(id));
-        Data.addTransactionCache(id);
-        Data.addWalletCache(id);
-    }
-
-    public void genesis(long value, String genesisKey) throws BlockchainException {
-        TransactionCache transactionCache = Data.getTransactionCache(id);
-        TransactionRequest genesisTransactionRequest = TransactionRequestFactory.genesisTransaction(genesisKey, value, transactionCache);
+    public void genesis(long value, String genesisKey) {
+        TransactionRequest genesisTransactionRequest = TransactionRequestFactory.genesisTransaction(genesisKey, value, id);
         mineNextBlock(new TransactionRequests(List.of(genesisTransactionRequest)), id, 1);
     }
 

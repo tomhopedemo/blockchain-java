@@ -5,16 +5,9 @@ import crypto.blockchain.Data;
 
 import java.util.*;
 
-public record MultiAccountChain(String id){
+public record AccountChain(String id){
 
-    public void create(){
-        Blockchain blockchain = new Blockchain(id);
-        Data.addBlockchain(blockchain);
-        Data.addAccountBalanceCache(blockchain.getId());
-        Data.addWalletCache(blockchain.getId());
-    }
-
-    public void genesis(long value, String genesisKey) throws BlockchainException {
+    public void genesis(long value, String genesisKey) {
         AccountTransactionOutput transactionOutput = new AccountTransactionOutput(genesisKey, value);
         AccountTransactionRequests requests = new AccountTransactionRequests(List.of(new AccountTransactionRequest(null, List.of(transactionOutput))));
         mineNextBlock(requests, id);
@@ -81,9 +74,9 @@ public record MultiAccountChain(String id){
         //Update Caches
         for (AccountTransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
             for (AccountTransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
-                accountBalanceCache.add(transactionOutput.getRecipient(), transactionOutput.getValue());
+                Data.addAccountBalance(id, transactionOutput.getRecipient(), transactionOutput.getValue());
                 if (!isGenesis) {
-                    accountBalanceCache.subtract(transactionRequest.publicKeyAddress, transactionOutput.getValue());
+                    Data.subtractAccountBalance(id, transactionOutput.getRecipient(), transactionOutput.getValue());
                 }
             }
         }

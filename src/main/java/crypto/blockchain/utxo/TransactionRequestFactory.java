@@ -60,12 +60,12 @@ public class TransactionRequestFactory {
         return transactionOutputsById;
     }
 
-    public static TransactionRequest genesisTransaction(String genesisKey, long genesisTransactionValue, TransactionCache transactionCache) {
+    public static TransactionRequest genesisTransaction(String genesisKey, long genesisTransactionValue, String id) {
         TransactionOutput genesisTransactionOutput = new TransactionOutput(genesisKey, genesisTransactionValue);
         List<TransactionOutput> transactionOutputs = List.of(genesisTransactionOutput);
         TransactionRequest genesisTransactionRequest = new TransactionRequest(new ArrayList<>(), transactionOutputs);
         String transactionOutputHash = genesisTransactionOutput.generateTransactionOutputHash(genesisTransactionRequest.getTransactionRequestHash());
-        transactionCache.put(transactionOutputHash, genesisTransactionOutput);
+        Data.addTransaction(id, transactionOutputHash, genesisTransactionOutput);
         return genesisTransactionRequest;
     }
 }

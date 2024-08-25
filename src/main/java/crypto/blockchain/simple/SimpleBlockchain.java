@@ -9,7 +9,7 @@ public record SimpleBlockchain (String id) {
 
     public void create(){
         Blockchain blockchain = new Blockchain(id);
-        Data.addBlockchain(blockchain);
+        Data.addChain(blockchain);
     }
 
     public void genesis() {

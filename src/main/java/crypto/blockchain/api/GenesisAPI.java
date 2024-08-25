@@ -1,5 +1,6 @@
 package crypto.blockchain.api;
 
+import crypto.blockchain.BlockType;
 import crypto.blockchain.Blockchain;
 import crypto.blockchain.BlockchainException;
 import crypto.blockchain.service.ChainService;
@@ -19,10 +20,10 @@ public class GenesisAPI {
     String genesis(@RequestParam("id") String id,
                    @RequestParam("publicKey") String publicKey,
                    @RequestParam("type") String type,
-                   @RequestParam("value") Long value) throws BlockchainException {
+                   @RequestParam("value") Long value)  {
             Blockchain blockchain = chainService.getBlockchain(id);
             if (blockchain != null) {
-                chainService.createGenesisBlock(id, ChainType.valueOf(type), value, publicKey);
+                chainService.createGenesisBlock(id, BlockType.valueOf(type), value, publicKey);
             }
             return chainService.getBlockchainJson(id);
     }

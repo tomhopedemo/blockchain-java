@@ -15,8 +15,7 @@ public class RequestController {
     //trusted process to handle your keys + generate transactions
     public static final String CORS = "http://localhost:3000";
 
-    @Autowired
-    AuxService auxService;
+    AuxService auxService = new AuxService();
 
     @GetMapping("/keys/add") @CrossOrigin(origins = CORS)
     void addKey(@RequestParam("id") String id, @RequestParam("publicKey") String publicKey, @RequestParam("privateKey") String privateKey){

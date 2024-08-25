@@ -6,6 +6,7 @@ import crypto.blockchain.account.AccountTransactionRequest;
 import crypto.blockchain.account.AccountTransactionRequestFactory;
 import crypto.blockchain.api.chain.ChainType;
 import crypto.blockchain.utxo.TransactionChain;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 

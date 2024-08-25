@@ -13,8 +13,7 @@ import static crypto.blockchain.api.chain.ChainApi.CORS;
 @RestController
 public class ChainCreateController {
 
-    @Autowired
-    ChainService chainService;
+    ChainService chainService = new ChainService();
 
     @GetMapping("/chain/create")  @CrossOrigin(origins = CORS)
     String create(@RequestParam("id") String id,

@@ -14,8 +14,8 @@ import static crypto.blockchain.api.chain.ChainApi.CORS;
 
 @RestController
 public class ChainSubmitController {
-    @Autowired
-    ChainService chainService;
+
+    ChainService chainService = new ChainService();
 
     @GetMapping("/simulate")  @CrossOrigin(origins = CORS)
     String simulate(@RequestParam("id") String id,

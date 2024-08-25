@@ -10,7 +10,6 @@ import crypto.blockchain.utxo.MultiTransactionChain;
 import crypto.blockchain.utxo.TransactionChain;
 import org.springframework.stereotype.Component;
 
-@Component
 public class ChainService {
 
     public void createBlockchain(String id, ChainType type) {

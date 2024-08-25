@@ -12,8 +12,7 @@ import static crypto.blockchain.api.chain.ChainApi.CORS;
 @RestController
 public class KeysController {
 
-    @Autowired
-    ChainService chainService;
+    ChainService chainService = new ChainService();
 
     @GetMapping("/keys/get")  @CrossOrigin(origins = CORS)
     String get(@RequestParam("id") String id) {

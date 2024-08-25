@@ -14,8 +14,7 @@ import static crypto.blockchain.api.chain.ChainApi.CORS;
 @RestController
 public class ChainGenesisController {
 
-    @Autowired
-    ChainService chainService;
+    ChainService chainService = new ChainService();
 
     @GetMapping("/chain/genesis")  @CrossOrigin(origins = CORS)
     String genesis(@RequestParam("id") String id,

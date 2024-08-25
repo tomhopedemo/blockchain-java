@@ -1,9 +1,11 @@
 package crypto.blockchain.utxo;
 
+import crypto.blockchain.TransactionOutput;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class TransactionCache {
+public class UTXOCache {
 
     public HashMap<String, TransactionOutput> unspentOutputsById = new HashMap<>();
 

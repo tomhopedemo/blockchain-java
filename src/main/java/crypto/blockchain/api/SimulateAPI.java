@@ -12,14 +12,12 @@ import java.util.Random;
 
 import static crypto.blockchain.api.Control.CORS;
 
-@RestController
+@RestController @CrossOrigin(origins = CORS)
 public class SimulateAPI {
-
-    ChainService chainService = new ChainService();
-
-    @GetMapping("/simulate")  @CrossOrigin(origins = CORS)
+    @GetMapping("/simulate")
     String simulate() throws BlockchainException {
         String id = randomId();
+        ChainService chainService = new ChainService();
         Blockchain blockchain = chainService.getBlockchain(id);
         if (blockchain != null) {
             Wallet wallet = chainService.createWallet();

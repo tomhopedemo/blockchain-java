@@ -10,10 +10,10 @@ import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class TransactionRequestFactory {
+public class UTXORequestFactory {
 
-    public static Optional<TransactionRequest> createTransactionRequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue, TransactionCache transactionCache) {
-        Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(wallet, transactionCache);
+    public static Optional<UTXORequest> createUTXORequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue, String id) {
+        Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(wallet, id);
         long balance = getBalance(unspentTransactionOutputsById);
         if (balance < transactionValue) {
             return Optional.empty();
@@ -40,7 +40,7 @@ public class TransactionRequestFactory {
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
         transactionOutputs.add(new TransactionOutput(recipientPublicKeyAddress, transactionValue));
         transactionOutputs.add(new TransactionOutput(wallet.publicKeyAddress, total - transactionValue));
-        TransactionRequest transactionRequest = new TransactionRequest(transactionInputs, transactionOutputs);
+        UTXORequest transactionRequest = new UTXORequest(transactionInputs, transactionOutputs);
         return Optional.of(transactionRequest);
     }
 
@@ -49,9 +49,9 @@ public class TransactionRequestFactory {
                 .map(transactionOutput -> transactionOutput.getValue()).mapToLong(Long::longValue).sum();
     }
 
-    public static Map<String, TransactionOutput> getTransactionOutputsById(Wallet wallet, TransactionCache transactionCache) {
+    public static Map<String, TransactionOutput> getTransactionOutputsById(Wallet wallet, String id) {
         Map<String, TransactionOutput> transactionOutputsById = new HashMap<>();
-        for (Map.Entry<String, TransactionOutput> item: transactionCache.entrySet()){
+        for (Map.Entry<String, TransactionOutput> item: Data.getUTXOCache(id).entrySet()){
             TransactionOutput transactionOutput = item.getValue();
             if (transactionOutput.getRecipient().equals(wallet.publicKeyAddress)) {
                 transactionOutputsById.put(item.getKey(), transactionOutput);
@@ -60,12 +60,12 @@ public class TransactionRequestFactory {
         return transactionOutputsById;
     }
 
-    public static TransactionRequest genesisTransaction(String genesisKey, long genesisTransactionValue, String id) {
+    public static UTXORequest genesisTransaction(String genesisKey, long genesisTransactionValue, String id) {
         TransactionOutput genesisTransactionOutput = new TransactionOutput(genesisKey, genesisTransactionValue);
         List<TransactionOutput> transactionOutputs = List.of(genesisTransactionOutput);
-        TransactionRequest genesisTransactionRequest = new TransactionRequest(new ArrayList<>(), transactionOutputs);
+        UTXORequest genesisTransactionRequest = new UTXORequest(new ArrayList<>(), transactionOutputs);
         String transactionOutputHash = genesisTransactionOutput.generateTransactionOutputHash(genesisTransactionRequest.getTransactionRequestHash());
-        Data.addTransaction(id, transactionOutputHash, genesisTransactionOutput);
+        Data.addUtxo(id, transactionOutputHash, genesisTransactionOutput);
         return genesisTransactionRequest;
     }
 }

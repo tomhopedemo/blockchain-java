@@ -6,15 +6,15 @@ import crypto.hashing.Hashing;
 
 import java.util.List;
 
-public class TransactionRequests implements BlockDataHashable {
+public class UTXORequests implements BlockDataHashable {
 
-    List<TransactionRequest> transactionRequests;
+    List<UTXORequest> transactionRequests;
 
-    public TransactionRequests(List<TransactionRequest> transactionRequests) {
+    public UTXORequests(List<UTXORequest> transactionRequests) {
         this.transactionRequests = transactionRequests;
     }
 
-    public List<TransactionRequest> getTransactionRequests() {
+    public List<UTXORequest> getTransactionRequests() {
         return transactionRequests;
     }
 

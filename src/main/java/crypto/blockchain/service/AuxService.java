@@ -4,9 +4,8 @@ import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
 import crypto.blockchain.account.AccountTransactionRequest;
 import crypto.blockchain.account.AccountTransactionRequestFactory;
-import crypto.blockchain.utxo.TransactionCache;
-import crypto.blockchain.utxo.TransactionRequest;
-import crypto.blockchain.utxo.TransactionRequestFactory;
+import crypto.blockchain.utxo.UTXORequest;
+import crypto.blockchain.utxo.UTXORequestFactory;
 
 import java.util.Optional;
 
@@ -17,7 +16,7 @@ public class AuxService {
     }
 
     public boolean exists(String id){
-        return Data.getBlockchain(id) != null;
+        return Data.getChain(id) != null;
     }
 
     public String createRequestJson(BlockType type, String id, String from, String to, long value) throws BlockchainException {
@@ -34,8 +33,7 @@ public class AuxService {
             case UTXO -> {
                 Optional<Wallet> wallet = Data.getWallet(id, from);
                 if (wallet.isPresent()) {
-                    TransactionCache transactionCache = Data.getTransactionCache(id);
-                    Optional<TransactionRequest> transactionRequest = TransactionRequestFactory.createTransactionRequest(wallet.get(), to, value, transactionCache);
+                    Optional<UTXORequest> transactionRequest = UTXORequestFactory.createUTXORequest(wallet.get(), to, value, id);
                     if (transactionRequest.isPresent()){
                         return new GsonBuilder().setPrettyPrinting().create().toJson(transactionRequest.get());
                     }

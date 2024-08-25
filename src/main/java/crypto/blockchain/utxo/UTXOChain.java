@@ -8,42 +8,38 @@ import java.util.*;
 public record UTXOChain(String id){
 
     public void genesis(long value, String genesisKey) {
-        TransactionRequest genesisTransactionRequest = TransactionRequestFactory.genesisTransaction(genesisKey, value, id);
-        mineNextBlock(new TransactionRequests(List.of(genesisTransactionRequest)), id, 1);
+        UTXORequest genesisTransactionRequest = UTXORequestFactory.genesisTransaction(genesisKey, value, id);
+        mineNextBlock(new UTXORequests(List.of(genesisTransactionRequest)), id, 1);
     }
 
-    public void simulate() {
-        Blockchain blockchain = Data.getBlockchain(id);
+    public void simulate(Wallet genesis) {
+        Blockchain blockchain = Data.getChain(id);
         Wallet wallet = Wallet.generate();
-        Wallet genesis = Data.getGenesisWallet(id);
-        List<TransactionRequest> transactionRequestsQueue = new ArrayList<>();
-        createAndRegisterSimpleTransactionRequest(genesis, wallet, transactionRequestsQueue, 5, id);
-        if (!transactionRequestsQueue.isEmpty()) {
-            Optional<TransactionRequests> transactionRequestsForNextBlock = constructTransactionRequestsForNextBlock(transactionRequestsQueue, id);
-            if (transactionRequestsForNextBlock.isPresent()) {
-                mineNextBlock(transactionRequestsForNextBlock.get(), id, 1);
-                transactionRequestsQueue.removeAll(transactionRequestsForNextBlock.get().getTransactionRequests());
+        List<UTXORequest> utxoRequestsQueue = new ArrayList<>();
+        //can i add the requests to a queue in the blockchain itself? - data plez
+
+        Optional<UTXORequest> utxoRequestOptional = UTXORequestFactory.createUTXORequest(wallet, genesis.getPublicKeyAddress(), 5, id);
+        if (utxoRequestOptional.isPresent()){
+            UTXORequest utxoRequest = utxoRequestOptional.get();
+            utxoRequestsQueue.add(utxoRequest);
+        }
+
+        if (!utxoRequestsQueue.isEmpty()) {
+            Optional<UTXORequests> utxoRequestsForNextBlock = constructUTXORequestsForNextBlock(utxoRequestsQueue, id);
+            if (utxoRequestsForNextBlock.isPresent()) {
+                mineNextBlock(utxoRequestsForNextBlock.get(), id, 1);
+                utxoRequestsQueue.removeAll(utxoRequestsForNextBlock.get().getTransactionRequests());
             }
         }
         Data.addWallet(blockchain.getId(), wallet);
     }
 
-    private static void createAndRegisterSimpleTransactionRequest(Wallet walletA, Wallet walletB, List<TransactionRequest> transactionRequestsQueue, int value, String id) {
-        TransactionCache transactionCache = Data.getTransactionCache(id);
-        Optional<TransactionRequest> transactionRequestOptional = TransactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, value, transactionCache);
-        if (transactionRequestOptional.isPresent()){
-            TransactionRequest transactionRequest = transactionRequestOptional.get();
-            transactionRequestsQueue.add(transactionRequest);
-        }
-    }
-
-    public static Optional<TransactionRequests> constructTransactionRequestsForNextBlock(List<TransactionRequest> availableTransactionRequests, String id) {
+    public static Optional<UTXORequests> constructUTXORequestsForNextBlock(List<UTXORequest> availableUtxoRequests, String id) {
         Set<String> inputsToInclude = new HashSet<>();
-        List<TransactionRequest> transactionRequestsToInclude = new ArrayList<>();
-        TransactionCache transactionCache = Data.getTransactionCache(id);
-        for (TransactionRequest transactionRequest : availableTransactionRequests) {
+        List<UTXORequest> utxoRequestsToInclude = new ArrayList<>();
+        for (UTXORequest utxoRequest : availableUtxoRequests) {
             //verify signature
-            boolean verified = TransactionVerification.verifySignature(transactionRequest, false, id);
+            boolean verified = UTXOVerification.verifySignature(utxoRequest, false, id);
             if (!verified){
                 continue;
             }
@@ -51,7 +47,7 @@ public record UTXOChain(String id){
             //consider for inclusion in this block.
             List<String> transactionInputsToAdd = new ArrayList<>();
             boolean include = true;
-            for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
+            for (TransactionInput transactionInput : utxoRequest.getTransactionInputs()) {
                 //check if input has already been used in this same transaction request
                 if (transactionInputsToAdd.contains(transactionInput.getTransactionOutputHash())){
                     include = false;
@@ -61,7 +57,7 @@ public record UTXOChain(String id){
                     include = false;
                     break;
                     //check if input is available
-                } else if (!transactionCache.contains(transactionInput.getTransactionOutputHash())) {
+                } else if (!Data.hasUtxo(id, transactionInput.getTransactionOutputHash())) {
                     include = false;
                     break;
                 } else {
@@ -69,27 +65,26 @@ public record UTXOChain(String id){
                 }
             }
             if (include) {
-                transactionRequestsToInclude.add(transactionRequest);
-                inputsToInclude.addAll(transactionRequest.getTransactionInputs().stream().map(t -> t.getTransactionOutputHash()).toList());
+                utxoRequestsToInclude.add(utxoRequest);
+                inputsToInclude.addAll(utxoRequest.getTransactionInputs().stream().map(t -> t.getTransactionOutputHash()).toList());
             }
         }
-        if (transactionRequestsToInclude.isEmpty()){
+        if (utxoRequestsToInclude.isEmpty()){
             return Optional.empty();
         } else {
-            return Optional.of(new TransactionRequests(transactionRequestsToInclude));
+            return Optional.of(new UTXORequests(utxoRequestsToInclude));
         }
     }
 
-    public void mineNextBlock(TransactionRequests transactionRequests, String id, int difficulty) {
-        Blockchain blockchain = Data.getBlockchain(id);
-        TransactionCache transactionCache = Data.getTransactionCache(id);
+    public void mineNextBlock(UTXORequests transactionRequests, String id, int difficulty) {
+        Blockchain blockchain = Data.getChain(id);
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
         boolean skipEqualityCheck = mostRecentBlock == null; //indicative of genesis block - will tidy
 
         //Individual Transaction Verification
-        for (TransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
-            boolean verified = TransactionVerification.verifySignature(transactionRequest, skipEqualityCheck, id);
+        for (UTXORequest transactionRequest : transactionRequests.getTransactionRequests()) {
+            boolean verified = UTXOVerification.verifySignature(transactionRequest, skipEqualityCheck, id);
             if (!verified){
                 return;
             }
@@ -101,7 +96,7 @@ public record UTXOChain(String id){
 
         //Overall Verification (no repeats)
         Set<String> inputs = new HashSet<>();
-        for (TransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
+        for (UTXORequest transactionRequest : transactionRequests.getTransactionRequests()) {
             for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
                 if (inputs.contains(transactionInput.getTransactionOutputHash())){
                     return;
@@ -118,22 +113,21 @@ public record UTXOChain(String id){
         blockchain.add(block);
 
         //Update Caches
-        for (TransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
+        for (UTXORequest transactionRequest : transactionRequests.getTransactionRequests()) {
             for (TransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
-                transactionCache.put(transactionOutput.generateTransactionOutputHash(transactionRequest.getTransactionRequestHash()), transactionOutput);
+                Data.addUtxo(id, transactionOutput.generateTransactionOutputHash(transactionRequest.getTransactionRequestHash()), transactionOutput);
             }
             for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
-                transactionCache.remove(transactionInput.getTransactionOutputHash());
+                Data.removeUtxo(id, transactionInput.getTransactionOutputHash());
             }
         }
     }
 
-    private static boolean checkInputSumEqualToOutputSum(TransactionRequest transactionRequest, String id) {
-        TransactionCache transactionCache = Data.getTransactionCache(id);
+    private static boolean checkInputSumEqualToOutputSum(UTXORequest transactionRequest, String id) {
         long sumOfInputs = 0L;
         long sumOfOutputs = 0L;
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
-            TransactionOutput transactionOutput = transactionCache.get(transactionInput.getTransactionOutputHash());
+            TransactionOutput transactionOutput = Data.getUtxo(id, transactionInput.getTransactionOutputHash());
             long transactionOutputValue = transactionOutput.getValue();
             sumOfInputs += transactionOutputValue;
         }

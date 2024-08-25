@@ -8,10 +8,10 @@ import java.util.List;
 public record ComboChain(String id){
 
     public void genesis(long value, String genesisKey) {
-        TransactionRequest transactionRequest = TransactionRequestFactory.genesisTransaction(genesisKey, value, id);
-        new UTXOChain(id).mineNextBlock(new TransactionRequests(List.of(transactionRequest)), id, 1);
+        UTXORequest transactionRequest = UTXORequestFactory.genesisTransaction(genesisKey, value, id);
+        new UTXOChain(id).mineNextBlock(new UTXORequests(List.of(transactionRequest)), id, 1);
 
-        AccountTransactionOutput transactionOutput = new AccountTransactionOutput(genesisKey, value);
+        TransactionOutput transactionOutput = new TransactionOutput(genesisKey, value);
         AccountTransactionRequest request = new AccountTransactionRequest(null, List.of(transactionOutput));
         new AccountChain(id).mineNextBlock(new AccountTransactionRequests(List.of(request)), id);
     }

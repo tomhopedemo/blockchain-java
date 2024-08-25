@@ -11,17 +11,17 @@ import org.springframework.web.bind.annotation.RestController;
 import static crypto.blockchain.api.Control.CORS;
 
 @RestController @CrossOrigin(origins = CORS)
-public class GenesisAPI {
-    @GetMapping("/chain/genesis")
+public class SubmitAPI {
+
+    @GetMapping("/transaction/submit")
     String genesis(@RequestParam("id") String id,
-                   @RequestParam("publicKey") String publicKey,
                    @RequestParam("type") String type,
-                   @RequestParam("value") Long value)  {
+                   @RequestParam("transactionJson") String transactionJson){
         ChainService chainService = new ChainService();
         Blockchain blockchain = chainService.getBlockchain(id);
-            if (blockchain != null) {
-                chainService.createGenesisBlock(id, BlockType.valueOf(type), value, publicKey);
-            }
-            return chainService.getBlockchainJson(id);
+        if (blockchain != null) {
+            chainService.submitTransaction(id, BlockType.valueOf(type), transactionJson);
+        }
+        return chainService.getBlockchainJson(id);
     }
 }

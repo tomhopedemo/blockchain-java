@@ -1,15 +1,13 @@
-package crypto.blockchain.account;
+package crypto.blockchain;
 
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
 
-
-public class AccountTransactionOutput {
-
+public class TransactionOutput {
     String recipient;
     String value;
 
-    public AccountTransactionOutput(String recipientPublicKeyAddress, long value) {
+    public TransactionOutput(String recipientPublicKeyAddress, long value) {
         this.recipient = recipientPublicKeyAddress;
         this.value = String.valueOf(value);
     }
@@ -33,3 +31,4 @@ public class AccountTransactionOutput {
     }
 
 }
+

@@ -2,7 +2,7 @@ package crypto.blockchain.account;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AccountBalanceCache {
+public class AccountCache {
 
     public ConcurrentHashMap<String, Long> accounts = new ConcurrentHashMap<>();
 

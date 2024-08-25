@@ -1,6 +1,7 @@
 package crypto.blockchain.account;
 
 import crypto.blockchain.BlockDataHashable;
+import crypto.blockchain.TransactionOutput;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
 
@@ -9,11 +10,11 @@ import java.util.List;
 public class AccountTransactionRequest implements BlockDataHashable {
 
     public String publicKeyAddress;
-    public List<AccountTransactionOutput> transactionOutputs;
+    public List<TransactionOutput> transactionOutputs;
     public String transactionRequestHashHex;
     public String signature;
 
-    public AccountTransactionRequest(String publicKeyAddress, List<AccountTransactionOutput> transactionOutputs) {
+    public AccountTransactionRequest(String publicKeyAddress, List<TransactionOutput> transactionOutputs) {
         this.publicKeyAddress = publicKeyAddress;
         this.transactionOutputs = transactionOutputs;
         this.transactionRequestHashHex = Encoder.encodeToHexadecimal(calculateTransactionHash());
@@ -25,7 +26,7 @@ public class AccountTransactionRequest implements BlockDataHashable {
         return Hashing.hash(preHash);
     }
 
-    public List<AccountTransactionOutput> getTransactionOutputs() {
+    public List<TransactionOutput> getTransactionOutputs() {
         return transactionOutputs;
     }
 

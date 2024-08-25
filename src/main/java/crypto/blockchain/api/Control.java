@@ -15,7 +15,7 @@ import java.security.Security;
  *  8. we have x at home is have a go at building anything.
  *  9. rather than building different services, create instance of a monolith with certain features enabled.
  *  10. modify simulate controller to do all of the aspects, including holding the wallet locally. and creating the genesis blocks
-
+ * 11. submit to add to requests queue for all blockchains
  we need to solve this type issue. i don't want to be explictly passing around type and at the same
  time i dont' want to be dependent on type being specified at blockchain level that can't be changed
  later. so an alternative is that we retain it on the block level i.e. it is the block itself which is typed.

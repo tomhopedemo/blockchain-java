@@ -13,14 +13,14 @@ public record SimpleBlockchain (String id) {
     }
 
     public void genesis() {
-        Blockchain blockchain = Data.getBlockchain(id);
+        Blockchain blockchain = Data.getChain(id);
         Block block = new Block(new StringHashable("abcde"), "");
         BlockMiner.mineBlockHash(block, "0".repeat(1));
         blockchain.add(block);
     }
 
     public void simulate() {
-        Blockchain blockchain = Data.getBlockchain(id);
+        Blockchain blockchain = Data.getChain(id);
         Block nextBlock = mineNextBlock(blockchain);
         blockchain.add(nextBlock);
     }

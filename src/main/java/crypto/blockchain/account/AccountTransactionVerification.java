@@ -1,6 +1,7 @@
 package crypto.blockchain.account;
 
 import crypto.blockchain.Data;
+import crypto.blockchain.TransactionOutput;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;
@@ -35,7 +36,7 @@ public class AccountTransactionVerification {
 
     private static boolean hasBalance(AccountTransactionRequest transactionRequest, String id) {
         long sum = 0L;
-        for (AccountTransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
+        for (TransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
             sum += transactionOutput.getValue();
         }
 

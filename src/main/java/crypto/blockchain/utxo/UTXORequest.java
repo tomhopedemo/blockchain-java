@@ -1,18 +1,19 @@
 package crypto.blockchain.utxo;
 
 import crypto.blockchain.BlockDataHashable;
+import crypto.blockchain.TransactionOutput;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
 
 import java.util.List;
 
-public class TransactionRequest implements BlockDataHashable {
+public class UTXORequest implements BlockDataHashable {
 
     public List<TransactionInput> transactionInputs;
     public List<TransactionOutput> transactionOutputs;
     public String transactionRequestHashHex;
 
-    public TransactionRequest(List<TransactionInput> transactionInputs, List<TransactionOutput> transactionOutputs) {
+    public UTXORequest(List<TransactionInput> transactionInputs, List<TransactionOutput> transactionOutputs) {
         this.transactionInputs = transactionInputs;
         this.transactionOutputs = transactionOutputs;
         this.transactionRequestHashHex = Encoder.encodeToHexadecimal(calculateTransactionHash());

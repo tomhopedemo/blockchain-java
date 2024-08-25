@@ -8,7 +8,7 @@ import java.util.*;
 public record AccountChain(String id){
 
     public void genesis(long value, String genesisKey) {
-        AccountTransactionOutput transactionOutput = new AccountTransactionOutput(genesisKey, value);
+        TransactionOutput transactionOutput = new TransactionOutput(genesisKey, value);
         AccountTransactionRequests requests = new AccountTransactionRequests(List.of(new AccountTransactionRequest(null, List.of(transactionOutput))));
         mineNextBlock(requests, id);
     }
@@ -22,7 +22,7 @@ public record AccountChain(String id){
     }
 
     public void simulate() throws BlockchainException {
-        Blockchain blockchain = Data.getBlockchain(id);
+        Blockchain blockchain = Data.getChain(id);
         Wallet wallet = Wallet.generate();
         Wallet genesis = Data.getGenesisWallet(blockchain.getId());
 
@@ -40,7 +40,7 @@ public record AccountChain(String id){
     }
 
     public void mineNextBlock(AccountTransactionRequests transactionRequests, String id) {
-        Blockchain blockchain = Data.getBlockchain(id);
+        Blockchain blockchain = Data.getChain(id);
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
         boolean isGenesis =  mostRecentBlock == null;
@@ -70,10 +70,9 @@ public record AccountChain(String id){
         BlockMiner.mineBlockHash(block, "0".repeat(1));
         blockchain.add(block);
 
-        AccountBalanceCache accountBalanceCache = Data.getAccountBalanceCache(id);
         //Update Caches
         for (AccountTransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
-            for (AccountTransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
+            for (TransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
                 Data.addAccountBalance(id, transactionOutput.getRecipient(), transactionOutput.getValue());
                 if (!isGenesis) {
                     Data.subtractAccountBalance(id, transactionOutput.getRecipient(), transactionOutput.getValue());

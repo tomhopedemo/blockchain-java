@@ -14,13 +14,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class AccountTransactionRequestFactory {
 
     public static Optional<AccountTransactionRequest> createTransactionRequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue, String id) throws BlockchainException {
-        AccountBalanceCache accountBalanceCache = Data.getAccountBalanceCache(id);
+        AccountCache accountBalanceCache = Data.getAccountBalanceCache(id);
         Long balance = accountBalanceCache.get(wallet.getPublicKeyAddress());
         if (balance < transactionValue) {
             return Optional.empty();
         }
-        List<AccountTransactionOutput> transactionOutputs = new ArrayList<>();
-        transactionOutputs.add(new AccountTransactionOutput(recipientPublicKeyAddress, transactionValue));
+        List<TransactionOutput> transactionOutputs = new ArrayList<>();
+        transactionOutputs.add(new TransactionOutput(recipientPublicKeyAddress, transactionValue));
         AccountTransactionRequest transactionRequest = new AccountTransactionRequest(wallet.publicKeyAddress, transactionOutputs);
         byte[] signature = calculateSignature(transactionRequest, wallet);
         transactionRequest.setSignature(signature);

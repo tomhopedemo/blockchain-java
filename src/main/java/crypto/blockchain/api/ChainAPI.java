@@ -11,9 +11,7 @@ import static crypto.blockchain.api.Control.CORS;
 @RestController @CrossOrigin(origins = CORS)
 public class ChainAPI {
 
-    @GetMapping("/chain/create")  //but the type is not important here we're just registering the name
-    //you can then set the acceptable block types after - and you can add these. because this is your version of the
-    //chain. it is the name which is just registered on the platform as an identifier.
+    @GetMapping("/chain/create")
     String create(@RequestParam("id") String id) {
         ChainService chainService = new ChainService();
         if (!chainService.exists(id)) {

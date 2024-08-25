@@ -3,8 +3,9 @@ package crypto.blockchain.service;
 import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
 import crypto.blockchain.account.AccountChain;
-import crypto.blockchain.api.ChainType;
+import crypto.blockchain.account.AccountTransactionRequest;
 import crypto.blockchain.simple.SimpleBlockchain;
+import crypto.blockchain.utxo.UTXORequest;
 import crypto.blockchain.utxo.UTXOChain;
 
 public class ChainService {
@@ -30,12 +31,12 @@ public class ChainService {
         switch(type){
             case DATA -> new SimpleBlockchain(id).simulate();
             case ACCOUNT -> new AccountChain(id).simulate();
-            case UTXO -> new UTXOChain(id).simulate();
+            case UTXO -> new UTXOChain(id).simulate(from);
         }
     }
 
     public Blockchain getBlockchain(String id){
-        return Data.getBlockchain(id);
+        return Data.getChain(id);
     }
 
     public String getBlockchainJson(String id){
@@ -43,7 +44,7 @@ public class ChainService {
     }
 
     public boolean exists(String id){
-        return Data.getBlockchain(id) != null;
+        return Data.getChain(id) != null;
     }
 
     public String getKeysJson(String id) {
@@ -56,5 +57,21 @@ public class ChainService {
 
     public Wallet createWallet() {
         return Wallet.generate();
+    }
+
+    public void submitTransaction(String id, BlockType type, String transactionJson) {
+        switch(type){
+            case DATA -> {
+                Requests.add(id, transactionJson);
+            }
+            case ACCOUNT -> {
+                AccountTransactionRequest request = new GsonBuilder().create().fromJson(transactionJson, AccountTransactionRequest.class);
+                Requests.add(id, request);
+            }
+            case UTXO -> {
+                UTXORequest request = new GsonBuilder().create().fromJson(transactionJson, UTXORequest.class);
+                Requests.add(id, request);
+            }
+        }
     }
 }

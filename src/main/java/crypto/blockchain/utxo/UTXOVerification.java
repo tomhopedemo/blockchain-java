@@ -1,6 +1,7 @@
 package crypto.blockchain.utxo;
 
 import crypto.blockchain.Data;
+import crypto.blockchain.TransactionOutput;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;
@@ -10,13 +11,12 @@ import java.security.PublicKey;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class TransactionVerification {
+public class UTXOVerification {
 
-    public static boolean verifySignature(TransactionRequest transactionRequest, boolean skipEqualityCheckForGenesisTransactions, String id) {
-        TransactionCache transactionCache = Data.getTransactionCache(id);
+    public static boolean verifySignature(UTXORequest transactionRequest, boolean skipEqualityCheckForGenesisTransactions, String id) {
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
             String transactionOutputHash = transactionInput.getTransactionOutputHash();
-            TransactionOutput transactionOutput = transactionCache.get(transactionOutputHash);
+            TransactionOutput transactionOutput = Data.getUtxo(id, transactionOutputHash);
             if (transactionOutput == null){
                 return false;
             }
@@ -32,7 +32,7 @@ public class TransactionVerification {
         }
 
         if (!skipEqualityCheckForGenesisTransactions) {
-            boolean inputSumEqualToOutputSum = isInputSumEqualToOutputSum(transactionRequest, transactionCache);
+            boolean inputSumEqualToOutputSum = isInputSumEqualToOutputSum(transactionRequest, id);
             if (!inputSumEqualToOutputSum) {
                 return false;
             }
@@ -41,10 +41,10 @@ public class TransactionVerification {
         return true;
     }
 
-    private static boolean isInputSumEqualToOutputSum(TransactionRequest transactionRequest, TransactionCache transactionCache) {
+    private static boolean isInputSumEqualToOutputSum(UTXORequest transactionRequest, String id) {
         long sum = 0L;
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
-            TransactionOutput transactionOutput = transactionCache.get(transactionInput.getTransactionOutputHash());
+            TransactionOutput transactionOutput = Data.getUtxo(id, transactionInput.getTransactionOutputHash());
             sum += transactionOutput.getValue();
         }
         for (TransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {

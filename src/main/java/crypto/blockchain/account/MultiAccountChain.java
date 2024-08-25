@@ -46,7 +46,7 @@ public record MultiAccountChain(String id){
         Data.addWallet(blockchain.getId(), wallet);
     }
 
-    public static void mineNextBlock(AccountTransactionRequests transactionRequests, String id) {
+    public void mineNextBlock(AccountTransactionRequests transactionRequests, String id) {
         Blockchain blockchain = Data.getBlockchain(id);
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();

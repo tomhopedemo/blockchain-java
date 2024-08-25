@@ -6,10 +6,12 @@ import crypto.blockchain.utxo.TransactionCache;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Data {
 
+    static Map<String, Set<BlockType>> allowedBlocktypes;
     static Map<String, Blockchain> blockchains;
     static Map<String, AccountBalanceCache> accountBalanceCaches;
     static Map<String, TransactionCache> transactionCaches;
@@ -71,5 +73,9 @@ public class Data {
 
     public static Optional<Wallet> getWallet(String id, String from) {
         return walletCaches.get(id).getWallet(from);
+    }
+
+    public static void addType(String id, BlockType type) {
+        allowedBlocktypes.get(id).add(type);
     }
 }

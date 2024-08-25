@@ -87,7 +87,7 @@ public record MultiTransactionChain(String id){
         }
     }
 
-    public static void mineNextBlock(TransactionRequests transactionRequests, String id, int difficulty) {
+    public void mineNextBlock(TransactionRequests transactionRequests, String id, int difficulty) {
         Blockchain blockchain = Data.getBlockchain(id);
         TransactionCache transactionCache = Data.getTransactionCache(id);
         Block mostRecentBlock = blockchain.getMostRecent();

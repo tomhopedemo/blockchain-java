@@ -1,4 +1,4 @@
-package crypto.blockchain.api.chain;
+package crypto.blockchain.api;
 
 public enum ChainType {
     SIMPLE,

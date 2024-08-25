@@ -1,37 +1,33 @@
-package crypto.blockchain.api.auxillary;
+package crypto.blockchain.api;
 
+import crypto.blockchain.BlockType;
 import crypto.blockchain.BlockchainException;
-import crypto.blockchain.api.chain.ChainType;
 import crypto.blockchain.service.AuxService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-public class RequestController {
+import static crypto.blockchain.api.Control.CORS;
 
-    //trusted process to handle your keys + generate transactions
-    public static final String CORS = "http://localhost:3000";
+@RestController  @CrossOrigin(origins = CORS)
+public class AuxiliaryAPI {
 
-    AuxService auxService = new AuxService();
-
-    @GetMapping("/keys/add") @CrossOrigin(origins = CORS)
+    @GetMapping("/auxiliary/keys/add")
     void addKey(@RequestParam("id") String id, @RequestParam("publicKey") String publicKey, @RequestParam("privateKey") String privateKey){
-        auxService.addKey(id, publicKey, privateKey);
+        new AuxService().addKey(id, publicKey, privateKey);
     }
 
-    @GetMapping("/request/create")  @CrossOrigin(origins = CORS)
+    @GetMapping("/auxiliary/transaction/create")
     String create(@RequestParam("id") String id,
                     @RequestParam("from") String from,
                     @RequestParam("to") String to,
                     @RequestParam("value") Long value,
                     @RequestParam("type") String type
-
     ) throws BlockchainException {
+        AuxService auxService = new AuxService();
         if (auxService.exists(id)) {
-            return auxService.createRequestJson(ChainType.valueOf(type), id, from, to, value);
+            return auxService.createRequestJson(BlockType.valueOf(type), id, from, to, value);
         }
         return null;
     }

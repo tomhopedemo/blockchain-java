@@ -4,9 +4,9 @@ import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
 import crypto.blockchain.account.AccountTransactionRequest;
 import crypto.blockchain.account.AccountTransactionRequestFactory;
-import crypto.blockchain.api.chain.ChainType;
-import crypto.blockchain.utxo.TransactionChain;
-import org.springframework.stereotype.Component;
+import crypto.blockchain.utxo.TransactionCache;
+import crypto.blockchain.utxo.TransactionRequest;
+import crypto.blockchain.utxo.TransactionRequestFactory;
 
 import java.util.Optional;
 
@@ -20,7 +20,7 @@ public class AuxService {
         return Data.getBlockchain(id) != null;
     }
 
-    public String createRequestJson(ChainType type, String id, String from, String to, long value) throws BlockchainException {
+    public String createRequestJson(BlockType type, String id, String from, String to, long value) throws BlockchainException {
         switch(type){
             case ACCOUNT -> {
                 Optional<Wallet> wallet = Data.getWallet(id, from);
@@ -31,7 +31,16 @@ public class AuxService {
                     }
                 }
             }
-            case UTXO -> new TransactionChain(id).simulate();
+            case UTXO -> {
+                Optional<Wallet> wallet = Data.getWallet(id, from);
+                if (wallet.isPresent()) {
+                    TransactionCache transactionCache = Data.getTransactionCache(id);
+                    Optional<TransactionRequest> transactionRequest = TransactionRequestFactory.createTransactionRequest(wallet.get(), to, value, transactionCache);
+                    if (transactionRequest.isPresent()){
+                        return new GsonBuilder().setPrettyPrinting().create().toJson(transactionRequest.get());
+                    }
+                }
+            }
         }
         return null;
     }

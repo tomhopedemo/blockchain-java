@@ -10,11 +10,10 @@ public record AccountChain(String id){
     public void genesis(long value, String genesisKey) {
         TransactionOutput transactionOutput = new TransactionOutput(genesisKey, value);
         AccountTransactionRequests requests = new AccountTransactionRequests(List.of(new AccountTransactionRequest(null, List.of(transactionOutput))));
-        mineNextBlock(requests, id);
+        mineNextBlock(requests);
     }
 
     public void simulate() throws BlockchainException {
-        Blockchain blockchain = Data.getChain(id);
         Wallet wallet = Wallet.generate();
         Wallet genesis = Data.getGenesisWallet(id);
 
@@ -26,9 +25,9 @@ public record AccountChain(String id){
         }
 
         if (!transactionRequestsQueue.isEmpty()) {
-            Optional<AccountTransactionRequests> transactionRequestsForNextBlock = constructTransactionRequestsForNextBlock(transactionRequestsQueue, id);
+            Optional<AccountTransactionRequests> transactionRequestsForNextBlock = prepareRequests(transactionRequestsQueue);
             if (transactionRequestsForNextBlock.isPresent()) {
-                mineNextBlock(transactionRequestsForNextBlock.get(), id);
+                mineNextBlock(transactionRequestsForNextBlock.get());
                 transactionRequestsQueue.removeAll(transactionRequestsForNextBlock.get().getTransactionRequests());
             }
         }
@@ -36,7 +35,7 @@ public record AccountChain(String id){
         Data.addWallet(id, wallet);
     }
 
-    public void mineNextBlock(AccountTransactionRequests transactionRequests, String id) {
+    public void mineNextBlock(AccountTransactionRequests transactionRequests) {
         Blockchain blockchain = Data.getChain(id);
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
@@ -76,9 +75,10 @@ public record AccountChain(String id){
                 }
             }
         }
+        Requests.remove(id, transactionRequests.getTransactionRequests(), BlockType.ACCOUNT);
     }
 
-    public static Optional<AccountTransactionRequests> constructTransactionRequestsForNextBlock(List<AccountTransactionRequest> availableTransactionRequests, String id) {
+    public  Optional<AccountTransactionRequests> prepareRequests(List<AccountTransactionRequest> availableTransactionRequests) {
         List<AccountTransactionRequest> transactionRequestsToInclude = new ArrayList<>();
         for (AccountTransactionRequest transactionRequest : availableTransactionRequests) {
             //verify signature
@@ -94,6 +94,4 @@ public record AccountChain(String id){
             return Optional.of(new AccountTransactionRequests(transactionRequestsToInclude));
         }
     }
-
-
 }

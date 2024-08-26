@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
 import crypto.blockchain.account.AccountChain;
 import crypto.blockchain.account.AccountTransactionRequest;
-import crypto.blockchain.simple.SimpleBlockchain;
+import crypto.blockchain.simple.SimpleChain;
 import crypto.blockchain.utxo.UTXORequest;
 import crypto.blockchain.utxo.UTXOChain;
 
@@ -26,7 +26,7 @@ public class ChainService {
 
     public void createGenesisBlock(String id, BlockType type, Long value, String key)  {
         switch(type){
-            case DATA -> new SimpleBlockchain(id).genesis();
+            case DATA -> new SimpleChain(id).genesis();
             case ACCOUNT -> new AccountChain(id).genesis(value, key);
             case UTXO -> new UTXOChain(id).genesis(value, key);
         }
@@ -34,7 +34,7 @@ public class ChainService {
 
     public void simulateBlock(String id, BlockType type, Wallet from) throws BlockchainException {
         switch(type){
-            case DATA -> new SimpleBlockchain(id).simulate();
+            case DATA -> new SimpleChain(id).simulate();
             case ACCOUNT -> new AccountChain(id).simulate();
             case UTXO -> new UTXOChain(id).simulate(from);
         }

@@ -79,8 +79,9 @@ public class Data {
         allowedBlocktypes.get(id).add(type);
     }
 
-
-
+    public static Set<BlockType> getBlockTypes(String id){
+        return allowedBlocktypes.get(id);
+    }
 
 
     public static AccountCache getAccountBalanceCache(String id){

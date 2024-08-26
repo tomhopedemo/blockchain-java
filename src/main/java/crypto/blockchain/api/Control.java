@@ -16,6 +16,10 @@ import java.security.Security;
  *  9. rather than building different services, create instance of a monolith with certain features enabled.
  *  10. modify simulate controller to do all of the aspects, including holding the wallet locally. and creating the genesis blocks
  * 11. submit to add to requests queue for all blockchains
+ * 12. simple chain to have signatured data
+ * 13. miners!
+ * 14. mining difficulty for utxo, want this to be programmable with algos. it shouldn't be a value. it should  be a calc itself,
+ * potentially somethign which is set on chain and not specific to a block type. I think it should be set on the chain and accessed
  we need to solve this type issue. i don't want to be explictly passing around type and at the same
  time i dont' want to be dependent on type being specified at blockchain level that can't be changed
  later. so an alternative is that we retain it on the block level i.e. it is the block itself which is typed.

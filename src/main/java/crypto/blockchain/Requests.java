@@ -28,4 +28,21 @@ public class Requests {
         dataRequests.putIfAbsent(id, new ArrayList<>());
         dataRequests.get(id).add(request);
     }
+
+    public static List<? extends Request> get(String id, BlockType blockType) {
+        return switch (blockType){
+            case DATA -> dataRequests.get(id);
+            case ACCOUNT -> accountRequests.get(id);
+            case UTXO -> utxoRequests.get(id);
+        };
+    }
+
+    public static void remove(String id, List<? extends Request> transactionRequests, BlockType blockType) {
+        switch (blockType){
+            case DATA -> dataRequests.get(id).removeAll(transactionRequests);
+            case ACCOUNT -> accountRequests.get(id).removeAll(transactionRequests);
+            case UTXO -> utxoRequests.get(id).removeAll(transactionRequests);
+        }
+    }
+
 }

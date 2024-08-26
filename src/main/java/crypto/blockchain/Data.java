@@ -31,6 +31,10 @@ public class Data {
         return blockchains.get(id);
     }
 
+    public static boolean hasChain(String id) {
+        return blockchains.containsKey(id);
+    }
+
 
     public static void addWallet(String id, Wallet wallet) {
         walletCaches.putIfAbsent(id, new WalletCache());
@@ -88,7 +92,7 @@ public class Data {
     }
 
     public static List<String> getKeys(String id) {
-        return walletCaches.get(id).getWallets().stream().map(w -> w.publicKeyAddress).toList();
+        return walletCaches.get(id).getWallets().stream().map(w -> w.getPublicKeyAddress()).toList();
     }
 
     public static Optional<Wallet> getWallet(String id, String from) {

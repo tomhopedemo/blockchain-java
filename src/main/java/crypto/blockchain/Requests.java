@@ -11,7 +11,7 @@ public class Requests {
 
     static Map<String, List<AccountTransactionRequest>> accountRequests;
     static Map<String, List<UTXORequest>> utxoRequests;
-    static Map<String, List<String>> dataRequests;
+    static Map<String, List<DataRequest>> dataRequests;
 
 
     public static void add(String id, AccountTransactionRequest request) {
@@ -24,7 +24,7 @@ public class Requests {
         utxoRequests.get(id).add(request);
     }
 
-    public static void add(String id, String request) {
+    public static void add(String id, DataRequest request) {
         dataRequests.putIfAbsent(id, new ArrayList<>());
         dataRequests.get(id).add(request);
     }

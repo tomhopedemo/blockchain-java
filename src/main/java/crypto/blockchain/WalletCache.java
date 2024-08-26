@@ -15,7 +15,7 @@ public class WalletCache {
     }
 
     public Optional<Wallet> getWallet(String publicKey){
-        return wallets.stream().filter(w -> publicKey.equals(w.publicKeyAddress)).findAny();
+        return wallets.stream().filter(w -> publicKey.equals(w.getPublicKeyAddress())).findAny();
     }
 
     public List<Wallet> getWallets(){

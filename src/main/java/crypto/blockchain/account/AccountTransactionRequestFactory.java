@@ -21,7 +21,7 @@ public class AccountTransactionRequestFactory {
         }
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
         transactionOutputs.add(new TransactionOutput(recipientPublicKeyAddress, transactionValue));
-        AccountTransactionRequest transactionRequest = new AccountTransactionRequest(wallet.publicKeyAddress, transactionOutputs);
+        AccountTransactionRequest transactionRequest = new AccountTransactionRequest(wallet.getPublicKeyAddress(), transactionOutputs);
         byte[] signature = calculateSignature(transactionRequest, wallet);
         transactionRequest.setSignature(signature);
         return Optional.of(transactionRequest);

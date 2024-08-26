@@ -2,6 +2,7 @@ package crypto.blockchain.api;
 
 import crypto.blockchain.BlockType;
 import crypto.blockchain.Blockchain;
+import crypto.blockchain.Request;
 import crypto.blockchain.service.ChainService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,12 +17,14 @@ public class SubmitAPI {
     @GetMapping("/transaction/submit")
     String genesis(@RequestParam("id") String id,
                    @RequestParam("type") String type,
-                   @RequestParam("transactionJson") String transactionJson){
+                   @RequestParam("transactionJson") String requestJson){
         ChainService chainService = new ChainService();
-        Blockchain blockchain = chainService.getBlockchain(id);
+        Blockchain blockchain = chainService.getChain(id);
         if (blockchain != null) {
-            chainService.submitTransaction(id, BlockType.valueOf(type), transactionJson);
+            BlockType blockType = BlockType.valueOf(type);
+            Request request = chainService.deserialiseRequest(blockType, requestJson);
+            chainService.submitRequest(id, blockType, request);
         }
-        return chainService.getBlockchainJson(id);
+        return chainService.getChainJson(id);
     }
 }

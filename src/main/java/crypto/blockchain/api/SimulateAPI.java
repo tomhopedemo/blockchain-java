@@ -1,11 +1,10 @@
 package crypto.blockchain.api;
 
 import crypto.blockchain.*;
+import crypto.blockchain.service.AuxService;
 import crypto.blockchain.service.ChainService;
-import crypto.blockchain.simple.StringHashable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Random;
@@ -18,16 +17,25 @@ public class SimulateAPI {
     String simulate() throws BlockchainException {
         String id = randomId();
         ChainService chainService = new ChainService();
-        Blockchain blockchain = chainService.getBlockchain(id);
-        if (blockchain != null) {
-            Wallet wallet = chainService.createWallet();
-
-            chainService.createChain(id);
-            chainService.allowBlockType(id, BlockType.ACCOUNT);
-            chainService.createGenesisBlock(id, BlockType.ACCOUNT, 100L, wallet.getPublicKeyAddress());
-            chainService.simulateBlock(id, BlockType.ACCOUNT, wallet);
+        if (chainService.hasChain(id)){
+            throw new BlockchainException("Unable to simulate chain");
         }
-        return chainService.getBlockchainJson(id);
+
+        Wallet wallet = chainService.createWallet();
+
+        chainService.createChain(id);
+        chainService.allowBlockType(id, BlockType.ACCOUNT);
+        chainService.createGenesisBlock(id, BlockType.ACCOUNT, 100L, wallet.getPublicKeyAddress());
+
+        AuxService auxService = new AuxService();
+        auxService.addKey(id, wallet.getPrivateKey(), wallet.getPublicKeyAddress());
+
+        Wallet toWallet = chainService.createWallet();
+        Request request = auxService.createRequest(BlockType.ACCOUNT, id, wallet.getPublicKeyAddress(), toWallet.getPublicKeyAddress(), 5);
+
+        chainService.submitRequest(id, BlockType.ACCOUNT, request);
+
+        return chainService.getChainJson(id);
     }
 
     private String randomId(){

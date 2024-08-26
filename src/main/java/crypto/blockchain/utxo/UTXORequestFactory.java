@@ -26,7 +26,7 @@ public class UTXORequestFactory {
             byte[] preSignature = transactionOutputHash.getBytes(UTF_8);
             byte[] signature;
             try {
-                PrivateKey privateKey = Encoder.decodeToPrivateKey(wallet.privateKey);
+                PrivateKey privateKey = Encoder.decodeToPrivateKey(wallet.getPrivateKey());
                 signature = ECDSA.calculateECDSASignature(privateKey, preSignature);
             } catch (GeneralSecurityException e){
                 return Optional.empty();
@@ -39,7 +39,7 @@ public class UTXORequestFactory {
 
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
         transactionOutputs.add(new TransactionOutput(recipientPublicKeyAddress, transactionValue));
-        transactionOutputs.add(new TransactionOutput(wallet.publicKeyAddress, total - transactionValue));
+        transactionOutputs.add(new TransactionOutput(wallet.getPublicKeyAddress(), total - transactionValue));
         UTXORequest transactionRequest = new UTXORequest(transactionInputs, transactionOutputs);
         return Optional.of(transactionRequest);
     }
@@ -53,7 +53,7 @@ public class UTXORequestFactory {
         Map<String, TransactionOutput> transactionOutputsById = new HashMap<>();
         for (Map.Entry<String, TransactionOutput> item: Data.getUTXOCache(id).entrySet()){
             TransactionOutput transactionOutput = item.getValue();
-            if (transactionOutput.getRecipient().equals(wallet.publicKeyAddress)) {
+            if (transactionOutput.getRecipient().equals(wallet.getPublicKeyAddress())) {
                 transactionOutputsById.put(item.getKey(), transactionOutput);
             }
         }

@@ -19,6 +19,31 @@ public class AuxService {
         return Data.getChain(id) != null;
     }
 
+    public Request createRequest(BlockType type, String id, String from, String to, long value) throws BlockchainException {
+        switch(type){
+            case ACCOUNT -> {
+                Optional<Wallet> wallet = Data.getWallet(id, from);
+                if (wallet.isPresent()) {
+                    Optional<AccountTransactionRequest> transactionRequest = AccountTransactionRequestFactory.createTransactionRequest(wallet.get(), to, value, id);
+                    if (transactionRequest.isPresent()){
+                        return transactionRequest.get();
+                    }
+                }
+            }
+            case UTXO -> {
+                Optional<Wallet> wallet = Data.getWallet(id, from);
+                if (wallet.isPresent()) {
+                    Optional<UTXORequest> utxoRequest = UTXORequestFactory.createUTXORequest(wallet.get(), to, value, id);
+                    if (utxoRequest.isPresent()){
+                        return utxoRequest.get();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+
     public String createRequestJson(BlockType type, String id, String from, String to, long value) throws BlockchainException {
         switch(type){
             case ACCOUNT -> {
@@ -26,16 +51,16 @@ public class AuxService {
                 if (wallet.isPresent()) {
                     Optional<AccountTransactionRequest> transactionRequest = AccountTransactionRequestFactory.createTransactionRequest(wallet.get(), to, value, id);
                     if (transactionRequest.isPresent()){
-                        return new GsonBuilder().setPrettyPrinting().create().toJson(transactionRequest.get());
+                        return new GsonBuilder().create().toJson(transactionRequest.get());
                     }
                 }
             }
             case UTXO -> {
                 Optional<Wallet> wallet = Data.getWallet(id, from);
                 if (wallet.isPresent()) {
-                    Optional<UTXORequest> transactionRequest = UTXORequestFactory.createUTXORequest(wallet.get(), to, value, id);
-                    if (transactionRequest.isPresent()){
-                        return new GsonBuilder().setPrettyPrinting().create().toJson(transactionRequest.get());
+                    Optional<UTXORequest> utxoRequest = UTXORequestFactory.createUTXORequest(wallet.get(), to, value, id);
+                    if (utxoRequest.isPresent()){
+                        return new GsonBuilder().create().toJson(utxoRequest.get());
                     }
                 }
             }

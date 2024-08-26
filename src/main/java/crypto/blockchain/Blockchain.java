@@ -29,8 +29,4 @@ public class Blockchain {
         return blocks.get(index);
     }
 
-    public String getId(){
-        return id;
-    }
-
 }

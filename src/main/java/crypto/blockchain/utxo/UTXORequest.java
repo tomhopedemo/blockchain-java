@@ -1,13 +1,14 @@
 package crypto.blockchain.utxo;
 
 import crypto.blockchain.BlockDataHashable;
+import crypto.blockchain.Request;
 import crypto.blockchain.TransactionOutput;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
 
 import java.util.List;
 
-public class UTXORequest implements BlockDataHashable {
+public class UTXORequest implements BlockDataHashable, Request {
 
     public List<TransactionInput> transactionInputs;
     public List<TransactionOutput> transactionOutputs;
@@ -41,8 +42,5 @@ public class UTXORequest implements BlockDataHashable {
     public String blockDataHash() {
         return transactionRequestHashHex;
     }
-
-
-
 
 }

@@ -31,7 +31,7 @@ public record UTXOChain(String id){
                 utxoRequestsQueue.removeAll(utxoRequestsForNextBlock.get().getTransactionRequests());
             }
         }
-        Data.addWallet(blockchain.getId(), wallet);
+        Data.addWallet(id, wallet);
     }
 
     public static Optional<UTXORequests> constructUTXORequestsForNextBlock(List<UTXORequest> availableUtxoRequests, String id) {

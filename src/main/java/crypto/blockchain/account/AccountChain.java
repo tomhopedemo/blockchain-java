@@ -13,21 +13,18 @@ public record AccountChain(String id){
         mineNextBlock(requests, id);
     }
 
-    private void createAndRegisterSimpleTransactionRequest(Wallet walletA, Wallet walletB, List<AccountTransactionRequest> transactionRequestsQueue, int value, String id) throws BlockchainException {
-        Optional<AccountTransactionRequest> transactionRequestOptional = AccountTransactionRequestFactory.createTransactionRequest(walletA, walletB.publicKeyAddress, value, id);
-        if (transactionRequestOptional.isPresent()){
-            AccountTransactionRequest transactionRequest = transactionRequestOptional.get();
-            transactionRequestsQueue.add(transactionRequest);
-        }
-    }
-
     public void simulate() throws BlockchainException {
         Blockchain blockchain = Data.getChain(id);
         Wallet wallet = Wallet.generate();
-        Wallet genesis = Data.getGenesisWallet(blockchain.getId());
+        Wallet genesis = Data.getGenesisWallet(id);
 
         List<AccountTransactionRequest> transactionRequestsQueue = new ArrayList<>();
-        createAndRegisterSimpleTransactionRequest(genesis, wallet, transactionRequestsQueue, 5, id);
+
+        Optional<AccountTransactionRequest> transactionRequestOptional = AccountTransactionRequestFactory.createTransactionRequest(genesis, wallet.getPublicKeyAddress(), 5, id);
+        if (transactionRequestOptional.isPresent()){
+            transactionRequestsQueue.add(transactionRequestOptional.get());
+        }
+
         if (!transactionRequestsQueue.isEmpty()) {
             Optional<AccountTransactionRequests> transactionRequestsForNextBlock = constructTransactionRequestsForNextBlock(transactionRequestsQueue, id);
             if (transactionRequestsForNextBlock.isPresent()) {
@@ -36,7 +33,7 @@ public record AccountChain(String id){
             }
         }
 
-        Data.addWallet(blockchain.getId(), wallet);
+        Data.addWallet(id, wallet);
     }
 
     public void mineNextBlock(AccountTransactionRequests transactionRequests, String id) {

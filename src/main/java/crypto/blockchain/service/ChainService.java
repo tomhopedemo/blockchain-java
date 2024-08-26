@@ -1,5 +1,6 @@
 package crypto.blockchain.service;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
 import crypto.blockchain.account.AccountChain;
@@ -13,6 +14,10 @@ public class ChainService {
     public void createChain(String id) {
         Blockchain blockchain = new Blockchain(id);
         Data.addChain(blockchain);
+    }
+
+    public boolean hasChain(String id) {
+        return Data.hasChain(id);
     }
 
     public void allowBlockType(String id, BlockType type) {
@@ -35,12 +40,12 @@ public class ChainService {
         }
     }
 
-    public Blockchain getBlockchain(String id){
+    public Blockchain getChain(String id){
         return Data.getChain(id);
     }
 
-    public String getBlockchainJson(String id){
-        return new GsonBuilder().create().toJson(getBlockchain(id));
+    public String getChainJson(String id){
+        return new GsonBuilder().create().toJson(getChain(id));
     }
 
     public boolean exists(String id){
@@ -59,19 +64,27 @@ public class ChainService {
         return Wallet.generate();
     }
 
-    public void submitTransaction(String id, BlockType type, String transactionJson) {
+    public void submitRequest(String id, BlockType type, Request request) {
         switch(type){
             case DATA -> {
-                Requests.add(id, transactionJson);
+                Requests.add(id, (DataRequest) request);
             }
             case ACCOUNT -> {
-                AccountTransactionRequest request = new GsonBuilder().create().fromJson(transactionJson, AccountTransactionRequest.class);
-                Requests.add(id, request);
+                Requests.add(id, (AccountTransactionRequest) request);
             }
             case UTXO -> {
-                UTXORequest request = new GsonBuilder().create().fromJson(transactionJson, UTXORequest.class);
-                Requests.add(id, request);
+                Requests.add(id, (UTXORequest) request);
             }
         }
     }
+
+    public Request deserialiseRequest(BlockType blockType, String requestJson) {
+        final Gson gson = new GsonBuilder().create();
+        return switch(blockType){
+            case DATA -> gson.fromJson(requestJson, DataRequest.class);
+            case ACCOUNT -> gson.fromJson(requestJson, AccountTransactionRequest.class);
+            case UTXO -> gson.fromJson(requestJson, UTXORequest.class);
+        };
+    }
+
 }

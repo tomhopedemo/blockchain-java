@@ -1,13 +1,14 @@
 package crypto.blockchain.account;
 
 import crypto.blockchain.BlockDataHashable;
+import crypto.blockchain.Request;
 import crypto.blockchain.TransactionOutput;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
 
 import java.util.List;
 
-public class AccountTransactionRequest implements BlockDataHashable {
+public class AccountTransactionRequest implements BlockDataHashable, Request {
 
     public String publicKeyAddress;
     public List<TransactionOutput> transactionOutputs;

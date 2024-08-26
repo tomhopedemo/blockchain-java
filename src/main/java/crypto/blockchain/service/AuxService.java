@@ -4,10 +4,14 @@ import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
 import crypto.blockchain.account.AccountTransactionRequest;
 import crypto.blockchain.account.AccountTransactionRequestFactory;
+import crypto.blockchain.signed.SignedDataRequest;
+import crypto.blockchain.signed.SignedDataRequestFactory;
 import crypto.blockchain.utxo.UTXORequest;
 import crypto.blockchain.utxo.UTXORequestFactory;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 public class AuxService {
 
@@ -19,52 +23,25 @@ public class AuxService {
         return Data.getChain(id) != null;
     }
 
-    public Request createRequest(BlockType type, String id, String from, String to, long value) throws BlockchainException {
-        switch(type){
-            case ACCOUNT -> {
-                Optional<Wallet> wallet = Data.getWallet(id, from);
-                if (wallet.isPresent()) {
-                    Optional<AccountTransactionRequest> transactionRequest = AccountTransactionRequestFactory.createTransactionRequest(wallet.get(), to, value, id);
-                    if (transactionRequest.isPresent()){
-                        return transactionRequest.get();
-                    }
-                }
-            }
-            case UTXO -> {
-                Optional<Wallet> wallet = Data.getWallet(id, from);
-                if (wallet.isPresent()) {
-                    Optional<UTXORequest> utxoRequest = UTXORequestFactory.createUTXORequest(wallet.get(), to, value, id);
-                    if (utxoRequest.isPresent()){
-                        return utxoRequest.get();
-                    }
-                }
-            }
+    public Optional<? extends Request> createRequest(BlockType type, String id, String from, String to, Object value) throws BlockchainException {
+        Optional<Wallet> wallet = Data.getWallet(id, from);
+        if (wallet.isEmpty()){
+            return Optional.empty();
         }
-        return null;
+        return switch(type){
+            case DATA -> Optional.empty();
+            case SIGNED_DATA -> SignedDataRequestFactory.createSignedDataRequest(wallet.get(), (String) value);
+            case ACCOUNT -> AccountTransactionRequestFactory.createTransactionRequest(wallet.get(), to, (Long) value, id);
+            case UTXO -> UTXORequestFactory.createUTXORequest(wallet.get(), to, (Long) value, id);
+        };
     }
-
 
     public String createRequestJson(BlockType type, String id, String from, String to, long value) throws BlockchainException {
-        switch(type){
-            case ACCOUNT -> {
-                Optional<Wallet> wallet = Data.getWallet(id, from);
-                if (wallet.isPresent()) {
-                    Optional<AccountTransactionRequest> transactionRequest = AccountTransactionRequestFactory.createTransactionRequest(wallet.get(), to, value, id);
-                    if (transactionRequest.isPresent()){
-                        return new GsonBuilder().create().toJson(transactionRequest.get());
-                    }
-                }
-            }
-            case UTXO -> {
-                Optional<Wallet> wallet = Data.getWallet(id, from);
-                if (wallet.isPresent()) {
-                    Optional<UTXORequest> utxoRequest = UTXORequestFactory.createUTXORequest(wallet.get(), to, value, id);
-                    if (utxoRequest.isPresent()){
-                        return new GsonBuilder().create().toJson(utxoRequest.get());
-                    }
-                }
-            }
+        Optional<? extends Request> request = createRequest(type, id, from, to, value);
+        if (request.isEmpty()){
+            return null;
         }
-        return null;
+        return new GsonBuilder().create().toJson(request.get(), type.getRequestClass());
     }
+
 }

@@ -14,7 +14,7 @@ public class AccountCache {
         accounts.compute(accountPublicKey, (_, v) -> v == null ? -value : v - value);
     }
 
-    public Long get(String publicKeyAddress) {
-        return accounts.get(publicKeyAddress);
+    public Long get(String accountPublicKey) {
+        return accounts.get(accountPublicKey);
     }
 }

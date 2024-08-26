@@ -1,8 +1,6 @@
 package crypto.blockchain.api;
 
-import crypto.blockchain.BlockType;
-import crypto.blockchain.Blockchain;
-import crypto.blockchain.Request;
+import crypto.blockchain.*;
 import crypto.blockchain.service.ChainService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -26,6 +24,7 @@ public class SubmitAPI {
             BlockType blockType = BlockType.valueOf(type);
             Request request = chainService.deserialiseRequest(blockType, requestJson);
             chainService.submitRequest(id, blockType, request);
+            MinerPool.addMiner(new Miner(id));
             return new ResponseEntity<>(chainService.getChainJson(id), OK);
         } else {
             return new ResponseEntity<>(INTERNAL_SERVER_ERROR);

@@ -12,6 +12,11 @@ public class TransactionOutput {
         this.value = String.valueOf(value);
     }
 
+    public TransactionOutput(String publicKeyAddress, String value) {
+        this.recipient = publicKeyAddress;
+        this.value = String.valueOf(value);
+    }
+
     public long getValue(){
         return Long.parseLong(value);
     }

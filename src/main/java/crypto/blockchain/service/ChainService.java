@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
 import crypto.blockchain.account.AccountChain;
 import crypto.blockchain.account.AccountTransactionRequest;
+import crypto.blockchain.signed.SignedChain;
+import crypto.blockchain.signed.SignedDataRequest;
 import crypto.blockchain.simple.SimpleChain;
 import crypto.blockchain.utxo.UTXORequest;
 import crypto.blockchain.utxo.UTXOChain;
@@ -24,19 +26,12 @@ public class ChainService {
         Data.addType(id, type);
     }
 
-    public void createGenesisBlock(String id, BlockType type, Long value, String key)  {
+    public void createGenesisBlock(String id, BlockType type, Object value, String key)  {
         switch(type){
-            case DATA -> new SimpleChain(id).genesis();
-            case ACCOUNT -> new AccountChain(id).genesis(value, key);
-            case UTXO -> new UTXOChain(id).genesis(value, key);
-        }
-    }
-
-    public void simulateBlock(String id, BlockType type, Wallet from) throws BlockchainException {
-        switch(type){
-            case DATA -> new SimpleChain(id).simulate();
-            case ACCOUNT -> new AccountChain(id).simulate();
-            case UTXO -> new UTXOChain(id).simulate(from);
+            case DATA -> new SimpleChain(id).genesis((String) value);
+            case SIGNED_DATA -> new SignedChain(id).genesis((String) value, key);
+            case ACCOUNT -> new AccountChain(id).genesis((Long) value, key);
+            case UTXO -> new UTXOChain(id).genesis((Long) value, key);
         }
     }
 
@@ -62,15 +57,10 @@ public class ChainService {
 
     public void submitRequest(String id, BlockType type, Request request) {
         switch(type){
-            case DATA -> {
-                Requests.add(id, (DataRequest) request);
-            }
-            case ACCOUNT -> {
-                Requests.add(id, (AccountTransactionRequest) request);
-            }
-            case UTXO -> {
-                Requests.add(id, (UTXORequest) request);
-            }
+            case DATA -> Requests.add(id, (DataRequest) request);
+            case SIGNED_DATA -> Requests.add(id, (SignedDataRequest) request);
+            case ACCOUNT -> Requests.add(id, (AccountTransactionRequest) request);
+            case UTXO -> Requests.add(id, (UTXORequest) request);
         }
     }
 
@@ -78,6 +68,7 @@ public class ChainService {
         final Gson gson = new GsonBuilder().create();
         return switch(blockType){
             case DATA -> gson.fromJson(requestJson, DataRequest.class);
+            case SIGNED_DATA -> gson.fromJson(requestJson, SignedDataRequest.class);
             case ACCOUNT -> gson.fromJson(requestJson, AccountTransactionRequest.class);
             case UTXO -> gson.fromJson(requestJson, UTXORequest.class);
         };

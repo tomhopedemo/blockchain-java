@@ -20,7 +20,7 @@ public class AccountTransactionRequests implements BlockDataHashable {
 
     @Override
     public String blockDataHash()  {
-        String preHash = String.join("", transactionRequests.stream().map(transactionRequest -> transactionRequest.getTransactionRequestHash()).toList());
+        String preHash = String.join("", transactionRequests.stream().map(transactionRequest -> transactionRequest.blockDataHash()).toList());
         byte[] hash = Hashing.hash(preHash);
         return Encoder.encodeToHexadecimal(hash);
     }

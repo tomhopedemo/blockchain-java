@@ -29,6 +29,7 @@ public class AuxiliaryAPI {
     ) throws BlockchainException {
         AuxService auxService = new AuxService();
         if (auxService.exists(id)) {
+
             String requestJson = auxService.createRequestJson(BlockType.valueOf(type), id, from, to, value);
             return new ResponseEntity<>(requestJson, HttpStatus.OK);
         } else {

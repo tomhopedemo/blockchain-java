@@ -1,5 +1,6 @@
 package crypto.blockchain.api;
 
+import crypto.blockchain.MinerPool;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -25,8 +26,6 @@ import java.security.Security;
  later. so an alternative is that we retain it on the block level i.e. it is the block itself which is typed.
  so actually you can try and add any block type to the blockchain......
  and whether or not the blockchain is valid or not depends on the software which checks it.
-
-
  */
 @SpringBootApplication
 public class Control {

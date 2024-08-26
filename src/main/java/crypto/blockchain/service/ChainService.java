@@ -48,10 +48,6 @@ public class ChainService {
         return new GsonBuilder().create().toJson(getChain(id));
     }
 
-    public boolean exists(String id){
-        return Data.getChain(id) != null;
-    }
-
     public String getKeysJson(String id) {
         return new GsonBuilder().create().toJson(Data.getKeys(id));
     }

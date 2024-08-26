@@ -3,6 +3,8 @@ package crypto.blockchain.api;
 import crypto.blockchain.*;
 import crypto.blockchain.service.AuxService;
 import crypto.blockchain.service.ChainService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,11 +16,11 @@ import static crypto.blockchain.api.Control.CORS;
 @RestController @CrossOrigin(origins = CORS)
 public class SimulateAPI {
     @GetMapping("/simulate")
-    String simulate() throws BlockchainException {
+    public ResponseEntity<?> simulate() throws BlockchainException {
         String id = randomId();
         ChainService chainService = new ChainService();
         if (chainService.hasChain(id)){
-            throw new BlockchainException("Unable to simulate chain");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         Wallet wallet = chainService.createWallet();
@@ -34,8 +36,9 @@ public class SimulateAPI {
         Request request = auxService.createRequest(BlockType.ACCOUNT, id, wallet.getPublicKeyAddress(), toWallet.getPublicKeyAddress(), 5);
 
         chainService.submitRequest(id, BlockType.ACCOUNT, request);
+        new Miner(id).run(); // synchronously.
 
-        return chainService.getChainJson(id);
+        return new ResponseEntity<>(chainService.getChainJson(id), HttpStatus.OK);
     }
 
     private String randomId(){

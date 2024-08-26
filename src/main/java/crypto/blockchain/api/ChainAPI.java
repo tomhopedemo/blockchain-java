@@ -1,6 +1,8 @@
 package crypto.blockchain.api;
 
 import crypto.blockchain.service.ChainService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,12 +14,21 @@ import static crypto.blockchain.api.Control.CORS;
 public class ChainAPI {
 
     @GetMapping("/chain/create")
-    String create(@RequestParam("id") String id) {
+    public ResponseEntity<?> create(@RequestParam String id) {
         ChainService chainService = new ChainService();
-        if (!chainService.exists(id)) {
+        if (chainService.hasChain(id)) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
             chainService.createChain(id);
-            return id;
+            return new ResponseEntity<>(id, HttpStatus.OK);
         }
-        return null;
     }
+
+
+    @GetMapping("/chain/get")
+    public String get(@RequestParam("id") String id) {
+        return new ChainService().getChainJson(id);
+    }
+
+
 }

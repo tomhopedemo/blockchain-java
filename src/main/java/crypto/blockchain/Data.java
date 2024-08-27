@@ -88,10 +88,6 @@ public class Data {
         return accountCaches.get(id);
     }
 
-    public static Wallet getGenesisWallet(String id) {
-        return walletCaches.get(id).getGenesisWallet();
-    }
-
     public static List<String> getKeys(String id) {
         return walletCaches.get(id).getWallets().stream().map(w -> w.getPublicKeyAddress()).toList();
     }

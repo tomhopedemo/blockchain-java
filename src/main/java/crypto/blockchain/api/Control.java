@@ -6,16 +6,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.security.Security;
 /**
- *  1. implement staking + leader identification
- *  2. accoutn bsed -> Overall Verification (account balance) - would want to check that either there is only one transaction per account or the account covers all
- *  3. visualization of blockchain data to be of the form, select block/blocks
- *  4. blockchain validation can happen at blockchain level
- *  5. mining difficulty for utxo, want this to be programmable with algos. it shouldn't be a value. it should  be a calc itself,potentially somethign which is set on chain and not specific to a block type. I think it should be set on the chain and accessed
- we need to solve this type issue. i don't want to be explictly passing around type and at the same
- time i dont' want to be dependent on type being specified at blockchain level that can't be changed
- later. so an alternative is that we retain it on the block level i.e. it is the block itself which is typed.
- so actually you can try and add any block type to the blockchain......
- and whether or not the blockchain is valid or not depends on the software which checks it.
+ *  1. staking + leader identification (note i like the idea that nodes can be spun up at
+ *  will, and we can have a list of leaders). also for staking should there be a limit.
+ *  is it fair that you need a lot to pay for staking.
+ *  traditional staking - so stake transaction. staking transaction.
+ *  //this can either be to a specific account - which is dirty - or a different block type.
+ *  //so we'll iterate through until we find a valid version. you pay to write the value
+ *  //you'll be notified ahead of time - core node. will exist to always do this.
+ *  2. visualization of blockchain data to be of the form, select block/blocks
+ *  4. mining difficulty for utxo, want this to be programmable with algos. it shouldn't be a value. it should be a calc itself,potentially somethign which is set on chain and not specific to a block type. I think it should be set on the chain and accessed
+ *  5. always have a node available for the 'client' - so store the chain.
+ *
  */
 @SpringBootApplication
 public class Control {

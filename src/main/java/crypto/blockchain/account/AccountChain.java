@@ -22,7 +22,7 @@ public record AccountChain(String id){
         //Individual Transaction Verification
         if (!isGenesis) {
             for (AccountTransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
-                boolean verified = AccountTransactionVerification.verifySignature(transactionRequest, false, id);
+                boolean verified = AccountTransactionVerification.verify(transactionRequest, false, id);
                 if (!verified) {
                     return;
                 }
@@ -56,11 +56,10 @@ public record AccountChain(String id){
         Requests.remove(id, transactionRequests.getTransactionRequests(), BlockType.ACCOUNT);
     }
 
-    public  Optional<AccountTransactionRequests> prepareRequests(List<AccountTransactionRequest> availableTransactionRequests) {
+    public Optional<AccountTransactionRequests> prepareRequests(List<AccountTransactionRequest> availableAccountTransactionRequests) {
         List<AccountTransactionRequest> transactionRequestsToInclude = new ArrayList<>();
-        for (AccountTransactionRequest transactionRequest : availableTransactionRequests) {
-            //verify signature
-            boolean verified = AccountTransactionVerification.verifySignature(transactionRequest, false, id);
+        for (AccountTransactionRequest transactionRequest : availableAccountTransactionRequests) {
+            boolean verified = AccountTransactionVerification.verify(transactionRequest, false, id);
             if (!verified){
                 continue;
             }

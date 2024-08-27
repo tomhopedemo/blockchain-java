@@ -8,12 +8,6 @@ public class WalletCache {
 
     private final List<Wallet> wallets = new ArrayList<>();
 
-    private Wallet genesisWallet;
-
-    public Wallet getGenesisWallet(){
-        return genesisWallet;
-    }
-
     public Optional<Wallet> getWallet(String publicKey){
         return wallets.stream().filter(w -> publicKey.equals(w.getPublicKeyAddress())).findAny();
     }
@@ -26,8 +20,4 @@ public class WalletCache {
         wallets.add(wallet);
     }
 
-    public void addGenesisWallet(Wallet genesis) {
-        genesisWallet = genesis;
-        wallets.add(genesis);
-    }
 }

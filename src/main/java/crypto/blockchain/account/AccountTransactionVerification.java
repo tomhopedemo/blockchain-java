@@ -13,7 +13,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AccountTransactionVerification {
 
-    public static boolean verifySignature(AccountTransactionRequest transactionRequest, boolean skipEqualityCheck, String id) {
+    public static boolean verify(AccountTransactionRequest transactionRequest, boolean skipBalanceCheck, String id) {
         String transactionOutputsHash = transactionRequest.generateTransactionOutputsHash();
         try {
             PublicKey publicKey = Encoder.decodeToPublicKey(transactionRequest.getPublicKeyAddress());
@@ -25,7 +25,7 @@ public class AccountTransactionVerification {
             return false;
         }
 
-        if (!skipEqualityCheck) { //genesis transactions
+        if (!skipBalanceCheck) { //genesis transactions
             boolean hasBalance = hasBalance(transactionRequest, id);
             if (!hasBalance) {
                 return false;

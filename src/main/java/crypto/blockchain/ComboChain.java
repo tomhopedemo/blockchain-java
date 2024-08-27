@@ -16,7 +16,7 @@ public record ComboChain(String id){
         new AccountChain(id).mineNextBlock(new AccountTransactionRequests(List.of(request)));
     }
 
-    public void simulate(Wallet from) throws BlockchainException {
+    public void simulate(Wallet from) throws ChainException {
         Wallet wallet = Wallet.generate();
         Data.addWallet(id, wallet);
         AccountTransactionRequest transactionRequest = AccountTransactionRequestFactory.createTransactionRequest(from, wallet.getPublicKeyAddress(), 5, id).get();

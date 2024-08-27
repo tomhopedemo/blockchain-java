@@ -13,7 +13,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AccountTransactionRequestFactory {
 
-    public static Optional<AccountTransactionRequest> createTransactionRequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue, String id) throws BlockchainException {
+    public static Optional<AccountTransactionRequest> createTransactionRequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue, String id) throws ChainException {
         AccountCache accountBalanceCache = Data.getAccountBalanceCache(id);
         Long balance = accountBalanceCache.get(wallet.getPublicKeyAddress());
         if (balance < transactionValue) {
@@ -27,14 +27,14 @@ public class AccountTransactionRequestFactory {
         return Optional.of(transactionRequest);
     }
 
-    public static byte[] calculateSignature(AccountTransactionRequest transactionRequest, Wallet wallet) throws BlockchainException{
+    public static byte[] calculateSignature(AccountTransactionRequest transactionRequest, Wallet wallet) throws ChainException {
         String transactionOutputsHash = transactionRequest.generateTransactionOutputsHash();
         byte[] preSignature = transactionOutputsHash.getBytes(UTF_8);
         try {
             PrivateKey privateKey = Encoder.decodeToPrivateKey(wallet.getPrivateKey());
             return ECDSA.calculateECDSASignature(privateKey, preSignature);
         } catch (GeneralSecurityException e){
-            throw new BlockchainException(e);
+            throw new ChainException(e);
         }
     }
 

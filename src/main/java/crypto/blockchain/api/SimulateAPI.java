@@ -18,7 +18,7 @@ import static crypto.blockchain.api.Control.CORS;
 @RestController @CrossOrigin(origins = CORS)
 public class SimulateAPI {
     @GetMapping("/simulate")
-    public ResponseEntity<?> simulate(@RequestParam("type") String type) throws BlockchainException {
+    public ResponseEntity<?> simulate(@RequestParam("type") String type) throws ChainException {
         BlockType blockType = BlockType.valueOf(type);
         String id = randomString(5);
         ChainService chainService = new ChainService();
@@ -57,7 +57,7 @@ public class SimulateAPI {
         return new ResponseEntity<>(chainService.getChainJson(id), HttpStatus.OK);
     }
 
-    private ResponseEntity<?> simulateSignedData(String id) throws BlockchainException {
+    private ResponseEntity<?> simulateSignedData(String id) throws ChainException {
         ChainService chainService = new ChainService();
         Wallet wallet = chainService.createWallet();
         Wallet anotherWallet = chainService.createWallet();
@@ -78,7 +78,7 @@ public class SimulateAPI {
     }
 
 
-    private ResponseEntity<?> simulateTransactional(String id, BlockType blockType) throws BlockchainException {
+    private ResponseEntity<?> simulateTransactional(String id, BlockType blockType) throws ChainException {
         ChainService chainService = new ChainService();
         Wallet wallet = chainService.createWallet();
 

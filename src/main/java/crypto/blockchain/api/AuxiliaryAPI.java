@@ -1,7 +1,7 @@
 package crypto.blockchain.api;
 
 import crypto.blockchain.BlockType;
-import crypto.blockchain.BlockchainException;
+import crypto.blockchain.ChainException;
 import crypto.blockchain.service.AuxService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,7 @@ public class AuxiliaryAPI {
                     @RequestParam("to") String to,
                     @RequestParam("value") Long value,
                     @RequestParam("type") String type
-    ) throws BlockchainException {
+    ) throws ChainException {
         AuxService auxService = new AuxService();
         if (auxService.exists(id)) {
 

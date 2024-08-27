@@ -8,8 +8,6 @@ public class Blockchain {
     public String id;
     public List<Block> blocks = new ArrayList<>();
 
-    public boolean valid = true;
-
     public Blockchain(String id) {
         this.id = id;
     }

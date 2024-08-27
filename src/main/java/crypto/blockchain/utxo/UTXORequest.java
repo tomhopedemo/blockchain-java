@@ -12,18 +12,23 @@ public class UTXORequest implements BlockDataHashable, Request {
 
     public List<TransactionInput> transactionInputs;
     public List<TransactionOutput> transactionOutputs;
-    public String transactionRequestHashHex;
+    public String transactionRequestHash;
 
-    public UTXORequest(List<TransactionInput> transactionInputs, List<TransactionOutput> transactionOutputs) {
-        this.transactionInputs = transactionInputs;
-        this.transactionOutputs = transactionOutputs;
-        this.transactionRequestHashHex = Encoder.encodeToHexadecimal(calculateTransactionHash());
+    @Override
+    public String getBlockDataHash() {
+        return transactionRequestHash;
     }
 
     private byte[] calculateTransactionHash() {
         String preHash = String.join("", getTransactionInputs().stream().map(transactionInput -> transactionInput.serialise()).toList()) +
                 String.join("", getTransactionOutputs().stream().map(transactionOutput -> transactionOutput.serialise()).toList());
         return Hashing.hash(preHash);
+    }
+
+    public UTXORequest(List<TransactionInput> transactionInputs, List<TransactionOutput> transactionOutputs) {
+        this.transactionInputs = transactionInputs;
+        this.transactionOutputs = transactionOutputs;
+        this.transactionRequestHash = Encoder.encodeToHexadecimal(calculateTransactionHash());
     }
 
     public List<TransactionOutput> getTransactionOutputs() {
@@ -35,12 +40,8 @@ public class UTXORequest implements BlockDataHashable, Request {
     }
 
     public String getTransactionRequestHash() {
-        return this.transactionRequestHashHex;
+        return this.transactionRequestHash;
     }
 
-    @Override
-    public String getBlockDataHash() {
-        return transactionRequestHashHex;
-    }
 
 }

@@ -32,10 +32,10 @@ public record AccountChain(String id){
         //Overall Verification (no repeat accounts)
         Set<String> accounts = new HashSet<>();
         for (AccountTransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
-            if (accounts.contains(transactionRequest.getPublicKeyAddress())){
+            if (accounts.contains(transactionRequest.publicKeyAddress())){
                 return;
             }
-            accounts.add(transactionRequest.getPublicKeyAddress());
+            accounts.add(transactionRequest.publicKeyAddress());
         }
 
 
@@ -46,7 +46,7 @@ public record AccountChain(String id){
 
         //Update Caches
         for (AccountTransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
-            for (TransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
+            for (TransactionOutput transactionOutput : transactionRequest.transactionOutputs()) {
                 Data.addAccountBalance(id, transactionOutput.getRecipient(), transactionOutput.getValue());
                 if (!isGenesis) {
                     Data.subtractAccountBalance(id, transactionOutput.getRecipient(), transactionOutput.getValue());

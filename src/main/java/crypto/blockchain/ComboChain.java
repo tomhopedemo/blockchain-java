@@ -12,7 +12,7 @@ public record ComboChain(String id){
         new UTXOChain(id).mineNextBlock(new UTXORequests(List.of(transactionRequest)), 1);
 
         TransactionOutput transactionOutput = new TransactionOutput(genesisKey, value);
-        AccountTransactionRequest request = new AccountTransactionRequest(null, List.of(transactionOutput));
+        AccountTransactionRequest request = AccountTransactionRequest.createGenesis(List.of(transactionOutput));
         new AccountChain(id).mineNextBlock(new AccountTransactionRequests(List.of(request)));
     }
 

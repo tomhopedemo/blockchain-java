@@ -39,7 +39,7 @@ public class UTXORequest implements BlockDataHashable, Request {
     }
 
     @Override
-    public String blockDataHash() {
+    public String getBlockDataHash() {
         return transactionRequestHashHex;
     }
 

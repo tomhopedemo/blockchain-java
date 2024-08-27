@@ -36,7 +36,7 @@ public class SignedDataRequest implements BlockDataHashable, Request {
     }
 
     @Override
-    public String blockDataHash() {
+    public String getBlockDataHash() {
         return getSignedDataRequestHashHex();
     }
 

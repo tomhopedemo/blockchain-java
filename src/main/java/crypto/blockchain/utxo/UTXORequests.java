@@ -19,7 +19,7 @@ public class UTXORequests implements BlockDataHashable {
     }
 
     @Override
-    public String blockDataHash()  {
+    public String getBlockDataHash()  {
         String preHash = String.join("", transactionRequests.stream().map(transactionRequest -> transactionRequest.getTransactionRequestHash()).toList());
         byte[] hash = Hashing.hash(preHash);
         return Encoder.encodeToHexadecimal(hash);

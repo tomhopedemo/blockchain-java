@@ -14,10 +14,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class AccountTransactionVerification {
 
     public static boolean verify(AccountTransactionRequest transactionRequest, boolean skipBalanceCheck, String id) {
-        String transactionOutputsHash = transactionRequest.generateTransactionOutputsHash();
         try {
             PublicKey publicKey = Encoder.decodeToPublicKey(transactionRequest.getPublicKeyAddress());
-            boolean verified = ECDSA.verifyECDSASignature(publicKey, transactionOutputsHash.getBytes(UTF_8), Hex.decode(transactionRequest.getSignature()));
+            String integratedHash = transactionRequest.generateIntegratedHash();
+            boolean verified = ECDSA.verifyECDSASignature(publicKey, integratedHash.getBytes(UTF_8), Hex.decode(transactionRequest.getSignature()));
             if (!verified){
                 return false;
             }
@@ -25,7 +25,7 @@ public class AccountTransactionVerification {
             return false;
         }
 
-        if (!skipBalanceCheck) { //genesis transactions
+        if (!skipBalanceCheck) {
             boolean hasBalance = hasBalance(transactionRequest, id);
             if (!hasBalance) {
                 return false;

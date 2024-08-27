@@ -9,7 +9,7 @@ public record AccountChain(String id){
 
     public void genesis(long value, String genesisKey) {
         TransactionOutput transactionOutput = new TransactionOutput(genesisKey, value);
-        AccountTransactionRequests requests = new AccountTransactionRequests(List.of(new AccountTransactionRequest(null, List.of(transactionOutput))));
+        AccountTransactionRequests requests = new AccountTransactionRequests(List.of(AccountTransactionRequest.createGenesis(List.of(transactionOutput))));
         mineNextBlock(requests);
     }
 

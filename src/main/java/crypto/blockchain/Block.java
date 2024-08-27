@@ -14,7 +14,7 @@ public class Block {
 
     public Block(BlockDataHashable blockDataHashable, String previousHashId) {
         this.blockData =  blockDataHashable;
-        this.blockDataHash = blockDataHashable.blockDataHash();
+        this.blockDataHash = blockDataHashable.getBlockDataHash();
         this.previousBlockHashId = previousHashId;
     }
 

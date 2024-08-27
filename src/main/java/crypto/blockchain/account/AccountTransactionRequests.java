@@ -19,8 +19,8 @@ public class AccountTransactionRequests implements BlockDataHashable {
     }
 
     @Override
-    public String blockDataHash()  {
-        String preHash = String.join("", transactionRequests.stream().map(transactionRequest -> transactionRequest.blockDataHash()).toList());
+    public String getBlockDataHash()  {
+        String preHash = String.join("", transactionRequests.stream().map(transactionRequest -> transactionRequest.getBlockDataHash()).toList());
         byte[] hash = Hashing.hash(preHash);
         return Encoder.encodeToHexadecimal(hash);
     }

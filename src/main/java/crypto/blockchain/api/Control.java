@@ -11,7 +11,6 @@ import java.security.Security;
  *  3. visualization of blockchain data to be of the form, select block/blocks
  *  4. blockchain validation can happen at blockchain level
  *  5. mining difficulty for utxo, want this to be programmable with algos. it shouldn't be a value. it should  be a calc itself,potentially somethign which is set on chain and not specific to a block type. I think it should be set on the chain and accessed
- *  6. chain validation by aux as an operation.
  we need to solve this type issue. i don't want to be explictly passing around type and at the same
  time i dont' want to be dependent on type being specified at blockchain level that can't be changed
  later. so an alternative is that we retain it on the block level i.e. it is the block itself which is typed.

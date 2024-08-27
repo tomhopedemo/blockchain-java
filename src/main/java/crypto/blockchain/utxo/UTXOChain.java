@@ -14,27 +14,6 @@ public record UTXOChain(String id){
         mineNextBlock(new UTXORequests(List.of(genesisTransactionRequest)), 1);
     }
 
-    public void simulate(Wallet genesis) {
-        Wallet wallet = Wallet.generate();
-        List<UTXORequest> utxoRequestsQueue = new ArrayList<>();
-        //can i add the requests to a queue in the blockchain itself? - data plez
-
-        Optional<UTXORequest> utxoRequestOptional = UTXORequestFactory.createUTXORequest(wallet, genesis.getPublicKeyAddress(), 5, id);
-        if (utxoRequestOptional.isPresent()){
-            UTXORequest utxoRequest = utxoRequestOptional.get();
-            utxoRequestsQueue.add(utxoRequest);
-        }
-
-        if (!utxoRequestsQueue.isEmpty()) {
-            Optional<UTXORequests> utxoRequestsForNextBlock = prepareRequests(utxoRequestsQueue);
-            if (utxoRequestsForNextBlock.isPresent()) {
-                mineNextBlock(utxoRequestsForNextBlock.get(), 1);
-                utxoRequestsQueue.removeAll(utxoRequestsForNextBlock.get().getTransactionRequests());
-            }
-        }
-        Data.addWallet(id, wallet);
-    }
-
     public Optional<UTXORequests> prepareRequests(List<UTXORequest> availableUtxoRequests) {
         Set<String> inputsToInclude = new HashSet<>();
         List<UTXORequest> utxoRequestsToInclude = new ArrayList<>();

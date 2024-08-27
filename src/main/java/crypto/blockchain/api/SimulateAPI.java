@@ -15,15 +15,6 @@ import java.util.Random;
 
 import static crypto.blockchain.api.Control.CORS;
 
-//public void simulateBlock(String id, BlockType type, Wallet from) throws BlockchainException {
-//    switch(type){
-//        case DATA -> new SimpleChain(id).simulate();
-//        case ACCOUNT -> new AccountChain(id).simulate();
-//        case UTXO -> new UTXOChain(id).simulate(from);
-//    }
-//}
-
-
 @RestController @CrossOrigin(origins = CORS)
 public class SimulateAPI {
     @GetMapping("/simulate")
@@ -102,7 +93,6 @@ public class SimulateAPI {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         chainService.submitRequest(id, blockType, request.get());
-
         return new ResponseEntity<>(chainService.getChainJson(id), HttpStatus.OK);
     }
 

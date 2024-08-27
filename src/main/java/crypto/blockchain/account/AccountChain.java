@@ -13,28 +13,6 @@ public record AccountChain(String id){
         mineNextBlock(requests);
     }
 
-    public void simulate() throws BlockchainException {
-        Wallet wallet = Wallet.generate();
-        Wallet genesis = Data.getGenesisWallet(id);
-
-        List<AccountTransactionRequest> transactionRequestsQueue = new ArrayList<>();
-
-        Optional<AccountTransactionRequest> transactionRequestOptional = AccountTransactionRequestFactory.createTransactionRequest(genesis, wallet.getPublicKeyAddress(), 5, id);
-        if (transactionRequestOptional.isPresent()){
-            transactionRequestsQueue.add(transactionRequestOptional.get());
-        }
-
-        if (!transactionRequestsQueue.isEmpty()) {
-            Optional<AccountTransactionRequests> transactionRequestsForNextBlock = prepareRequests(transactionRequestsQueue);
-            if (transactionRequestsForNextBlock.isPresent()) {
-                mineNextBlock(transactionRequestsForNextBlock.get());
-                transactionRequestsQueue.removeAll(transactionRequestsForNextBlock.get().getTransactionRequests());
-            }
-        }
-
-        Data.addWallet(id, wallet);
-    }
-
     public void mineNextBlock(AccountTransactionRequests transactionRequests) {
         Blockchain blockchain = Data.getChain(id);
         Block mostRecentBlock = blockchain.getMostRecent();

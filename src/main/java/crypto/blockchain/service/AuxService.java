@@ -17,7 +17,7 @@ public class AuxService {
 
     static Gson JSON = new GsonBuilder().create();
 
-    public void addKey(String id, String publicKey, String privateKey) {
+    public void registerWallet(String id, String publicKey, String privateKey) {
         Data.addWallet(id, new Wallet(privateKey, publicKey));
     }
 

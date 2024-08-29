@@ -17,7 +17,7 @@ public record AccountTransactionsBlockFactory(String id) implements BlockFactory
         //Individual Transaction Verification
         if (!isGenesis) {
             for (AccountTransactionRequest transactionRequest : transactionRequests.transactionRequests()) {
-                boolean verified = AccountTransactionVerification.verify(transactionRequest, false, id);
+                boolean verified = AccountTransactionVerification.verify(transactionRequest, id);
                 if (!verified) {
                     return;
                 }
@@ -55,7 +55,7 @@ public record AccountTransactionsBlockFactory(String id) implements BlockFactory
     public Optional<AccountTransactionRequests> prepareRequests(List<AccountTransactionRequest> availableAccountTransactionRequests) {
         List<AccountTransactionRequest> transactionRequestsToInclude = new ArrayList<>();
         for (AccountTransactionRequest transactionRequest : availableAccountTransactionRequests) {
-            boolean verified = AccountTransactionVerification.verify(transactionRequest, false, id);
+            boolean verified = AccountTransactionVerification.verify(transactionRequest, id);
             if (!verified){
                 continue;
             }

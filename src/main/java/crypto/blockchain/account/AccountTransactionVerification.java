@@ -1,5 +1,6 @@
 package crypto.blockchain.account;
 
+import crypto.blockchain.Blockchain;
 import crypto.blockchain.Data;
 import crypto.blockchain.TransactionOutput;
 import crypto.cryptography.ECDSA;
@@ -13,7 +14,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AccountTransactionVerification {
 
-    public static boolean verify(AccountTransactionRequest transactionRequest, boolean skipBalanceCheck, String id) {
+    public static boolean verify(AccountTransactionRequest transactionRequest, String id) {
         try {
             PublicKey publicKey = Encoder.decodeToPublicKey(transactionRequest.publicKey());
             String integratedHash = transactionRequest.generateIntegratedHash();
@@ -25,7 +26,7 @@ public class AccountTransactionVerification {
             return false;
         }
 
-        if (!skipBalanceCheck) {
+        if (!(Data.getChain(id).getMostRecent() == null)) {
             boolean hasBalance = hasBalance(transactionRequest, id);
             if (!hasBalance) {
                 return false;

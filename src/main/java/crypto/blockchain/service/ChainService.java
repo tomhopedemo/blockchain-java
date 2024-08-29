@@ -37,12 +37,7 @@ public class ChainService {
     }
 
     public void submitRequest(String id, BlockType type, Request request) {
-        switch(type){
-            case DATA -> Requests.add(id, (DataRequest) request);
-            case SIGNED_DATA -> Requests.add(id, (SignedDataRequest) request);
-            case ACCOUNT -> Requests.add(id, (AccountTransactionRequest) request);
-            case UTXO -> Requests.add(id, (UTXORequest) request);
-        }
+        Requests.add(id, type, request);
     }
 
     public Request deserialiseRequest(BlockType blockType, String requestJson) {

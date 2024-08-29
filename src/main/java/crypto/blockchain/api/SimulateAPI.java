@@ -61,7 +61,7 @@ public class SimulateAPI {
         Wallet wallet = auxService.createWallet();
         Wallet anotherWallet = auxService.createWallet();
 
-        auxService.addKey(id, wallet.getPrivateKey(), wallet.getPublicKeyAddress());
+        auxService.registerWallet(id, wallet.getPrivateKey(), wallet.getPublicKeyAddress());
 
         Optional<? extends Request> genesisRequest = auxService.createGenesisRequest(id, BlockType.SIGNED_DATA, wallet.getPublicKeyAddress(), "ABCDE");
         if (genesisRequest.isEmpty()){
@@ -69,7 +69,7 @@ public class SimulateAPI {
         }
         chainService.submitRequest(id, BlockType.SIGNED_DATA, genesisRequest.get());
 
-        auxService.addKey(id, anotherWallet.getPrivateKey(), anotherWallet.getPublicKeyAddress());
+        auxService.registerWallet(id, anotherWallet.getPrivateKey(), anotherWallet.getPublicKeyAddress());
         Optional<? extends Request> request = auxService.createRequest(BlockType.SIGNED_DATA, id, anotherWallet.getPublicKeyAddress(), null, "GHIJK");
         if (request.isEmpty()){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -84,9 +84,7 @@ public class SimulateAPI {
         AuxService auxService = new AuxService();
 
         Wallet wallet = auxService.createWallet();
-        Data.addWallet(id, wallet);
-
-        auxService.addKey(id, wallet.getPrivateKey(), wallet.getPublicKeyAddress());
+        auxService.registerWallet(id, wallet.getPublicKeyAddress(), wallet.getPrivateKey());
 
         Optional<? extends Request> genesisRequest = auxService.createGenesisRequest(id, blockType, wallet.getPublicKeyAddress(), 100L);
         if (genesisRequest.isEmpty()){

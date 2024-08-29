@@ -16,16 +16,25 @@ import java.security.Security;
  *  2. visualization of blockchain data to be of the form, select block/blocks
  *  3. mining difficulty for utxo, want this to be programmable with algos. it shouldn't be a value. it should be a calc itself,potentially somethign which is set on chain and not specific to a block type. I think it should be set on the chain and accessed
  *  4. always have a node available for the 'client' - so store the chain.
- *  5. switch to make blockchain public e.g. once genesis created
+ *  5. switch to make blockchain public e.g. once genesis created or when decided
+ *      meaning we need a way to keep the blockchain private - there can be a
+ *      publish button. this will also fix the 'version' of the software.
+ *      i.e. you get a version of the software as well as the actual blockchain.
+ *
+ *      //alternatively each time you access the server,
+ *      //a new instance of this software gets run
+ *      //and so there is no worry about other blockchains.
+ *      //there will also be a public version which is such that you can interract.
+ *
  *  6. await visibility of data in chain
  *  7. reqeusts add should be typed
- *  8. signature on genesis used to prove ownership of chain.
- *  10. remove some of the optionals
- *  13. AccountChain + 3 others to be typed as BlockFactory,
- *  14. simulate to be run for all 4 chain types
- *  15. APi classes to not throw exceptions
- *  17. merge together blockdatahashable and request ( in the sense that request should be blockdatahashable, this will ensure a well structured hierarchy of data types all blockhashable - also allowing to removing horrible casting)
- *  18. use the fact that blockfactories are now being used
+ *  9. remove some of the optionals
+ *  10. AccountChain + 3 others to be typed as BlockFactory,
+ *  11. simulate to be run for all 4 chain types
+ *  12. APi classes to not throw exceptions
+ *  13. merge together blockdatahashable and request ( in the sense that request should be blockdatahashable, this will ensure a well structured hierarchy of data types all blockhashable - also allowing to removing horrible casting)
+ *  14. use the fact that blockfactories are now being used
+ *  15. runsynch code reduce
  */
 @SpringBootApplication
 public class Control {

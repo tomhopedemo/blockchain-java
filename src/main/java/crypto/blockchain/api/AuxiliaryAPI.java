@@ -17,7 +17,7 @@ public class AuxiliaryAPI {
 
     @GetMapping("/auxiliary/keys/add")
     public void addKey(@RequestParam("id") String id, @RequestParam("publicKey") String publicKey, @RequestParam("privateKey") String privateKey){
-        new AuxService().addKey(id, publicKey, privateKey);
+        new AuxService().registerWallet(id, publicKey, privateKey);
     }
 
     @GetMapping("/auxiliary/request/create")

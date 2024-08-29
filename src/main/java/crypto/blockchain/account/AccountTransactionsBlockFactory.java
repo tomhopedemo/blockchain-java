@@ -5,8 +5,9 @@ import crypto.blockchain.Data;
 
 import java.util.*;
 
-public record AccountChain(String id){
+public record AccountTransactionsBlockFactory(String id) implements BlockFactory<AccountTransactionRequests, AccountTransactionRequest> {
 
+    @Override
     public void mineNextBlock(AccountTransactionRequests transactionRequests) {
         Blockchain blockchain = Data.getChain(id);
         Block mostRecentBlock = blockchain.getMostRecent();
@@ -15,7 +16,7 @@ public record AccountChain(String id){
 
         //Individual Transaction Verification
         if (!isGenesis) {
-            for (AccountTransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
+            for (AccountTransactionRequest transactionRequest : transactionRequests.transactionRequests()) {
                 boolean verified = AccountTransactionVerification.verify(transactionRequest, false, id);
                 if (!verified) {
                     return;
@@ -25,11 +26,11 @@ public record AccountChain(String id){
 
         //Overall Verification (no repeat accounts)
         Set<String> accounts = new HashSet<>();
-        for (AccountTransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
-            if (accounts.contains(transactionRequest.publicKeyAddress())){
+        for (AccountTransactionRequest transactionRequest : transactionRequests.transactionRequests()) {
+            if (accounts.contains(transactionRequest.publicKey())){
                 return;
             }
-            accounts.add(transactionRequest.publicKeyAddress());
+            accounts.add(transactionRequest.publicKey());
         }
 
 
@@ -39,7 +40,7 @@ public record AccountChain(String id){
         blockchain.add(block);
 
         //Update Caches
-        for (AccountTransactionRequest transactionRequest : transactionRequests.getTransactionRequests()) {
+        for (AccountTransactionRequest transactionRequest : transactionRequests.transactionRequests()) {
             for (TransactionOutput transactionOutput : transactionRequest.transactionOutputs()) {
                 Data.addAccountBalance(id, transactionOutput.getRecipient(), transactionOutput.getValue());
                 if (!isGenesis) {
@@ -47,9 +48,10 @@ public record AccountChain(String id){
                 }
             }
         }
-        Requests.remove(id, transactionRequests.getTransactionRequests(), BlockType.ACCOUNT);
+        Requests.remove(id, transactionRequests.transactionRequests(), BlockType.ACCOUNT);
     }
 
+    @Override
     public Optional<AccountTransactionRequests> prepareRequests(List<AccountTransactionRequest> availableAccountTransactionRequests) {
         List<AccountTransactionRequest> transactionRequestsToInclude = new ArrayList<>();
         for (AccountTransactionRequest transactionRequest : availableAccountTransactionRequests) {
@@ -65,4 +67,5 @@ public record AccountChain(String id){
             return Optional.of(new AccountTransactionRequests(transactionRequestsToInclude));
         }
     }
+
 }

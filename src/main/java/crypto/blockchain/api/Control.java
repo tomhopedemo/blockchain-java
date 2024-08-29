@@ -20,10 +20,9 @@ import java.security.Security;
  *  6. await visibility of data in chain
  *  7. reqeusts add should be typed
  *  8. signature on genesis used to prove ownership of chain.
- *  9. skip mechanism to invoke miner synchronously (for genesis)
  *  10. remove some of the optionals
  *  11. aux service to handle creation of wallets (and save key)
- *  13. AccountChain to be merged with AccountTransactionRequests.
+ *  13. AccountChain + 3 others to be typed as BlockFactory,
  *  14. simulate to be run for all 4 chain types
  *  15. APi classes to not throw exceptions
  *

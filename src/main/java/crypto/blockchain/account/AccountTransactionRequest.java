@@ -11,7 +11,7 @@ import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public record AccountTransactionRequest (String publicKeyAddress, List<TransactionOutput> transactionOutputs, String signature) implements BlockDataHashable, Request {
+public record AccountTransactionRequest (String publicKey, List<TransactionOutput> transactionOutputs, String signature) implements BlockDataHashable, Request {
 
     @Override
     public String getBlockDataHash() {
@@ -46,13 +46,7 @@ public record AccountTransactionRequest (String publicKeyAddress, List<Transacti
         return new AccountTransactionRequest(publicKeyAddress, transactionOutputs, Encoder.encodeToHexadecimal(signature));
     }
 
-    public static AccountTransactionRequest createGenesis(List<TransactionOutput> transactionOutputs){
-        return new AccountTransactionRequest("", transactionOutputs, "");
-    }
-
-
     public String generateIntegratedHash(){
-        return generateIntegratedHash(publicKeyAddress, transactionOutputs);
+        return generateIntegratedHash(publicKey, transactionOutputs);
     }
-
 }

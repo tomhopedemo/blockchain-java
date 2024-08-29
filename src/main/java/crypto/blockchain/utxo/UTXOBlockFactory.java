@@ -7,9 +7,10 @@ import java.util.*;
 
 import static crypto.blockchain.BlockType.UTXO;
 
-public record UTXOChain(String id){
+public record UTXOBlockFactory(String id) implements BlockFactory<UTXORequests, UTXORequest>{
 
-    public void mineNextBlock(UTXORequests requests, int difficulty) {
+    @Override
+    public void mineNextBlock(UTXORequests requests) {
         Blockchain blockchain = Data.getChain(id);
         Block mostRecentBlock = blockchain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
@@ -39,10 +40,9 @@ public record UTXOChain(String id){
             }
         }
 
-
         //Create block
         Block block = new Block(requests, previousBlockHash);
-        BlockMiner.mineBlockHash(block, "0".repeat(difficulty));
+        BlockMiner.mineBlockHash(block, "0".repeat(1));
         blockchain.add(block);
 
         //Update Caches
@@ -57,6 +57,7 @@ public record UTXOChain(String id){
         Requests.remove(id, requests.getTransactionRequests(), UTXO);
     }
 
+    @Override
     public Optional<UTXORequests> prepareRequests(List<UTXORequest> availableUtxoRequests) {
         Set<String> inputsToInclude = new HashSet<>();
         List<UTXORequest> utxoRequestsToInclude = new ArrayList<>();

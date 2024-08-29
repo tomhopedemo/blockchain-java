@@ -6,17 +6,7 @@ import crypto.hashing.Hashing;
 
 import java.util.List;
 
-public class AccountTransactionRequests implements BlockDataHashable {
-
-    List<AccountTransactionRequest> transactionRequests;
-
-    public AccountTransactionRequests(List<AccountTransactionRequest> transactionRequests) {
-        this.transactionRequests = transactionRequests;
-    }
-
-    public List<AccountTransactionRequest> getTransactionRequests() {
-        return transactionRequests;
-    }
+public record AccountTransactionRequests (List<AccountTransactionRequest> transactionRequests) implements BlockDataHashable {
 
     @Override
     public String getBlockDataHash()  {

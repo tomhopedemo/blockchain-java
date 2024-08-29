@@ -1,13 +1,13 @@
 package crypto.blockchain;
 
-import crypto.blockchain.account.AccountChain;
+import crypto.blockchain.account.AccountTransactionsBlockFactory;
 import crypto.blockchain.account.AccountTransactionRequest;
 import crypto.blockchain.account.AccountTransactionRequests;
 import crypto.blockchain.signed.BlockDataWrapper;
 import crypto.blockchain.signed.SignedChain;
 import crypto.blockchain.signed.SignedDataRequest;
 import crypto.blockchain.simple.SimpleChain;
-import crypto.blockchain.utxo.UTXOChain;
+import crypto.blockchain.utxo.UTXOBlockFactory;
 import crypto.blockchain.utxo.UTXORequest;
 import crypto.blockchain.utxo.UTXORequests;
 
@@ -49,17 +49,17 @@ public record Miner (String id) implements Runnable {
                     }
                 }
                 case ACCOUNT -> {
-                    AccountChain accountChain = new AccountChain(id);
-                    Optional<AccountTransactionRequests> accountTransactionRequests = accountChain.prepareRequests((List<AccountTransactionRequest>) requests);
+                    AccountTransactionsBlockFactory accountTransactionsBlockFactory = new AccountTransactionsBlockFactory(id);
+                    Optional<AccountTransactionRequests> accountTransactionRequests = accountTransactionsBlockFactory.prepareRequests((List<AccountTransactionRequest>) requests);
                     if (accountTransactionRequests.isPresent()) {
-                        accountChain.mineNextBlock(accountTransactionRequests.get());
+                        accountTransactionsBlockFactory.mineNextBlock(accountTransactionRequests.get());
                     }
                 }
                 case UTXO -> {
-                    UTXOChain utxoChain = new UTXOChain(id);
-                    Optional<UTXORequests> utxoRequests = utxoChain.prepareRequests((List<UTXORequest>) requests);
+                    UTXOBlockFactory utxoBlockFactory = new UTXOBlockFactory(id);
+                    Optional<UTXORequests> utxoRequests = utxoBlockFactory.prepareRequests((List<UTXORequest>) requests);
                     if (utxoRequests.isPresent()) {
-                        utxoChain.mineNextBlock(utxoRequests.get(), 1);
+                        utxoBlockFactory.mineNextBlock(utxoRequests.get());
                     }
                 }
             }

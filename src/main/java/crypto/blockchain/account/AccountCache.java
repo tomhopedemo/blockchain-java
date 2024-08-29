@@ -6,15 +6,15 @@ public class AccountCache {
 
     public ConcurrentHashMap<String, Long> accounts = new ConcurrentHashMap<>();
 
-    public void add(String accountPublicKey, Long value){
-        accounts.compute(accountPublicKey, (_, v) -> v == null ?  value : v + value);
+    public void add(String publicKey, Long value){
+        accounts.compute(publicKey, (_, v) -> v == null ?  value : v + value);
     }
 
-    public void subtract(String accountPublicKey, Long value){
-        accounts.compute(accountPublicKey, (_, v) -> v == null ? -value : v - value);
+    public void subtract(String publicKey, Long value){
+        accounts.compute(publicKey, (_, v) -> v == null ? -value : v - value);
     }
 
-    public Long get(String accountPublicKey) {
-        return accounts.get(accountPublicKey);
+    public Long get(String publicKey) {
+        return accounts.get(publicKey);
     }
 }

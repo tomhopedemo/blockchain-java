@@ -52,7 +52,7 @@ public record AccountTransactionsBlockFactory(String id) implements BlockFactory
     }
 
     @Override
-    public Optional<AccountTransactionRequests> prepareRequests(List<AccountTransactionRequest> availableAccountTransactionRequests) {
+    public AccountTransactionRequests prepareRequests(List<AccountTransactionRequest> availableAccountTransactionRequests) {
         List<AccountTransactionRequest> transactionRequestsToInclude = new ArrayList<>();
         for (AccountTransactionRequest transactionRequest : availableAccountTransactionRequests) {
             boolean verified = AccountTransactionVerification.verify(transactionRequest, id);
@@ -62,9 +62,9 @@ public record AccountTransactionsBlockFactory(String id) implements BlockFactory
             transactionRequestsToInclude.add(transactionRequest);
         }
         if (transactionRequestsToInclude.isEmpty()){
-            return Optional.empty();
+            return null;
         } else {
-            return Optional.of(new AccountTransactionRequests(transactionRequestsToInclude));
+            return new AccountTransactionRequests(transactionRequestsToInclude);
         }
     }
 

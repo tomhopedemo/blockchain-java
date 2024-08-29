@@ -35,7 +35,7 @@ public record SignedBlockFactory(String id) implements BlockFactory<BlockDataWra
     }
 
     @Override
-    public Optional<BlockDataWrapper> prepareRequests(List<SignedDataRequest> requests) {
-        return Optional.of(new BlockDataWrapper(requests));
+    public BlockDataWrapper prepareRequests(List<SignedDataRequest> requests) {
+        return new BlockDataWrapper(requests);
     }
 }

@@ -3,13 +3,12 @@ package crypto.blockchain.simple;
 import crypto.blockchain.*;
 import crypto.blockchain.Data;
 import crypto.blockchain.signed.BlockDataWrapper;
-import crypto.blockchain.signed.SignedDataRequest;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record SimpleChain(String id) implements BlockFactory<BlockDataWrapper, DataRequest>{
+public record SimpleBlockFactory(String id) implements BlockFactory<BlockDataWrapper, DataRequest>{
 
     @Override
     public void mineNextBlock(BlockDataWrapper blockDataWrapper) {
@@ -27,11 +26,11 @@ public record SimpleChain(String id) implements BlockFactory<BlockDataWrapper, D
     }
 
     @Override
-    public Optional<BlockDataWrapper> prepareRequests(List<DataRequest> requests) {
+    public BlockDataWrapper prepareRequests(List<DataRequest> requests) {
         if (requests.isEmpty()){
-            return Optional.empty();
+            return null;
         } else {
-            return Optional.of(new BlockDataWrapper(List.of(requests.getFirst())));
+            return new BlockDataWrapper(List.of(requests.getFirst()));
         }
     }
 }

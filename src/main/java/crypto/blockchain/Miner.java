@@ -6,7 +6,7 @@ import crypto.blockchain.account.AccountTransactionRequests;
 import crypto.blockchain.signed.BlockDataWrapper;
 import crypto.blockchain.signed.SignedBlockFactory;
 import crypto.blockchain.signed.SignedDataRequest;
-import crypto.blockchain.simple.SimpleChain;
+import crypto.blockchain.simple.SimpleBlockFactory;
 import crypto.blockchain.utxo.UTXOBlockFactory;
 import crypto.blockchain.utxo.UTXORequest;
 import crypto.blockchain.utxo.UTXORequests;
@@ -33,35 +33,17 @@ public record Miner (String id) implements Runnable {
             if (requests == null || requests.isEmpty()) {
                 continue;
             }
-            switch (blockType) {
-                case DATA -> {
-                    SimpleChain dataChain = new SimpleChain(id);
-                    Optional<BlockDataWrapper> dataRequests = dataChain.prepareRequests((List<DataRequest>) requests);
-                    if (dataRequests.isPresent()) {
-                        dataChain.mineNextBlock(dataRequests.get());
-                    }
-                }
-                case SIGNED_DATA -> {
-                    SignedBlockFactory signedDataChain = new SignedBlockFactory(id);
-                    Optional<BlockDataWrapper> dataRequests = signedDataChain.prepareRequests((List<SignedDataRequest>) requests);
-                    if (dataRequests.isPresent()) {
-                        signedDataChain.mineNextBlock(dataRequests.get());
-                    }
-                }
-                case ACCOUNT -> {
-                    AccountTransactionsBlockFactory accountTransactionsBlockFactory = new AccountTransactionsBlockFactory(id);
-                    Optional<AccountTransactionRequests> accountTransactionRequests = accountTransactionsBlockFactory.prepareRequests((List<AccountTransactionRequest>) requests);
-                    if (accountTransactionRequests.isPresent()) {
-                        accountTransactionsBlockFactory.mineNextBlock(accountTransactionRequests.get());
-                    }
-                }
-                case UTXO -> {
-                    UTXOBlockFactory utxoBlockFactory = new UTXOBlockFactory(id);
-                    Optional<UTXORequests> utxoRequests = utxoBlockFactory.prepareRequests((List<UTXORequest>) requests);
-                    if (utxoRequests.isPresent()) {
-                        utxoBlockFactory.mineNextBlock(utxoRequests.get());
-                    }
-                }
+
+            BlockFactory blockFactory = switch (blockType) {
+                case DATA -> new SimpleBlockFactory(id);
+                case SIGNED_DATA -> new SignedBlockFactory(id);
+                case ACCOUNT -> new AccountTransactionsBlockFactory(id);
+                case UTXO -> new UTXOBlockFactory(id);
+            };
+
+            BlockDataHashable blockDataHashable = blockFactory.prepareRequests(requests);
+            if (blockDataHashable != null) {
+                blockFactory.mineNextBlock(blockDataHashable);
             }
         }
     }

@@ -58,7 +58,7 @@ public record UTXOBlockFactory(String id) implements BlockFactory<UTXORequests, 
     }
 
     @Override
-    public Optional<UTXORequests> prepareRequests(List<UTXORequest> availableUtxoRequests) {
+    public UTXORequests prepareRequests(List<UTXORequest> availableUtxoRequests) {
         Set<String> inputsToInclude = new HashSet<>();
         List<UTXORequest> utxoRequestsToInclude = new ArrayList<>();
         for (UTXORequest utxoRequest : availableUtxoRequests) {
@@ -94,9 +94,9 @@ public record UTXOBlockFactory(String id) implements BlockFactory<UTXORequests, 
             }
         }
         if (utxoRequestsToInclude.isEmpty()){
-            return Optional.empty();
+            return null;
         } else {
-            return Optional.of(new UTXORequests(utxoRequestsToInclude));
+            return new UTXORequests(utxoRequestsToInclude);
         }
     }
 

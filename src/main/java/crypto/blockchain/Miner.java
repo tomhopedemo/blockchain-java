@@ -4,7 +4,7 @@ import crypto.blockchain.account.AccountTransactionsBlockFactory;
 import crypto.blockchain.account.AccountTransactionRequest;
 import crypto.blockchain.account.AccountTransactionRequests;
 import crypto.blockchain.signed.BlockDataWrapper;
-import crypto.blockchain.signed.SignedChain;
+import crypto.blockchain.signed.SignedBlockFactory;
 import crypto.blockchain.signed.SignedDataRequest;
 import crypto.blockchain.simple.SimpleChain;
 import crypto.blockchain.utxo.UTXOBlockFactory;
@@ -36,13 +36,13 @@ public record Miner (String id) implements Runnable {
             switch (blockType) {
                 case DATA -> {
                     SimpleChain dataChain = new SimpleChain(id);
-                    Optional<List<DataRequest>> dataRequests = dataChain.prepareRequests((List<DataRequest>) requests);
+                    Optional<BlockDataWrapper> dataRequests = dataChain.prepareRequests((List<DataRequest>) requests);
                     if (dataRequests.isPresent()) {
                         dataChain.mineNextBlock(dataRequests.get());
                     }
                 }
                 case SIGNED_DATA -> {
-                    SignedChain signedDataChain = new SignedChain(id);
+                    SignedBlockFactory signedDataChain = new SignedBlockFactory(id);
                     Optional<BlockDataWrapper> dataRequests = signedDataChain.prepareRequests((List<SignedDataRequest>) requests);
                     if (dataRequests.isPresent()) {
                         signedDataChain.mineNextBlock(dataRequests.get());

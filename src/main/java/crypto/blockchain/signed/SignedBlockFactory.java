@@ -5,17 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+public record SignedBlockFactory(String id) implements BlockFactory<BlockDataWrapper, SignedDataRequest>{
 
-/**
- * 'Transaction' is a single SignedDataRequest
- */
-public record SignedChain (String id) {
-
+    @Override
     public void mineNextBlock(BlockDataWrapper requests) {
         //Data Request Verification
-        for (BlockDataHashable blockData : requests.getBlockData()) {
+        for (BlockDataHashable blockData : requests.blockData()) {
             SignedDataRequest signedDataRequest = (SignedDataRequest) blockData;
-            boolean verified = SignedChainVerification.verifySignature(signedDataRequest);
+            boolean verified = SignedDataRequestVerification.verifySignature(signedDataRequest);
             if (!verified) {
                 return;
             }
@@ -31,13 +28,13 @@ public record SignedChain (String id) {
 
         //Update caches
         List<SignedDataRequest> signedDataRequests = new ArrayList<>();
-        for (BlockDataHashable blockDataHashable : requests.getBlockData()) {
+        for (BlockDataHashable blockDataHashable : requests.blockData()) {
             signedDataRequests.add((SignedDataRequest) blockDataHashable);
         }
         Requests.remove(id, signedDataRequests, BlockType.SIGNED_DATA);
     }
 
-
+    @Override
     public Optional<BlockDataWrapper> prepareRequests(List<SignedDataRequest> requests) {
         return Optional.of(new BlockDataWrapper(requests));
     }

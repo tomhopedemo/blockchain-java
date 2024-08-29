@@ -1,6 +1,5 @@
 package crypto.blockchain.signed;
 
-import crypto.blockchain.account.AccountTransactionRequest;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;
@@ -10,7 +9,7 @@ import java.security.PublicKey;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class SignedChainVerification {
+public class SignedDataRequestVerification {
     public static boolean verifySignature(SignedDataRequest signedDataRequest) {
         String valueHash = signedDataRequest.generateValueHash();
         try {

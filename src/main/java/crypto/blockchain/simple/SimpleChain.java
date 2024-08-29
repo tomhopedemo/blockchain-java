@@ -2,28 +2,36 @@ package crypto.blockchain.simple;
 
 import crypto.blockchain.*;
 import crypto.blockchain.Data;
+import crypto.blockchain.signed.BlockDataWrapper;
+import crypto.blockchain.signed.SignedDataRequest;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record SimpleChain(String id) {
+public record SimpleChain(String id) implements BlockFactory<BlockDataWrapper, DataRequest>{
 
-    public void mineNextBlock(List<DataRequest> dataRequests) {
+    @Override
+    public void mineNextBlock(BlockDataWrapper blockDataWrapper) {
         Blockchain chain = Data.getChain(id);
         Block mostRecentBlock = chain.getMostRecent();
-        StringHashable data = new StringHashable(dataRequests.getFirst().data());
-        Block nextBlock = new Block(data, mostRecentBlock.blockHashId);
+        Block nextBlock = new Block(blockDataWrapper, mostRecentBlock.getBlockHashId());
         BlockMiner.mineBlockHash(nextBlock, "0".repeat(1));
-        Requests.remove(id, dataRequests, BlockType.DATA);
         chain.add(nextBlock);
+        List<DataRequest> requests = new ArrayList<>();
+        for (BlockDataHashable blockDataHashable : blockDataWrapper.blockData()) {
+            requests.add((DataRequest) blockDataHashable);
+        }
+        Requests.remove(id, requests, BlockType.DATA);
+
     }
 
-    public Optional<List<DataRequest>> prepareRequests(List<DataRequest> requests) {
+    @Override
+    public Optional<BlockDataWrapper> prepareRequests(List<DataRequest> requests) {
         if (requests.isEmpty()){
             return Optional.empty();
         } else {
-            return Optional.of(List.of(requests.getFirst()));
+            return Optional.of(new BlockDataWrapper(List.of(requests.getFirst())));
         }
     }
-
 }

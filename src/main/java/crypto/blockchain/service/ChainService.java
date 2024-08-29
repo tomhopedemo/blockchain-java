@@ -5,11 +5,18 @@ import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
 import crypto.blockchain.account.AccountChain;
 import crypto.blockchain.account.AccountTransactionRequest;
+import crypto.blockchain.account.AccountTransactionRequestFactory;
+import crypto.blockchain.account.AccountTransactionRequests;
 import crypto.blockchain.signed.SignedChain;
 import crypto.blockchain.signed.SignedDataRequest;
+import crypto.blockchain.signed.SignedDataRequestFactory;
 import crypto.blockchain.simple.SimpleChain;
 import crypto.blockchain.utxo.UTXORequest;
 import crypto.blockchain.utxo.UTXOChain;
+import crypto.blockchain.utxo.UTXORequestFactory;
+
+import java.util.List;
+import java.util.Optional;
 
 public class ChainService {
 
@@ -26,17 +33,6 @@ public class ChainService {
 
     public void allowBlockType(String id, BlockType type) {
         Data.addType(id, type);
-    }
-
-    //currently not done by mining but should be.
-    public void createGenesisBlock(String id, BlockType type, Object value, String key)  {
-        switch(type){
-            case DATA -> new SimpleChain(id).genesis((String) value);
-            case SIGNED_DATA -> new SignedChain(id).genesis((String) value, key);
-            case ACCOUNT -> new AccountChain(id).genesis((Long) value, key);
-            case UTXO -> new UTXOChain(id).genesis((Long) value, key);
-        }
-        new Miner(id).run();
     }
 
     public Blockchain getChain(String id){

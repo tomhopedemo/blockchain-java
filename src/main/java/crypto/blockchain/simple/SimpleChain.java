@@ -8,14 +8,6 @@ import java.util.Optional;
 
 public record SimpleChain(String id) {
 
-    public Optional<List<DataRequest>> prepareRequests(List<DataRequest> requests) {
-        if (requests.isEmpty()){
-            return Optional.empty();
-        } else {
-            return Optional.of(List.of(requests.getFirst()));
-        }
-    }
-
     public void mineNextBlock(List<DataRequest> dataRequests) {
         Blockchain chain = Data.getChain(id);
         Block mostRecentBlock = chain.getMostRecent();
@@ -26,12 +18,12 @@ public record SimpleChain(String id) {
         chain.add(nextBlock);
     }
 
-    public void genesis(String value) {
-        Blockchain chain = Data.getChain(id);
-        Block block = new Block(new StringHashable(value), "");
-        BlockMiner.mineBlockHash(block, "0".repeat(1));
-        chain.add(block);
+    public Optional<List<DataRequest>> prepareRequests(List<DataRequest> requests) {
+        if (requests.isEmpty()){
+            return Optional.empty();
+        } else {
+            return Optional.of(List.of(requests.getFirst()));
+        }
     }
-
 
 }

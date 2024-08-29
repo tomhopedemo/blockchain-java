@@ -57,16 +57,19 @@ public class SimulateAPI {
 
     private ResponseEntity<?> simulateSignedData(String id) throws ChainException {
         ChainService chainService = new ChainService();
+        AuxService auxService = new AuxService();
         Wallet wallet = chainService.createWallet();
         Wallet anotherWallet = chainService.createWallet();
 
-        chainService.createGenesisBlock(id, BlockType.SIGNED_DATA, "ABCDE", wallet.getPublicKeyAddress());
-
-        AuxService auxService = new AuxService();
-
         auxService.addKey(id, wallet.getPrivateKey(), wallet.getPublicKeyAddress());
-        auxService.addKey(id, anotherWallet.getPrivateKey(), anotherWallet.getPublicKeyAddress());
 
+        Optional<? extends Request> genesisRequest = auxService.createGenesisRequest(id, BlockType.SIGNED_DATA, wallet.getPublicKeyAddress(), "ABCDE");
+        if (genesisRequest.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        chainService.submitRequest(id, BlockType.SIGNED_DATA, genesisRequest.get());
+
+        auxService.addKey(id, anotherWallet.getPrivateKey(), anotherWallet.getPublicKeyAddress());
         Optional<? extends Request> request = auxService.createRequest(BlockType.SIGNED_DATA, id, anotherWallet.getPublicKeyAddress(), null, "GHIJK");
         if (request.isEmpty()){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -80,10 +83,15 @@ public class SimulateAPI {
         ChainService chainService = new ChainService();
         Wallet wallet = chainService.createWallet();
         Data.addWallet(id, wallet);
-        chainService.createGenesisBlock(id, blockType, 100L, wallet.getPublicKeyAddress());
 
         AuxService auxService = new AuxService();
         auxService.addKey(id, wallet.getPrivateKey(), wallet.getPublicKeyAddress());
+
+        Optional<? extends Request> genesisRequest = auxService.createGenesisRequest(id, blockType, wallet.getPublicKeyAddress(), 100L);
+        if (genesisRequest.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        chainService.submitRequest(id, blockType, genesisRequest.get());
 
         Wallet toWallet = chainService.createWallet();
         Optional<? extends Request> request = auxService.createRequest(blockType, id, wallet.getPublicKeyAddress(), toWallet.getPublicKeyAddress(), 5L);

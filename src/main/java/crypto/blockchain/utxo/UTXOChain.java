@@ -9,53 +9,6 @@ import static crypto.blockchain.BlockType.UTXO;
 
 public record UTXOChain(String id){
 
-    public void genesis(long value, String genesisKey) {
-        UTXORequest genesisTransactionRequest = UTXORequestFactory.genesisTransaction(genesisKey, value, id);
-        mineNextBlock(new UTXORequests(List.of(genesisTransactionRequest)), 1);
-    }
-
-    public Optional<UTXORequests> prepareRequests(List<UTXORequest> availableUtxoRequests) {
-        Set<String> inputsToInclude = new HashSet<>();
-        List<UTXORequest> utxoRequestsToInclude = new ArrayList<>();
-        for (UTXORequest utxoRequest : availableUtxoRequests) {
-            //verify signature
-            boolean verified = UTXOVerification.verifySignature(utxoRequest, false, id);
-            if (!verified){
-                continue;
-            }
-
-            //consider for inclusion in this block.
-            List<String> transactionInputsToAdd = new ArrayList<>();
-            boolean include = true;
-            for (TransactionInput transactionInput : utxoRequest.getTransactionInputs()) {
-                //check if input has already been used in this same transaction request
-                if (transactionInputsToAdd.contains(transactionInput.getTransactionOutputHash())){
-                    include = false;
-                    break;
-                    //check if input is already added to the set of transactions for this block;
-                } else if (inputsToInclude.contains(transactionInput.getTransactionOutputHash())){
-                    include = false;
-                    break;
-                    //check if input is available
-                } else if (!Data.hasUtxo(id, transactionInput.getTransactionOutputHash())) {
-                    include = false;
-                    break;
-                } else {
-                    transactionInputsToAdd.add(transactionInput.getTransactionOutputHash());
-                }
-            }
-            if (include) {
-                utxoRequestsToInclude.add(utxoRequest);
-                inputsToInclude.addAll(utxoRequest.getTransactionInputs().stream().map(t -> t.getTransactionOutputHash()).toList());
-            }
-        }
-        if (utxoRequestsToInclude.isEmpty()){
-            return Optional.empty();
-        } else {
-            return Optional.of(new UTXORequests(utxoRequestsToInclude));
-        }
-    }
-
     public void mineNextBlock(UTXORequests requests, int difficulty) {
         Blockchain blockchain = Data.getChain(id);
         Block mostRecentBlock = blockchain.getMostRecent();
@@ -102,6 +55,48 @@ public record UTXOChain(String id){
             }
         }
         Requests.remove(id, requests.getTransactionRequests(), UTXO);
+    }
+
+    public Optional<UTXORequests> prepareRequests(List<UTXORequest> availableUtxoRequests) {
+        Set<String> inputsToInclude = new HashSet<>();
+        List<UTXORequest> utxoRequestsToInclude = new ArrayList<>();
+        for (UTXORequest utxoRequest : availableUtxoRequests) {
+            //verify signature
+            boolean verified = UTXOVerification.verifySignature(utxoRequest, false, id);
+            if (!verified){
+                continue;
+            }
+
+            //consider for inclusion in this block.
+            List<String> transactionInputsToAdd = new ArrayList<>();
+            boolean include = true;
+            for (TransactionInput transactionInput : utxoRequest.getTransactionInputs()) {
+                //check if input has already been used in this same transaction request
+                if (transactionInputsToAdd.contains(transactionInput.getTransactionOutputHash())){
+                    include = false;
+                    break;
+                    //check if input is already added to the set of transactions for this block;
+                } else if (inputsToInclude.contains(transactionInput.getTransactionOutputHash())){
+                    include = false;
+                    break;
+                    //check if input is available
+                } else if (!Data.hasUtxo(id, transactionInput.getTransactionOutputHash())) {
+                    include = false;
+                    break;
+                } else {
+                    transactionInputsToAdd.add(transactionInput.getTransactionOutputHash());
+                }
+            }
+            if (include) {
+                utxoRequestsToInclude.add(utxoRequest);
+                inputsToInclude.addAll(utxoRequest.getTransactionInputs().stream().map(t -> t.getTransactionOutputHash()).toList());
+            }
+        }
+        if (utxoRequestsToInclude.isEmpty()){
+            return Optional.empty();
+        } else {
+            return Optional.of(new UTXORequests(utxoRequestsToInclude));
+        }
     }
 
     private static boolean checkInputSumEqualToOutputSum(UTXORequest transactionRequest, String id) {

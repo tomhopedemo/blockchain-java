@@ -12,6 +12,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class UTXORequestFactory {
 
+
+    public static UTXORequest createGenesisRequest(String recipientPublicKeyAddress, long transactionValue, String id) {
+        List<TransactionOutput> transactionOutputs = new ArrayList<>();
+        transactionOutputs.add(new TransactionOutput(recipientPublicKeyAddress, transactionValue));
+        return new UTXORequest(new ArrayList<>(), transactionOutputs);
+    }
+
     public static Optional<UTXORequest> createUTXORequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue, String id) {
         Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(wallet, id);
         long balance = getBalance(unspentTransactionOutputsById);

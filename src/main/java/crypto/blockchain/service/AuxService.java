@@ -2,10 +2,13 @@ package crypto.blockchain.service;
 
 import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
+import crypto.blockchain.account.AccountTransactionRequest;
 import crypto.blockchain.account.AccountTransactionRequestFactory;
+import crypto.blockchain.signed.SignedDataRequest;
 import crypto.blockchain.signed.SignedDataRequestFactory;
 import crypto.blockchain.utxo.UTXORequestFactory;
 
+import java.util.List;
 import java.util.Optional;
 
 public class AuxService {
@@ -16,6 +19,20 @@ public class AuxService {
 
     public boolean exists(String id){
         return Data.getChain(id) != null;
+    }
+
+    public Optional<? extends Request> createGenesisRequest(String id, BlockType type, String key, Object value) throws ChainException {
+        Optional<Wallet> wallet = Data.getWallet(id, key);
+        if (wallet.isEmpty()){
+            return Optional.empty();
+        }
+        Request request = switch(type){
+            case DATA -> new DataRequest((String) value);
+            case SIGNED_DATA -> new SignedDataRequest(key, (String) value);
+            case ACCOUNT -> AccountTransactionRequest.create(wallet.get(), List.of(new TransactionOutput(key, (Long) value)));
+            case UTXO -> UTXORequestFactory.createGenesisRequest(wallet.get().getPublicKeyAddress(), (Long) value, id);
+        };
+        return Optional.of(request);
     }
 
     public Optional<? extends Request> createRequest(BlockType type, String id, String from, String to, Object value) throws ChainException {

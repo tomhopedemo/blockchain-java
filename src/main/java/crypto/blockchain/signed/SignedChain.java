@@ -15,11 +15,6 @@ import java.util.List;
  */
 public record SignedChain (String id) {
 
-    public void genesis(String value, String key) {
-        BlockDataWrapper requests = new BlockDataWrapper(List.of(new SignedDataRequest(key, value)));
-        mineNextBlock(requests);
-    }
-
     public void mineNextBlock(BlockDataWrapper requests) {
         //Data Request Verification
         for (BlockDataHashable blockData : requests.getBlockData()) {

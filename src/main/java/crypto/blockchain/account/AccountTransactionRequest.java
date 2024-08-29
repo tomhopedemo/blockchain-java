@@ -40,13 +40,6 @@ public record AccountTransactionRequest (String publicKeyAddress, List<Transacti
         return Encoder.encodeToHexadecimal(integratedHash);
     }
 
-
-    public AccountTransactionRequest(String publicKeyAddress, List<TransactionOutput> transactionOutputs, String signature) {
-        this.publicKeyAddress = publicKeyAddress;
-        this.transactionOutputs = transactionOutputs;
-        this.signature = signature;
-    }
-
     public static AccountTransactionRequest create(Wallet wallet, List<TransactionOutput> transactionOutputs) throws ChainException {
         String publicKeyAddress = wallet.getPublicKeyAddress();
         byte[] signature = calculateSignature(wallet, transactionOutputs);

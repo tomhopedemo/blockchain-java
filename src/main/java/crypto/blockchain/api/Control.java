@@ -19,6 +19,13 @@ import java.security.Security;
  *  6. genesis mining
  *  7. switch to make blockchain public e.g. once genesis created
  *  8. await visibility of data in chain
+ *  9> reqeusts add should be typed
+ *  10. signature on genesis used to prove ownership of chain.
+ *  11. skip mechanism to invoke miner synchronously (for genesis)
+ *  12. remove some of the optionals
+ *  13. aux service to handle creation of wallets
+ *  14. Api classes to only call service classes.
+ *  15. signedchain to mine next block (and prepare requests? )
  */
 @SpringBootApplication
 public class Control {

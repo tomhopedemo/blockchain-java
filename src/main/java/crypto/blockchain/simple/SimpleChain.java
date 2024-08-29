@@ -8,13 +8,6 @@ import java.util.Optional;
 
 public record SimpleChain(String id) {
 
-    public void genesis(String value) {
-        Blockchain chain = Data.getChain(id);
-        Block block = new Block(new StringHashable(value), "");
-        BlockMiner.mineBlockHash(block, "0".repeat(1));
-        chain.add(block);
-    }
-
     public Optional<List<DataRequest>> prepareRequests(List<DataRequest> requests) {
         if (requests.isEmpty()){
             return Optional.empty();
@@ -33,6 +26,12 @@ public record SimpleChain(String id) {
         chain.add(nextBlock);
     }
 
+    public void genesis(String value) {
+        Blockchain chain = Data.getChain(id);
+        Block block = new Block(new StringHashable(value), "");
+        BlockMiner.mineBlockHash(block, "0".repeat(1));
+        chain.add(block);
+    }
 
 
 }

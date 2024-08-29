@@ -20,8 +20,8 @@ public class GenesisAPI {
                    @RequestParam("type") String type,
                    @RequestParam("value") Long value)  {
         ChainService chainService = new ChainService();
-        Blockchain blockchain = chainService.getChain(id);
-        if (blockchain != null) {
+        Blockchain chain = chainService.getChain(id);
+        if (chain != null) {
             chainService.createGenesisBlock(id, BlockType.valueOf(type), value, publicKey);
             return new ResponseEntity<>(chainService.getChainJson(id), HttpStatus.OK);
         } else {

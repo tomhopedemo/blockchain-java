@@ -16,6 +16,7 @@ public class Data {
     static Map<String, WalletCache> walletCaches;
 
     static {
+        allowedBlocktypes = new ConcurrentHashMap<>();
         blockchains = new ConcurrentHashMap<>();
         accountCaches = new ConcurrentHashMap<>();
         utxoCaches = new ConcurrentHashMap<>();

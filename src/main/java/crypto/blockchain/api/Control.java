@@ -16,7 +16,9 @@ import java.security.Security;
  *  2. visualization of blockchain data to be of the form, select block/blocks
  *  4. mining difficulty for utxo, want this to be programmable with algos. it shouldn't be a value. it should be a calc itself,potentially somethign which is set on chain and not specific to a block type. I think it should be set on the chain and accessed
  *  5. always have a node available for the 'client' - so store the chain.
- *
+ *  6. genesis mining
+ *  7. switch to make blockchain public e.g. once genesis created
+ *  8. await visibility of data in chain
  */
 @SpringBootApplication
 public class Control {
@@ -24,6 +26,7 @@ public class Control {
 
     public static void main(String... args) {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        MinerPool.start();
         SpringApplication.run(Control.class, args);
     }
 

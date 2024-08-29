@@ -39,19 +39,17 @@ public class SimulateAPI {
     }
 
 
-
-
     private ResponseEntity<?> simulateData(String id)  {
         ChainService chainService = new ChainService();
-        Wallet wallet = chainService.createWallet();
 
-        chainService.createGenesisBlock(id, BlockType.DATA, "ABCDE", wallet.getPublicKeyAddress());
+        Request genesis = new DataRequest("ABCDE");
+        chainService.submitRequest(id, BlockType.DATA, genesis);
 
-        AuxService auxService = new AuxService();
-        auxService.addKey(id, wallet.getPrivateKey(), wallet.getPublicKeyAddress());
+        //note that we may want to wait for the genesis block to be created
+        //also wait a certain amount of time like 5 seconds max.
+        //wait for something to be visible in the chain
 
         Request request = new DataRequest(randomString(10));
-
         chainService.submitRequest(id, BlockType.DATA, request);
 
         return new ResponseEntity<>(chainService.getChainJson(id), HttpStatus.OK);
@@ -81,14 +79,14 @@ public class SimulateAPI {
     private ResponseEntity<?> simulateTransactional(String id, BlockType blockType) throws ChainException {
         ChainService chainService = new ChainService();
         Wallet wallet = chainService.createWallet();
-
+        Data.addWallet(id, wallet);
         chainService.createGenesisBlock(id, blockType, 100L, wallet.getPublicKeyAddress());
 
         AuxService auxService = new AuxService();
         auxService.addKey(id, wallet.getPrivateKey(), wallet.getPublicKeyAddress());
 
         Wallet toWallet = chainService.createWallet();
-        Optional<? extends Request> request = auxService.createRequest(blockType, id, wallet.getPublicKeyAddress(), toWallet.getPublicKeyAddress(), 5);
+        Optional<? extends Request> request = auxService.createRequest(blockType, id, wallet.getPublicKeyAddress(), toWallet.getPublicKeyAddress(), 5L);
         if (request.isEmpty()){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

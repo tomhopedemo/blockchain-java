@@ -14,13 +14,14 @@ import static crypto.blockchain.api.Control.CORS;
 public class ChainAPI {
 
     @GetMapping("/chain/create")
-    public ResponseEntity<?> create(@RequestParam String id) {
+    public ResponseEntity<?> create(@RequestParam("id") String id) {
         ChainService chainService = new ChainService();
         if (chainService.hasChain(id)) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
             chainService.createChain(id);
-            return new ResponseEntity<>(id, HttpStatus.OK);
+            String chainJson = chainService.getChainJson(id);
+            return new ResponseEntity<>(chainJson, HttpStatus.OK);
         }
     }
 

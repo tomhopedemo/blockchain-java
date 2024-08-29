@@ -13,9 +13,11 @@ import crypto.blockchain.utxo.UTXOChain;
 
 public class ChainService {
 
+    static Gson JSON = new GsonBuilder().create();
+
     public void createChain(String id) {
-        Blockchain blockchain = new Blockchain(id);
-        Data.addChain(blockchain);
+        Blockchain chain = new Blockchain(id);
+        Data.addChain(chain);
     }
 
     public boolean hasChain(String id) {
@@ -26,6 +28,7 @@ public class ChainService {
         Data.addType(id, type);
     }
 
+    //currently not done by mining but should be.
     public void createGenesisBlock(String id, BlockType type, Object value, String key)  {
         switch(type){
             case DATA -> new SimpleChain(id).genesis((String) value);
@@ -33,6 +36,7 @@ public class ChainService {
             case ACCOUNT -> new AccountChain(id).genesis((Long) value, key);
             case UTXO -> new UTXOChain(id).genesis((Long) value, key);
         }
+        new Miner(id).run();
     }
 
     public Blockchain getChain(String id){
@@ -40,15 +44,15 @@ public class ChainService {
     }
 
     public String getChainJson(String id){
-        return new GsonBuilder().create().toJson(getChain(id));
+        return JSON.toJson(getChain(id));
     }
 
     public String getKeysJson(String id) {
-        return new GsonBuilder().create().toJson(Data.getKeys(id));
+        return JSON.toJson(Data.getKeys(id));
     }
 
     public String createWalletJson(){
-        return new GsonBuilder().create().toJson(createWallet());
+        return JSON.toJson(createWallet());
     }
 
     public Wallet createWallet() {
@@ -65,12 +69,11 @@ public class ChainService {
     }
 
     public Request deserialiseRequest(BlockType blockType, String requestJson) {
-        final Gson gson = new GsonBuilder().create();
         return switch(blockType){
-            case DATA -> gson.fromJson(requestJson, DataRequest.class);
-            case SIGNED_DATA -> gson.fromJson(requestJson, SignedDataRequest.class);
-            case ACCOUNT -> gson.fromJson(requestJson, AccountTransactionRequest.class);
-            case UTXO -> gson.fromJson(requestJson, UTXORequest.class);
+            case DATA -> JSON.fromJson(requestJson, DataRequest.class);
+            case SIGNED_DATA -> JSON.fromJson(requestJson, SignedDataRequest.class);
+            case ACCOUNT -> JSON.fromJson(requestJson, AccountTransactionRequest.class);
+            case UTXO -> JSON.fromJson(requestJson, UTXORequest.class);
         };
     }
 

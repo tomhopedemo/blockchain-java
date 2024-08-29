@@ -1,5 +1,6 @@
 package crypto.blockchain.service;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
 import crypto.blockchain.account.AccountTransactionRequest;
@@ -11,7 +12,10 @@ import crypto.blockchain.utxo.UTXORequestFactory;
 import java.util.List;
 import java.util.Optional;
 
+
 public class AuxService {
+
+    static Gson JSON = new GsonBuilder().create();
 
     public void addKey(String id, String publicKey, String privateKey) {
         Data.addWallet(id, new Wallet(privateKey, publicKey));
@@ -46,6 +50,14 @@ public class AuxService {
             case ACCOUNT -> AccountTransactionRequestFactory.createTransactionRequest(wallet.get(), to, (Long) value, id);
             case UTXO -> UTXORequestFactory.createUTXORequest(wallet.get(), to, (Long) value, id);
         };
+    }
+
+    public String createWalletJson(){
+        return JSON.toJson(createWallet());
+    }
+
+    public Wallet createWallet() {
+        return Wallet.generate();
     }
 
     public String createRequestJson(BlockType type, String id, String from, String to, long value) throws ChainException {

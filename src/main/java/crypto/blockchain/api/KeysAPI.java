@@ -1,5 +1,6 @@
 package crypto.blockchain.api;
 
+import crypto.blockchain.service.AuxService;
 import crypto.blockchain.service.ChainService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,6 @@ public class KeysAPI {
 
     @GetMapping("/keys/create")
     String wallet() {
-        return new ChainService().createWalletJson();
+        return new AuxService().createWalletJson();
     }
 }

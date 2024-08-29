@@ -58,8 +58,8 @@ public class SimulateAPI {
     private ResponseEntity<?> simulateSignedData(String id) throws ChainException {
         ChainService chainService = new ChainService();
         AuxService auxService = new AuxService();
-        Wallet wallet = chainService.createWallet();
-        Wallet anotherWallet = chainService.createWallet();
+        Wallet wallet = auxService.createWallet();
+        Wallet anotherWallet = auxService.createWallet();
 
         auxService.addKey(id, wallet.getPrivateKey(), wallet.getPublicKeyAddress());
 
@@ -81,10 +81,11 @@ public class SimulateAPI {
 
     private ResponseEntity<?> simulateTransactional(String id, BlockType blockType) throws ChainException {
         ChainService chainService = new ChainService();
-        Wallet wallet = chainService.createWallet();
+        AuxService auxService = new AuxService();
+
+        Wallet wallet = auxService.createWallet();
         Data.addWallet(id, wallet);
 
-        AuxService auxService = new AuxService();
         auxService.addKey(id, wallet.getPrivateKey(), wallet.getPublicKeyAddress());
 
         Optional<? extends Request> genesisRequest = auxService.createGenesisRequest(id, blockType, wallet.getPublicKeyAddress(), 100L);
@@ -95,7 +96,7 @@ public class SimulateAPI {
         Miner miner = new Miner(id);
         miner.runSynch();
 
-        Wallet toWallet = chainService.createWallet();
+        Wallet toWallet = auxService.createWallet();
         Optional<? extends Request> request = auxService.createRequest(blockType, id, wallet.getPublicKeyAddress(), toWallet.getPublicKeyAddress(), 5L);
         if (request.isEmpty()){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

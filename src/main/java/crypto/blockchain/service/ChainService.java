@@ -36,14 +36,6 @@ public class ChainService {
         return JSON.toJson(Data.getKeys(id));
     }
 
-    public String createWalletJson(){
-        return JSON.toJson(createWallet());
-    }
-
-    public Wallet createWallet() {
-        return Wallet.generate();
-    }
-
     public void submitRequest(String id, BlockType type, Request request) {
         switch(type){
             case DATA -> Requests.add(id, (DataRequest) request);

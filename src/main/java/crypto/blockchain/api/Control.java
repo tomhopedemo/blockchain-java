@@ -21,12 +21,11 @@ import java.security.Security;
  *  7. reqeusts add should be typed
  *  8. signature on genesis used to prove ownership of chain.
  *  10. remove some of the optionals
- *  11. aux service to handle creation of wallets (and save key)
  *  13. AccountChain + 3 others to be typed as BlockFactory,
  *  14. simulate to be run for all 4 chain types
  *  15. APi classes to not throw exceptions
- *  16. simplechain to potentially use blockdata wrapper.
  *  17. merge together blockdatahashable and request ( in the sense that request should be blockdatahashable, this will ensure a well structured hierarchy of data types all blockhashable - also allowing to removing horrible casting)
+ *  18. use the fact that blockfactories are now being used
  */
 @SpringBootApplication
 public class Control {

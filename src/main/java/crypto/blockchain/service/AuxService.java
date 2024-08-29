@@ -65,7 +65,7 @@ public class AuxService {
         if (request.isEmpty()){
             return null;
         }
-        return new GsonBuilder().create().toJson(request.get(), type.getRequestClass());
+        return JSON.toJson(request.get(), type.getRequestClass());
     }
 
     public boolean validate(String id) {

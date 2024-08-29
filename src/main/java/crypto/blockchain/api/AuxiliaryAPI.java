@@ -26,13 +26,15 @@ public class AuxiliaryAPI {
                     @RequestParam("to") String to,
                     @RequestParam("value") Long value,
                     @RequestParam("type") String type
-    ) throws ChainException {
+    )  {
         AuxService auxService = new AuxService();
         if (auxService.exists(id)) {
-            String requestJson = auxService.createRequestJson(BlockType.valueOf(type), id, from, to, value);
-            return new ResponseEntity<>(requestJson, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            try {
+                String requestJson = auxService.createRequestJson(BlockType.valueOf(type), id, from, to, value);
+                return new ResponseEntity<>(requestJson, HttpStatus.OK);
+            } catch (ChainException ignored){
+            }
         }
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

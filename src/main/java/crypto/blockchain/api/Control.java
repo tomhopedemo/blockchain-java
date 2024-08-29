@@ -27,12 +27,8 @@ import java.security.Security;
  *      //there will also be a public version which is such that you can interract.
  *
  *  6. await visibility of data in chain
- *  9. remove some of the optionals
  *  11. simulate to be run for all 4 chain types
- *  12. APi classes to not throw exceptions
  *  13. merge together blockdatahashable and request ( in the sense that request should be blockdatahashable, this will ensure a well structured hierarchy of data types all blockhashable - also allowing to removing horrible casting)
- *  14. use the fact that blockfactories are now being used
- *  15. runsynch code reduce
  */
 @SpringBootApplication
 public class Control {

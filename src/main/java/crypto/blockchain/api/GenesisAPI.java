@@ -23,15 +23,18 @@ public class GenesisAPI {
     public ResponseEntity<?> genesis(@RequestParam("id") String id,
                    @RequestParam("publicKey") String publicKey,
                    @RequestParam("type") String type,
-                   @RequestParam("value") Long value) throws ChainException {
+                   @RequestParam("value") Long value) {
         ChainService chainService = new ChainService();
         Blockchain chain = chainService.getChain(id);
         if (chain != null) {
             BlockType blockType = BlockType.valueOf(type);
-            Optional<? extends Request> request = new AuxService().createGenesisRequest(id, blockType, publicKey, value);
-            if (request.isPresent()) {
-                chainService.submitRequest(id, blockType, request.get());
-                return new ResponseEntity<>(HttpStatus.OK);
+            try {
+                Optional<? extends Request> request = new AuxService().createGenesisRequest(id, blockType, publicKey, value);
+                if (request.isPresent()) {
+                    chainService.submitRequest(id, blockType, request.get());
+                    return new ResponseEntity<>(HttpStatus.OK);
+                }
+            } catch (ChainException ignored){
             }
         }
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

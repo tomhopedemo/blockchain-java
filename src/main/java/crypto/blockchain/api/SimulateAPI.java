@@ -18,7 +18,7 @@ import static crypto.blockchain.api.Control.CORS;
 @RestController @CrossOrigin(origins = CORS)
 public class SimulateAPI {
     @GetMapping("/simulate")
-    public ResponseEntity<?> simulate(@RequestParam("type") String type) throws ChainException {
+    public ResponseEntity<?> simulate(@RequestParam("type") String type) {
         BlockType blockType = BlockType.valueOf(type);
         String id = randomString(5);
         ChainService chainService = new ChainService();
@@ -29,13 +29,17 @@ public class SimulateAPI {
         chainService.createChain(id);
         chainService.disableAutoMining(id);
         chainService.allowBlockType(id, blockType);
-        ResponseEntity<?> responseEntity = switch(blockType){
-            case DATA -> simulateData(id);
-            case SIGNED_DATA -> simulateSignedData(id);
-            case ACCOUNT -> simulateTransactional(id, BlockType.ACCOUNT);
-            case UTXO -> simulateTransactional(id, BlockType.UTXO);
-        };
-        return responseEntity;
+
+        try {
+            return switch (blockType) {
+                case DATA -> simulateData(id);
+                case SIGNED_DATA -> simulateSignedData(id);
+                case ACCOUNT -> simulateTransactional(id, BlockType.ACCOUNT);
+                case UTXO -> simulateTransactional(id, BlockType.UTXO);
+            };
+        } catch (ChainException ignored){
+        }
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 

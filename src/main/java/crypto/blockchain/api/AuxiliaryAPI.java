@@ -29,7 +29,6 @@ public class AuxiliaryAPI {
     ) throws ChainException {
         AuxService auxService = new AuxService();
         if (auxService.exists(id)) {
-
             String requestJson = auxService.createRequestJson(BlockType.valueOf(type), id, from, to, value);
             return new ResponseEntity<>(requestJson, HttpStatus.OK);
         } else {

@@ -16,28 +16,32 @@ public class Requests {
     static Map<String, List<DataRequest>> dataRequests = new HashMap<>();
     static Map<String, List<SignedDataRequest>> signedDataRequests = new HashMap<>();
 
-
-
     public static void add(String id, AccountTransactionRequest request) {
-        accountRequests.putIfAbsent(id, new ArrayList<>());
-        accountRequests.get(id).add(request);
+        accountRequests.computeIfAbsent(id, _ -> new ArrayList<>()).add(request);
     }
 
     public static void add(String id, UTXORequest request) {
-        utxoRequests.putIfAbsent(id, new ArrayList<>());
-        utxoRequests.get(id).add(request);
+        utxoRequests.computeIfAbsent(id, _ -> new ArrayList<>()).add(request);
     }
 
     public static void add(String id, DataRequest request) {
-        dataRequests.putIfAbsent(id, new ArrayList<>());
-        dataRequests.get(id).add(request);
+        dataRequests.computeIfAbsent(id, _ -> new ArrayList<>()).add(request);
+
     }
 
     public static void add(String id, SignedDataRequest request) {
-        signedDataRequests.putIfAbsent(id, new ArrayList<>());
-        signedDataRequests.get(id).add(request);
+        signedDataRequests.computeIfAbsent(id, _ -> new ArrayList<>()).add(request);
     }
 
+
+    public static List<? extends Request> add(String id, BlockType blockType) {
+        return switch (blockType){
+            case DATA -> dataRequests.get(id);
+            case SIGNED_DATA -> signedDataRequests.get(id);
+            case ACCOUNT -> accountRequests.get(id);
+            case UTXO -> utxoRequests.get(id);
+        };
+    }
 
     public static List<? extends Request> get(String id, BlockType blockType) {
         return switch (blockType){

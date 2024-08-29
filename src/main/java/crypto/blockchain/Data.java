@@ -84,9 +84,10 @@ public class Data {
         return allowedBlocktypes.get(id);
     }
 
-
-    public static AccountCache getAccountBalanceCache(String id){
-        return accountCaches.get(id);
+    public static Long getAccountBalance(String id, String publicKey){
+        AccountCache accountCache = accountCaches.get(id);
+        Long balance = accountCache == null ? 0L : accountCache.get(publicKey);
+        return balance == null ? 0L : balance;
     }
 
     public static List<String> getKeys(String id) {

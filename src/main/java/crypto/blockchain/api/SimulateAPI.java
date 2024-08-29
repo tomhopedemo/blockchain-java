@@ -27,6 +27,7 @@ public class SimulateAPI {
         }
 
         chainService.createChain(id);
+        chainService.disableAutoMining(id);
         chainService.allowBlockType(id, blockType);
         ResponseEntity<?> responseEntity = switch(blockType){
             case DATA -> simulateData(id);
@@ -34,7 +35,6 @@ public class SimulateAPI {
             case ACCOUNT -> simulateTransactional(id, BlockType.ACCOUNT);
             case UTXO -> simulateTransactional(id, BlockType.UTXO);
         };
-        new Miner(id).run(); // synchronously.
         return responseEntity;
     }
 
@@ -92,6 +92,8 @@ public class SimulateAPI {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         chainService.submitRequest(id, blockType, genesisRequest.get());
+        Miner miner = new Miner(id);
+        miner.runSynch();
 
         Wallet toWallet = chainService.createWallet();
         Optional<? extends Request> request = auxService.createRequest(blockType, id, wallet.getPublicKeyAddress(), toWallet.getPublicKeyAddress(), 5L);
@@ -99,6 +101,8 @@ public class SimulateAPI {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         chainService.submitRequest(id, blockType, request.get());
+        miner.runSynch();
+
         return new ResponseEntity<>(chainService.getChainJson(id), HttpStatus.OK);
     }
 

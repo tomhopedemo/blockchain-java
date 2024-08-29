@@ -9,7 +9,7 @@ import java.util.*;
 public class AccountTransactionRequestFactory {
 
     public static Optional<AccountTransactionRequest> createTransactionRequest(Wallet wallet, String recipient, long transactionValue, String id) throws ChainException {
-        Long balance = Data.getAccountBalanceCache(id).get(wallet.getPublicKeyAddress());
+        Long balance = Data.getAccountBalance(id, wallet.getPublicKeyAddress());
         if (balance < transactionValue) {
             return Optional.empty();
         }

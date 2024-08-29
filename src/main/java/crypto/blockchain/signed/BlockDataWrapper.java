@@ -8,13 +8,13 @@ import java.util.List;
 
 public class BlockDataWrapper implements BlockDataHashable {
 
-    List<BlockDataHashable> blockData;
+    List<? extends BlockDataHashable> blockData;
 
-    public BlockDataWrapper(List<BlockDataHashable> transactionRequests) {
+    public BlockDataWrapper(List<? extends BlockDataHashable> transactionRequests) {
         this.blockData = transactionRequests;
     }
 
-    public List<BlockDataHashable> getBlockData() {
+    public List<? extends BlockDataHashable> getBlockData() {
         return blockData;
     }
 

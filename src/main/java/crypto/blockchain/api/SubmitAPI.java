@@ -24,7 +24,7 @@ public class SubmitAPI {
             BlockType blockType = BlockType.valueOf(type);
             Request request = chainService.deserialiseRequest(blockType, requestJson);
             chainService.submitRequest(id, blockType, request);
-            MinerPool.requestMiner(id);
+            chainService.requestMiner(id);
             return new ResponseEntity<>(chainService.getChainJson(id), OK);
         } else {
             return new ResponseEntity<>(INTERNAL_SERVER_ERROR);

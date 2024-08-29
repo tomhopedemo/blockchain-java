@@ -39,8 +39,7 @@ public class AccountTransactionVerification {
         for (TransactionOutput transactionOutput : transactionRequest.transactionOutputs()) {
             sum += transactionOutput.getValue();
         }
-
-        Long balance = Data.getAccountBalanceCache(id).get(transactionRequest.publicKeyAddress());
+        Long balance = Data.getAccountBalance(id, transactionRequest.publicKeyAddress());
         return balance >= sum;
     }
 

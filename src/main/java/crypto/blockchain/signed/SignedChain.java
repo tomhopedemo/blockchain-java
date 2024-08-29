@@ -1,13 +1,9 @@
 package crypto.blockchain.signed;
 
 import crypto.blockchain.*;
-import crypto.blockchain.account.AccountTransactionRequest;
-import crypto.blockchain.account.AccountTransactionRequests;
-import crypto.blockchain.account.AccountTransactionVerification;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -42,4 +38,7 @@ public record SignedChain (String id) {
     }
 
 
+    public Optional<BlockDataWrapper> prepareRequests(List<SignedDataRequest> requests) {
+        return Optional.of(new BlockDataWrapper(requests));
+    }
 }

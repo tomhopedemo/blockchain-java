@@ -5,7 +5,6 @@ import crypto.blockchain.Request;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
 
-import java.util.List;
 
 public class SignedDataRequest implements BlockDataHashable, Request {
 

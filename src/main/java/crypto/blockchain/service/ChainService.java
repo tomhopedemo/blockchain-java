@@ -3,20 +3,9 @@ package crypto.blockchain.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
-import crypto.blockchain.account.AccountChain;
 import crypto.blockchain.account.AccountTransactionRequest;
-import crypto.blockchain.account.AccountTransactionRequestFactory;
-import crypto.blockchain.account.AccountTransactionRequests;
-import crypto.blockchain.signed.SignedChain;
 import crypto.blockchain.signed.SignedDataRequest;
-import crypto.blockchain.signed.SignedDataRequestFactory;
-import crypto.blockchain.simple.SimpleChain;
 import crypto.blockchain.utxo.UTXORequest;
-import crypto.blockchain.utxo.UTXOChain;
-import crypto.blockchain.utxo.UTXORequestFactory;
-
-import java.util.List;
-import java.util.Optional;
 
 public class ChainService {
 
@@ -73,4 +62,11 @@ public class ChainService {
         };
     }
 
+    public void requestMiner(String id) {
+        MinerPool.requestMiner(id);
+    }
+
+    public void disableAutoMining(String id) {
+        MinerPool.disable(id);
+    }
 }

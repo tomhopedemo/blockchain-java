@@ -13,6 +13,8 @@ public class MinerPool implements Runnable {
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);;
 
+    private final Set<String> disabledChains = new LinkedHashSet<>();
+
     private static final MinerPool MINER_POOL = new MinerPool();
 
     @Override
@@ -47,11 +49,17 @@ public class MinerPool implements Runnable {
     }
 
     private void addRequest(String id){
-        minerRequests.add(id);
+        if (!disabledChains.contains(id)){
+            minerRequests.add(id);
+        }
+    }
+
+    public static void disable(String id) {
+        getInstance().disabledChains.add(id);
     }
 
     public static void start(){
-        getInstance().run();
+        new Thread(getInstance()).start();
     }
 
     public static void removeMiner(String id) {

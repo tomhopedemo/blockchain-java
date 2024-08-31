@@ -10,10 +10,6 @@ public class AccountCache {
         accounts.compute(publicKey, (_, v) -> v == null ?  value : v + value);
     }
 
-    public void subtract(String publicKey, Long value){
-        accounts.compute(publicKey, (_, v) -> v == null ? -value : v - value);
-    }
-
     public Long get(String publicKey) {
         return accounts.get(publicKey);
     }

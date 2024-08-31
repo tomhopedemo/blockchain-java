@@ -19,17 +19,6 @@ public record AccountTransactionRequest (String publicKey, List<TransactionOutpu
         return Encoder.encodeToHexadecimal(hash);
     }
 
-    public static byte[] calculateSignature(Wallet wallet, List<TransactionOutput> transactionOutputs) throws ChainException {
-        String integratedHash = generateIntegratedHash(wallet.getPublicKeyAddress(), transactionOutputs);
-        byte[] preSignature = integratedHash.getBytes(UTF_8);
-        try {
-            PrivateKey privateKey = Encoder.decodeToPrivateKey(wallet.getPrivateKey());
-            return ECDSA.calculateECDSASignature(privateKey, preSignature);
-        } catch (GeneralSecurityException e){
-            throw new ChainException(e);
-        }
-    }
-
     private static String generateIntegratedHash(String publicKeyAddress, List<TransactionOutput> transactionOutputs) {
         String simplePreHash = publicKeyAddress +
                 String.join("", transactionOutputs.stream().map(transactionOutput -> transactionOutput.serialise()).toList());
@@ -42,7 +31,8 @@ public record AccountTransactionRequest (String publicKey, List<TransactionOutpu
 
     public static AccountTransactionRequest create(Wallet wallet, List<TransactionOutput> transactionOutputs) throws ChainException {
         String publicKeyAddress = wallet.getPublicKeyAddress();
-        byte[] signature = calculateSignature(wallet, transactionOutputs);
+        String integratedHash = generateIntegratedHash(wallet.getPublicKeyAddress(), transactionOutputs);
+        byte[] signature = Signing.sign(wallet, integratedHash);
         return new AccountTransactionRequest(publicKeyAddress, transactionOutputs, Encoder.encodeToHexadecimal(signature));
     }
 

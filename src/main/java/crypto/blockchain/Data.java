@@ -70,7 +70,7 @@ public class Data {
 
     public static void subtractAccountBalance(String id, String from, long value) {
         accountCaches.putIfAbsent(id, new AccountCache());
-        accountCaches.get(id).subtract(from, value);
+        accountCaches.get(id).add(from, -value);
     }
 
 

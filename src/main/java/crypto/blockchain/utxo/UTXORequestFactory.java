@@ -18,7 +18,7 @@ public class UTXORequestFactory {
         return new UTXORequest(new ArrayList<>(), transactionOutputs);
     }
 
-    public static Optional<UTXORequest> createUTXORequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue, String id) {
+    public static Optional<UTXORequest> createUTXORequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue, String id) throws ChainException{
         Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(wallet, id);
         long balance = getBalance(unspentTransactionOutputsById);
         if (balance < transactionValue) {
@@ -29,14 +29,7 @@ public class UTXORequestFactory {
         long total = 0;
         for (Map.Entry<String, TransactionOutput> entry: unspentTransactionOutputsById.entrySet()){
             String transactionOutputHash = entry.getKey();
-            byte[] preSignature = transactionOutputHash.getBytes(UTF_8);
-            byte[] signature;
-            try {
-                PrivateKey privateKey = Encoder.decodeToPrivateKey(wallet.getPrivateKey());
-                signature = ECDSA.calculateECDSASignature(privateKey, preSignature);
-            } catch (GeneralSecurityException e){
-                return Optional.empty();
-            }
+            byte[] signature = Signing.sign(wallet, transactionOutputHash);
             transactionInputs.add(new TransactionInput(transactionOutputHash, signature));
             TransactionOutput transactionOutput = entry.getValue();
             total += transactionOutput.getValue();

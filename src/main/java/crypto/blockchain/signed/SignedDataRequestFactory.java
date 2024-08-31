@@ -2,6 +2,7 @@ package crypto.blockchain.signed;
 
 import crypto.blockchain.ChainException;
 import crypto.blockchain.Request;
+import crypto.blockchain.Signing;
 import crypto.blockchain.Wallet;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
@@ -16,20 +17,9 @@ public class SignedDataRequestFactory {
 
     public static Optional<SignedDataRequest> createSignedDataRequest(Wallet wallet, String value) throws ChainException {
         SignedDataRequest signedDataRequest = new SignedDataRequest(wallet.getPublicKeyAddress(), value);
-        byte[] signature = calculateSignature(signedDataRequest, wallet);
+        byte[] signature = Signing.sign(wallet, signedDataRequest.generateValueHash());
         signedDataRequest.setSignature(signature);
         return Optional.of(signedDataRequest);
     }
-
-    public static byte[] calculateSignature(SignedDataRequest signedDataRequest, Wallet wallet) throws ChainException {
-        byte[] preSignature = signedDataRequest.generateValueHash().getBytes(UTF_8);
-        try {
-            PrivateKey privateKey = Encoder.decodeToPrivateKey(wallet.getPrivateKey());
-            return ECDSA.calculateECDSASignature(privateKey, preSignature);
-        } catch (GeneralSecurityException e){
-            throw new ChainException(e);
-        }
-    }
-
 
 }

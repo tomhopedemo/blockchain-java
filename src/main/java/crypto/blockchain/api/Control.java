@@ -35,6 +35,12 @@ import java.security.Security;
  *  12. stock implementation
  *  13. simulate -> generate sample
  *  14. option for lock on the block itself for a simple block
+ *  15. parametrize number of blocks generated in simulation
+ *  16. create transaction for simple
+ *  17. share logic for calculate signature
+ *  18. change accounttransaction to account
+ *  19. change wallet to keypair
+ *  20. generateIntegratedHash is a bit odd
  */
 
 

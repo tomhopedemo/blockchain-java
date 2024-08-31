@@ -12,7 +12,8 @@ public record SimpleBlockFactory(String id) implements BlockFactory<BlockDataWra
     public void mineNextBlock(BlockDataWrapper<DataRequest> blockDataWrapper) {
         Blockchain chain = Data.getChain(id);
         Block mostRecentBlock = chain.getMostRecent();
-        Block nextBlock = new Block(blockDataWrapper, mostRecentBlock.getBlockHashId());
+        String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
+        Block nextBlock = new Block(blockDataWrapper, previousBlockHash);
         BlockMiner.mineBlockHash(nextBlock, "0".repeat(1));
         chain.add(nextBlock);
         Requests.remove(id, blockDataWrapper.blockData(), BlockType.DATA);

@@ -34,7 +34,7 @@ import java.security.Security;
  *  11. live questions and answers .e.g in a classroom
  *  12. stock implementation
  *  13. simulate -> generate sample
- *
+ *  14. option for lock on the block itself for a simple block
  */
 
 

@@ -30,6 +30,10 @@ public class SignedDataRequest implements BlockDataHashable, Request {
         return Encoder.encodeToHexadecimal(hash);
     }
 
+    public String getValue(){
+        return value;
+    }
+
     public String getSignedDataRequestHashHex() {
         return signedDataHashHex;
     }
@@ -43,16 +47,11 @@ public class SignedDataRequest implements BlockDataHashable, Request {
         return signature;
     }
 
-    public String getValue(){
-        return value;
-    }
-
     public String getPublicKeyAddress(){
         return publicKeyAddress;
     }
 
-
     public void setSignature(byte[] signature) {
-
+        this.signature =  Encoder.encodeToHexadecimal(signature);
     }
 }

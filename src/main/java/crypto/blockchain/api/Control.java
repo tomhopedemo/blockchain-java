@@ -27,9 +27,17 @@ import java.security.Security;
  *      //there will also be a public version which is such that you can interract.
  *
  *  6. await visibility of data in chain
- *  11. simulate to be run for all 4 chain types
- *  13. merge together blockdatahashable and request ( in the sense that request should be blockdatahashable, this will ensure a well structured hierarchy of data types all blockhashable - also allowing to removing horrible casting)
+ *  7. voting/referendum blocks :) questions and answers
+ *  8. coin minting
+ *  9. side chains
+ *  10. image data
+ *  11. live questions and answers .e.g in a classroom
+ *  12. stock implementation
+ *  13. simulate -> generate sample
+ *
  */
+
+
 @SpringBootApplication
 public class Control {
     public static final String CORS = "http://localhost:3000";

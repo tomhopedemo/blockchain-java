@@ -12,7 +12,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class UTXORequestFactory {
 
-
     public static UTXORequest createGenesisRequest(String recipientPublicKeyAddress, long transactionValue, String id) {
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
         transactionOutputs.add(new TransactionOutput(recipientPublicKeyAddress, transactionValue));
@@ -58,21 +57,15 @@ public class UTXORequestFactory {
 
     public static Map<String, TransactionOutput> getTransactionOutputsById(Wallet wallet, String id) {
         Map<String, TransactionOutput> transactionOutputsById = new HashMap<>();
-        for (Map.Entry<String, TransactionOutput> item: Data.getUTXOCache(id).entrySet()){
-            TransactionOutput transactionOutput = item.getValue();
-            if (transactionOutput.getRecipient().equals(wallet.getPublicKeyAddress())) {
-                transactionOutputsById.put(item.getKey(), transactionOutput);
+        UTXOCache utxoCache = Data.getUTXOCache(id);
+        if (utxoCache != null) {
+            for (Map.Entry<String, TransactionOutput> item : utxoCache.entrySet()) {
+                TransactionOutput transactionOutput = item.getValue();
+                if (transactionOutput.getRecipient().equals(wallet.getPublicKeyAddress())) {
+                    transactionOutputsById.put(item.getKey(), transactionOutput);
+                }
             }
         }
         return transactionOutputsById;
-    }
-
-    public static UTXORequest genesisTransaction(String genesisKey, long genesisTransactionValue, String id) {
-        TransactionOutput genesisTransactionOutput = new TransactionOutput(genesisKey, genesisTransactionValue);
-        List<TransactionOutput> transactionOutputs = List.of(genesisTransactionOutput);
-        UTXORequest genesisTransactionRequest = new UTXORequest(new ArrayList<>(), transactionOutputs);
-        String transactionOutputHash = genesisTransactionOutput.generateTransactionOutputHash(genesisTransactionRequest.getTransactionRequestHash());
-        Data.addUtxo(id, transactionOutputHash, genesisTransactionOutput);
-        return genesisTransactionRequest;
     }
 }

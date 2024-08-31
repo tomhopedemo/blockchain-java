@@ -44,44 +44,46 @@ public class SimulateAPI {
 
 
     private ResponseEntity<?> simulateData(String id)  {
+        BlockType blockType = BlockType.DATA;
         ChainService chainService = new ChainService();
 
         Request genesis = new DataRequest("ABCDE");
-        chainService.submitRequest(id, BlockType.DATA, genesis);
-
-        //note that we may want to wait for the genesis block to be created
-        //also wait a certain amount of time like 5 seconds max.
-        //wait for something to be visible in the chain
+        chainService.submitRequest(id, blockType, genesis);
+        Miner miner = new Miner(id);
+        miner.runSynch();
 
         Request request = new DataRequest(randomString(10));
-        chainService.submitRequest(id, BlockType.DATA, request);
+        chainService.submitRequest(id, blockType, request);
+        miner.runSynch();
 
         return new ResponseEntity<>(chainService.getChainJson(id), HttpStatus.OK);
     }
 
     private ResponseEntity<?> simulateSignedData(String id) throws ChainException {
+        BlockType blockType = BlockType.SIGNED_DATA;
         ChainService chainService = new ChainService();
         AuxService auxService = new AuxService();
         Wallet wallet = auxService.createWallet();
-        Wallet anotherWallet = auxService.createWallet();
+        auxService.registerWallet(id, wallet.getPublicKeyAddress(), wallet.getPrivateKey());
 
-        auxService.registerWallet(id, wallet.getPrivateKey(), wallet.getPublicKeyAddress());
-
-        Optional<? extends Request> genesisRequest = auxService.createGenesisRequest(id, BlockType.SIGNED_DATA, wallet.getPublicKeyAddress(), "ABCDE");
+        Optional<? extends Request> genesisRequest = auxService.createGenesisRequest(id, blockType, wallet.getPublicKeyAddress(), "ABCDE");
         if (genesisRequest.isEmpty()){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        chainService.submitRequest(id, BlockType.SIGNED_DATA, genesisRequest.get());
+        chainService.submitRequest(id, blockType, genesisRequest.get());
+        Miner miner = new Miner(id);
+        miner.runSynch();
 
-        auxService.registerWallet(id, anotherWallet.getPrivateKey(), anotherWallet.getPublicKeyAddress());
-        Optional<? extends Request> request = auxService.createRequest(BlockType.SIGNED_DATA, id, anotherWallet.getPublicKeyAddress(), null, "GHIJK");
+        Wallet anotherWallet = auxService.createWallet();
+        auxService.registerWallet(id, anotherWallet.getPublicKeyAddress(), anotherWallet.getPrivateKey());
+        Optional<? extends Request> request = auxService.createRequest(blockType, id, anotherWallet.getPublicKeyAddress(), null, "GHIJK");
         if (request.isEmpty()){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        chainService.submitRequest(id, BlockType.SIGNED_DATA, request.get());
+        chainService.submitRequest(id, blockType, request.get());
+        miner.runSynch();
         return new ResponseEntity<>(chainService.getChainJson(id), HttpStatus.OK);
     }
-
 
     private ResponseEntity<?> simulateTransactional(String id, BlockType blockType) throws ChainException {
         ChainService chainService = new ChainService();

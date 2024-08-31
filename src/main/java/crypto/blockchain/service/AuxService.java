@@ -32,7 +32,7 @@ public class AuxService {
         }
         Request request = switch(type){
             case DATA -> new DataRequest((String) value);
-            case SIGNED_DATA -> new SignedDataRequest(key, (String) value);
+            case SIGNED_DATA -> SignedDataRequestFactory.createSignedDataRequest(wallet.get(), (String) value).get();
             case ACCOUNT -> AccountTransactionRequest.create(wallet.get(), List.of(new TransactionOutput(key, (Long) value)));
             case UTXO -> UTXORequestFactory.createGenesisRequest(wallet.get().getPublicKeyAddress(), (Long) value, id);
         };

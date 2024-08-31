@@ -3,15 +3,13 @@ package crypto.blockchain.signed;
 import crypto.blockchain.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-public record SignedBlockFactory(String id) implements BlockFactory<BlockDataWrapper, SignedDataRequest>{
+public record SignedBlockFactory(String id) implements BlockFactory<BlockDataWrapper<SignedDataRequest>, SignedDataRequest>{
 
     @Override
-    public void mineNextBlock(BlockDataWrapper requests) {
+    public void mineNextBlock(BlockDataWrapper<SignedDataRequest> requests) {
         //Data Request Verification
-        for (BlockDataHashable blockData : requests.blockData()) {
-            SignedDataRequest signedDataRequest = (SignedDataRequest) blockData;
+        for (SignedDataRequest signedDataRequest : requests.blockData()) {
             boolean verified = SignedDataRequestVerification.verifySignature(signedDataRequest);
             if (!verified) {
                 return;
@@ -27,15 +25,11 @@ public record SignedBlockFactory(String id) implements BlockFactory<BlockDataWra
         chain.add(block);
 
         //Update caches
-        List<SignedDataRequest> signedDataRequests = new ArrayList<>();
-        for (BlockDataHashable blockDataHashable : requests.blockData()) {
-            signedDataRequests.add((SignedDataRequest) blockDataHashable);
-        }
-        Requests.remove(id, signedDataRequests, BlockType.SIGNED_DATA);
+        Requests.remove(id, requests.blockData(), BlockType.SIGNED_DATA);
     }
 
     @Override
     public BlockDataWrapper prepareRequests(List<SignedDataRequest> requests) {
-        return new BlockDataWrapper(requests);
+        return new BlockDataWrapper(new ArrayList<>(requests));
     }
 }

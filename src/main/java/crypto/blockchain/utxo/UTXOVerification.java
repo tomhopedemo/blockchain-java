@@ -13,16 +13,16 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class UTXOVerification {
 
-    public static boolean verifySignature(UTXORequest transactionRequest, boolean skipEqualityCheckForGenesisTransactions, String id) {
-        for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
-            String transactionOutputHash = transactionInput.getTransactionOutputHash();
+    public static boolean verifySignature(UTXORequest request, String id) {
+        for (TransactionInput transactionInput : request.getTransactionInputs()) {
+            String transactionOutputHash = transactionInput.transactionOutputHash();
             TransactionOutput transactionOutput = Data.getUtxo(id, transactionOutputHash);
             if (transactionOutput == null){
                 return false;
             }
             try {
                 PublicKey publicKey = Encoder.decodeToPublicKey(transactionOutput.getRecipient());
-                boolean verified = ECDSA.verifyECDSASignature(publicKey, transactionOutputHash.getBytes(UTF_8), Hex.decode(transactionInput.getSignature()));
+                boolean verified = ECDSA.verifyECDSASignature(publicKey, transactionOutputHash.getBytes(UTF_8), Hex.decode(transactionInput.signature()));
                 if (!verified){
                     return false;
                 }
@@ -30,21 +30,17 @@ public class UTXOVerification {
                 return false;
             }
         }
-
-        if (!skipEqualityCheckForGenesisTransactions) {
-            boolean inputSumEqualToOutputSum = isInputSumEqualToOutputSum(transactionRequest, id);
-            if (!inputSumEqualToOutputSum) {
-                return false;
-            }
+        boolean inputSumEqualToOutputSum = isInputSumEqualToOutputSum(request, id);
+        if (!inputSumEqualToOutputSum) {
+            return false;
         }
-
         return true;
     }
 
     private static boolean isInputSumEqualToOutputSum(UTXORequest transactionRequest, String id) {
         long sum = 0L;
         for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
-            TransactionOutput transactionOutput = Data.getUtxo(id, transactionInput.getTransactionOutputHash());
+            TransactionOutput transactionOutput = Data.getUtxo(id, transactionInput.transactionOutputHash());
             sum += transactionOutput.getValue();
         }
         for (TransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {

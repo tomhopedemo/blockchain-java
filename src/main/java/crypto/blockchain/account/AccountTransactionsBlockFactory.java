@@ -8,17 +8,14 @@ import java.util.*;
 public record AccountTransactionsBlockFactory(String id) implements BlockFactory<AccountTransactionRequests, AccountTransactionRequest> {
 
     @Override
-    public void mineNextBlock(AccountTransactionRequests transactionRequests) {
+    public void mineNextBlock(AccountTransactionRequests requests) {
         Blockchain blockchain = Data.getChain(id);
-        Block mostRecentBlock = blockchain.getMostRecent();
-        String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
-        boolean isGenesis =  mostRecentBlock == null;
+        String previousBlockHash = blockchain.getMostRecent() == null ? null : blockchain.getMostRecent().getBlockHashId();
 
         //Individual Transaction Verification
-        if (!isGenesis) {
-            for (AccountTransactionRequest transactionRequest : transactionRequests.transactionRequests()) {
-                boolean verified = AccountTransactionVerification.verify(transactionRequest, id);
-                if (!verified) {
+        if (blockchain.getMostRecent() != null) {
+            for (AccountTransactionRequest request : requests.transactionRequests()) {
+                if (!AccountTransactionVerification.verify(request, id)) {
                     return;
                 }
             }
@@ -26,7 +23,7 @@ public record AccountTransactionsBlockFactory(String id) implements BlockFactory
 
         //Overall Verification (no repeat accounts)
         Set<String> accounts = new HashSet<>();
-        for (AccountTransactionRequest transactionRequest : transactionRequests.transactionRequests()) {
+        for (AccountTransactionRequest transactionRequest : requests.transactionRequests()) {
             if (accounts.contains(transactionRequest.publicKey())){
                 return;
             }
@@ -35,37 +32,33 @@ public record AccountTransactionsBlockFactory(String id) implements BlockFactory
 
 
         //Create block
-        Block block = new Block(transactionRequests, previousBlockHash);
+        Block block = new Block(requests, previousBlockHash);
         BlockMiner.mineBlockHash(block, "0".repeat(1));
         blockchain.add(block);
 
         //Update Caches
-        for (AccountTransactionRequest transactionRequest : transactionRequests.transactionRequests()) {
+        for (AccountTransactionRequest transactionRequest : requests.transactionRequests()) {
             for (TransactionOutput transactionOutput : transactionRequest.transactionOutputs()) {
                 Data.addAccountBalance(id, transactionOutput.getRecipient(), transactionOutput.getValue());
-                if (!isGenesis) {
+                if (blockchain.getMostRecent() != null) {
                     Data.subtractAccountBalance(id, transactionOutput.getRecipient(), transactionOutput.getValue());
                 }
             }
         }
-        Requests.remove(id, transactionRequests.transactionRequests(), BlockType.ACCOUNT);
+        Requests.remove(id, requests.transactionRequests(), BlockType.ACCOUNT);
     }
 
     @Override
-    public AccountTransactionRequests prepareRequests(List<AccountTransactionRequest> availableAccountTransactionRequests) {
-        List<AccountTransactionRequest> transactionRequestsToInclude = new ArrayList<>();
-        for (AccountTransactionRequest transactionRequest : availableAccountTransactionRequests) {
-            boolean verified = AccountTransactionVerification.verify(transactionRequest, id);
+    public AccountTransactionRequests prepareRequests(List<AccountTransactionRequest> availableRequests) {
+        List<AccountTransactionRequest> requests = new ArrayList<>();
+        for (AccountTransactionRequest request : availableRequests) {
+            boolean verified = AccountTransactionVerification.verify(request, id);
             if (!verified){
                 continue;
             }
-            transactionRequestsToInclude.add(transactionRequest);
+            requests.add(request);
         }
-        if (transactionRequestsToInclude.isEmpty()){
-            return null;
-        } else {
-            return new AccountTransactionRequests(transactionRequestsToInclude);
-        }
+        return requests.isEmpty() ? null : new AccountTransactionRequests(requests);
     }
 
 }

@@ -2,22 +2,10 @@ package crypto.blockchain.utxo;
 
 import crypto.encoding.Encoder;
 
-public class TransactionInput {
+public record TransactionInput (String transactionOutputHash, String signature) {
 
-    String transactionOutputHash;
-    String signature;
-
-    public TransactionInput(String transactionOutputId, byte[] signature) {
-        this.transactionOutputHash = transactionOutputId;
-        this.signature = Encoder.encodeToHexadecimal(signature);
-    }
-
-    public String getTransactionOutputHash() {
-        return transactionOutputHash;
-    }
-
-    public String getSignature() {
-        return signature;
+    public TransactionInput(String transactionOutputHash, byte[] signature) {
+        this(transactionOutputHash, Encoder.encodeToHexadecimal(signature));
     }
 
     public String serialise(){

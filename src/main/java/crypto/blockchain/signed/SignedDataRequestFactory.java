@@ -1,6 +1,7 @@
 package crypto.blockchain.signed;
 
 import crypto.blockchain.ChainException;
+import crypto.blockchain.Request;
 import crypto.blockchain.Wallet;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;

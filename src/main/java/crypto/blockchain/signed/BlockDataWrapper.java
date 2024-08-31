@@ -1,12 +1,13 @@
 package crypto.blockchain.signed;
 
+import crypto.blockchain.Block;
 import crypto.blockchain.BlockDataHashable;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
 
 import java.util.List;
 
-public record BlockDataWrapper (List<? extends BlockDataHashable> blockData) implements BlockDataHashable {
+public record BlockDataWrapper<T extends BlockDataHashable> (List<T> blockData) implements BlockDataHashable {
 
     @Override
     public String getBlockDataHash()  {

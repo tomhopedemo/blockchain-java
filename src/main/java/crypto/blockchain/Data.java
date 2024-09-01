@@ -13,6 +13,7 @@ public class Data {
     static Map<String, Blockchain> blockchains;
     static Map<String, AccountCaches> accountCaches;
     static Map<String, UTXOCache> utxoCaches;
+    static Map<String, CurrencyCache> currencyCache;
 
     static Map<String, KeyPairCache> keyPairCaches;
 
@@ -22,6 +23,7 @@ public class Data {
         accountCaches = new ConcurrentHashMap<>();
         utxoCaches = new ConcurrentHashMap<>();
         keyPairCaches = new ConcurrentHashMap<>();
+        currencyCache = new ConcurrentHashMap<>();
     }
 
 
@@ -89,12 +91,19 @@ public class Data {
         return accountCaches.get(publicKey, currency);
     }
 
-    //note that the currency can only be used by account chains for now
-    public static boolean hasCurrency(String id, String currency) {
-        AccountCaches accountCaches = Data.accountCaches.get(id);
-        if (accountCaches == null){
-            return false;
+    public static Optional<CurrencyRequest> getCurrency(String id, String currency) {
+        CurrencyCache currencies = currencyCache.get(id);
+        if (currencies == null){
+            return Optional.empty();
         }
-        return accountCaches.hasCurrency(currency);
+        return currencies.get(currency);
+    }
+
+    public static boolean hasCurrency(String id, String currency) {
+        return getCurrency(id, currency).isPresent();
+    }
+
+    public static void addCurrency(String id, CurrencyRequest currency) {
+        currencyCache.computeIfAbsent(id, _ -> new CurrencyCache()).add(currency);
     }
 }

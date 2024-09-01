@@ -46,7 +46,6 @@ public class SimulateAPI {
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-
     private ResponseEntity<?> simulateData(String id)  {
         BlockType blockType = BlockType.DATA;
         ChainService chainService = new ChainService();
@@ -66,6 +65,7 @@ public class SimulateAPI {
     private ResponseEntity<?> simulateCurrency(String id) {
         BlockType blockType = BlockType.CURRENCY;
         ChainService chainService = new ChainService();
+        chainService.allowBlockType(id, blockType);
         AuxService auxService = new AuxService();
         KeyPair keyPair = auxService.createKeyPair();
         auxService.registerKeyPair(id, keyPair.getPublicKeyAddress(), keyPair.getPrivateKey());

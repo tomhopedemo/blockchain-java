@@ -55,6 +55,7 @@ import java.security.Security;
  *  29. proof of work where machines are given codes for performing actual work
  *  30. share code for block creation in blockfactory
  *  31. deserialiseRequest to use enum
+ *  32. allow currencies for utxo chains too
  */
 
 

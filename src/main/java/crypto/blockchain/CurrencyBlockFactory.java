@@ -4,6 +4,7 @@ import crypto.blockchain.signed.BlockDataWrapper;
 import crypto.blockchain.signed.SignedDataRequestVerification;
 import crypto.cryptography.ECDSA;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,12 +29,15 @@ public record CurrencyBlockFactory(String id) implements BlockFactory<BlockDataW
         BlockMiner.mineBlockHash(block, "0".repeat(1));
         chain.add(block);
 
-        Requests.remove(id, requests.blockData(), BlockType.CURRENCY);
+        for (CurrencyRequest request : requests.blockData()) {
+            Data.addCurrency(id, request);
+        }
 
+        Requests.remove(id, requests.blockData(), BlockType.CURRENCY);
     }
 
     @Override
     public BlockDataWrapper<CurrencyRequest> prepareRequests(List<CurrencyRequest> requests) {
-        return new BlockDataWrapper<>(requests);
+        return new BlockDataWrapper<>(new ArrayList<>(requests));
     }
 }

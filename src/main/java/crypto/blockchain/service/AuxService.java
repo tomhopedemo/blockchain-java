@@ -23,17 +23,18 @@ public class AuxService {
         return Data.getChain(id) != null;
     }
 
-    public Optional<? extends Request> createGenesisRequest(String id, BlockType type, String key, String currency, Object value) throws ChainException {
-        Optional<KeyPair> KeyPair = Data.getKeyPair(id, key);
-        if (KeyPair.isEmpty()){
+    public Optional<? extends Request> createGenesisRequest(String id, BlockType type, String publicKey, String currency, Object value) throws ChainException {
+        Optional<KeyPair> keyPair = Data.getKeyPair(id, publicKey);
+        if (keyPair.isEmpty()){
             return Optional.empty();
         }
+
         Request request = switch(type){
             case DATA -> new DataRequest((String) value);
-            case SIGNED_DATA -> SignedDataRequestFactory.createSignedDataRequest(KeyPair.get(), (String) value).get();
+            case SIGNED_DATA -> SignedDataRequestFactory.createSignedDataRequest(keyPair.get(), (String) value).get();
             case CURRENCY -> throw new UnsupportedOperationException();
-            case ACCOUNT -> AccountTransactionRequestFactory.create(KeyPair.get(), currency, List.of(new TransactionOutput(key, (Long) value)));
-            case UTXO -> UTXORequestFactory.createGenesisRequest(KeyPair.get().getPublicKeyAddress(), (Long) value, id);
+            case ACCOUNT -> AccountTransactionRequestFactory.createGenesis(id, currency, List.of(new TransactionOutput(publicKey, (Long) value)));
+            case UTXO -> UTXORequestFactory.createGenesisRequest(keyPair.get().getPublicKeyAddress(), (Long) value, id);
         };
         return Optional.of(request);
     }

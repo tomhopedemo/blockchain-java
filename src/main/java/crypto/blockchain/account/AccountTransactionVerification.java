@@ -1,6 +1,5 @@
 package crypto.blockchain.account;
 
-import crypto.blockchain.Blockchain;
 import crypto.blockchain.Data;
 import crypto.blockchain.TransactionOutput;
 import crypto.cryptography.ECDSA;
@@ -26,7 +25,7 @@ public class AccountTransactionVerification {
             return false;
         }
 
-        if (!(Data.getChain(id).getMostRecent() == null)) {
+        if (Data.hasAccountCache(id, transactionRequest.currency())) {
             boolean hasBalance = hasBalance(transactionRequest, id);
             if (!hasBalance) {
                 return false;

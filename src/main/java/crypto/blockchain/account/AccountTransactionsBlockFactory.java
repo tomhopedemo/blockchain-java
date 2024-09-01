@@ -12,7 +12,7 @@ public record AccountTransactionsBlockFactory(String id) implements BlockFactory
         Blockchain blockchain = Data.getChain(id);
         String previousBlockHash = blockchain.getMostRecent() == null ? null : blockchain.getMostRecent().getBlockHashId();
 
-        //Individual Transaction Verification
+        //Individual Transaction Verification - we can remove this check
         if (blockchain.getMostRecent() != null) {
             for (AccountTransactionRequest request : requests.transactionRequests()) {
                 if (!AccountTransactionVerification.verify(request, id)) {
@@ -40,9 +40,7 @@ public record AccountTransactionsBlockFactory(String id) implements BlockFactory
         for (AccountTransactionRequest transactionRequest : requests.transactionRequests()) {
             for (TransactionOutput transactionOutput : transactionRequest.transactionOutputs()) {
                 Data.addAccountBalance(id, transactionOutput.getRecipient(), transactionRequest.currency(), transactionOutput.getValue());
-                if (blockchain.getMostRecent() != null) {
-                    Data.addAccountBalance(id, transactionOutput.getRecipient(), transactionRequest.currency(), -transactionOutput.getValue());
-                }
+                Data.addAccountBalance(id, transactionRequest.publicKey(), transactionRequest.currency(), -transactionOutput.getValue());
             }
         }
         Requests.remove(id, requests.transactionRequests(), BlockType.ACCOUNT);

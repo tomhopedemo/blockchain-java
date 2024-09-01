@@ -38,7 +38,10 @@ public class SimulateAPI {
                 case DATA -> simulateData(id);
                 case SIGNED_DATA -> simulateSignedData(id);
                 case CURRENCY -> simulateCurrency(id);
-                case ACCOUNT -> simulateTransactional(id, BlockType.ACCOUNT);
+                case ACCOUNT -> {
+                    simulateCurrency(id);
+                    yield simulateTransactional(id, BlockType.ACCOUNT);
+                }
                 case UTXO -> simulateTransactional(id, BlockType.UTXO);
             };
         } catch (ChainException ignored){
@@ -105,8 +108,6 @@ public class SimulateAPI {
     }
 
     private ResponseEntity<?> simulateTransactional(String id, BlockType blockType) throws ChainException {
-        simulateCurrency(id);
-
         ChainService chainService = new ChainService();
         AuxService auxService = new AuxService();
 
@@ -122,7 +123,7 @@ public class SimulateAPI {
         miner.runSynch();
 
         KeyPair toKeyPair = auxService.createKeyPair();
-        Optional<? extends Request> request = auxService.createRequest(blockType, id, keyPair.getPublicKeyAddress(), toKeyPair.getPublicKeyAddress(), CURRENCY, 5L);
+        Optional<? extends Request> request = auxService.createRequest(blockType, id, keyPair.getPublicKeyAddress(), CURRENCY, toKeyPair.getPublicKeyAddress(), 5L);
         if (request.isEmpty()){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

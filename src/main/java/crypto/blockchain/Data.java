@@ -106,4 +106,12 @@ public class Data {
     public static void addCurrency(String id, CurrencyRequest currency) {
         currencyCache.computeIfAbsent(id, _ -> new CurrencyCache()).add(currency);
     }
+
+    public static boolean hasAccountCache(String id, String currency) {
+        AccountCaches caches = accountCaches.get(id);
+        if (caches == null){
+            return false;
+        }
+        return caches.hasCurrency(currency);
+    }
 }

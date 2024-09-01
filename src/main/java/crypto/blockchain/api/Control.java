@@ -56,6 +56,8 @@ import java.security.Security;
  *  30. share code for block creation in blockfactory
  *  31. deserialiseRequest to use enum
  *  32. allow currencies for utxo chains too
+ *  33. remove check for  if (blockchain.getMostRecent() != null)  in atbf
+ *  34. auxService.createRequest has too many parameters, consider alternative invocations
  */
 
 

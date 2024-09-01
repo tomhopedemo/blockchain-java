@@ -45,12 +45,9 @@ public class MinerPool implements Runnable {
     }
 
     public static void requestMiner(String id){
-        getInstance().addRequest(id);
-    }
-
-    private void addRequest(String id){
-        if (!disabledChains.contains(id)){
-            minerRequests.add(id);
+        MinerPool instance = getInstance();
+        if (!instance.disabledChains.contains(id)){
+            instance.minerRequests.add(id);
         }
     }
 

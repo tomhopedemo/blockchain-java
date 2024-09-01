@@ -17,6 +17,9 @@ import static crypto.blockchain.api.Control.CORS;
 
 @RestController @CrossOrigin(origins = CORS)
 public class SimulateAPI {
+
+    public static final String CURRENCY = "CBX";
+
     @GetMapping("/simulate")
     public ResponseEntity<?> simulate(@RequestParam("type") String type) {
         BlockType blockType = BlockType.valueOf(type);
@@ -34,6 +37,7 @@ public class SimulateAPI {
             return switch (blockType) {
                 case DATA -> simulateData(id);
                 case SIGNED_DATA -> simulateSignedData(id);
+                case CURRENCY -> simulateCurrency(id);
                 case ACCOUNT -> simulateTransactional(id, BlockType.ACCOUNT);
                 case UTXO -> simulateTransactional(id, BlockType.UTXO);
             };
@@ -59,14 +63,29 @@ public class SimulateAPI {
         return new ResponseEntity<>(chainService.getChainJson(id), HttpStatus.OK);
     }
 
+    private ResponseEntity<?> simulateCurrency(String id) {
+        BlockType blockType = BlockType.CURRENCY;
+        ChainService chainService = new ChainService();
+        AuxService auxService = new AuxService();
+        KeyPair keyPair = auxService.createKeyPair();
+        auxService.registerKeyPair(id, keyPair.getPublicKeyAddress(), keyPair.getPrivateKey());
+        CurrencyRequest currencyRequest = new CurrencyRequest(CURRENCY, keyPair.getPublicKeyAddress(), keyPair.getPrivateKey());
+        chainService.submitRequest(id, blockType, currencyRequest);
+        Miner miner = new Miner(id);
+        miner.runSynch();
+        return new ResponseEntity<>(chainService.getChainJson(id), HttpStatus.OK);
+    }
+
+
+
     private ResponseEntity<?> simulateSignedData(String id) throws ChainException {
         BlockType blockType = BlockType.SIGNED_DATA;
         ChainService chainService = new ChainService();
         AuxService auxService = new AuxService();
-        Wallet wallet = auxService.createWallet();
-        auxService.registerWallet(id, wallet.getPublicKeyAddress(), wallet.getPrivateKey());
+        KeyPair keyPair = auxService.createKeyPair();
+        auxService.registerKeyPair(id, keyPair.getPublicKeyAddress(), keyPair.getPrivateKey());
 
-        Optional<? extends Request> genesisRequest = auxService.createGenesisRequest(id, blockType, wallet.getPublicKeyAddress(), "ABCDE");
+        Optional<? extends Request> genesisRequest = auxService.createGenesisRequest(id, blockType, keyPair.getPublicKeyAddress(), null, "ABCDE");
         if (genesisRequest.isEmpty()){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -74,9 +93,9 @@ public class SimulateAPI {
         Miner miner = new Miner(id);
         miner.runSynch();
 
-        Wallet anotherWallet = auxService.createWallet();
-        auxService.registerWallet(id, anotherWallet.getPublicKeyAddress(), anotherWallet.getPrivateKey());
-        Optional<? extends Request> request = auxService.createRequest(blockType, id, anotherWallet.getPublicKeyAddress(), null, "GHIJK");
+        KeyPair anotherKeyPair = auxService.createKeyPair();
+        auxService.registerKeyPair(id, anotherKeyPair.getPublicKeyAddress(), anotherKeyPair.getPrivateKey());
+        Optional<? extends Request> request = auxService.createRequest(blockType, id, anotherKeyPair.getPublicKeyAddress(), null, null, "GHIJK");
         if (request.isEmpty()){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -86,13 +105,15 @@ public class SimulateAPI {
     }
 
     private ResponseEntity<?> simulateTransactional(String id, BlockType blockType) throws ChainException {
+        simulateCurrency(id);
+
         ChainService chainService = new ChainService();
         AuxService auxService = new AuxService();
 
-        Wallet wallet = auxService.createWallet();
-        auxService.registerWallet(id, wallet.getPublicKeyAddress(), wallet.getPrivateKey());
+        KeyPair keyPair = auxService.createKeyPair();
+        auxService.registerKeyPair(id, keyPair.getPublicKeyAddress(), keyPair.getPrivateKey());
 
-        Optional<? extends Request> genesisRequest = auxService.createGenesisRequest(id, blockType, wallet.getPublicKeyAddress(), 100L);
+        Optional<? extends Request> genesisRequest = auxService.createGenesisRequest(id, blockType, keyPair.getPublicKeyAddress(), CURRENCY, 100L);
         if (genesisRequest.isEmpty()){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -100,8 +121,8 @@ public class SimulateAPI {
         Miner miner = new Miner(id);
         miner.runSynch();
 
-        Wallet toWallet = auxService.createWallet();
-        Optional<? extends Request> request = auxService.createRequest(blockType, id, wallet.getPublicKeyAddress(), toWallet.getPublicKeyAddress(), 5L);
+        KeyPair toKeyPair = auxService.createKeyPair();
+        Optional<? extends Request> request = auxService.createRequest(blockType, id, keyPair.getPublicKeyAddress(), toKeyPair.getPublicKeyAddress(), CURRENCY, 5L);
         if (request.isEmpty()){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

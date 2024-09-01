@@ -17,12 +17,13 @@ public class AuxiliaryAPI {
 
     @GetMapping("/auxiliary/keys/add")
     public void addKey(@RequestParam("id") String id, @RequestParam("publicKey") String publicKey, @RequestParam("privateKey") String privateKey){
-        new AuxService().registerWallet(id, publicKey, privateKey);
+        new AuxService().registerKeyPair(id, publicKey, privateKey);
     }
 
     @GetMapping("/auxiliary/request/create")
     public ResponseEntity<?> create(@RequestParam("id") String id,
                     @RequestParam("from") String from,
+                    @RequestParam("currency") String currency,
                     @RequestParam("to") String to,
                     @RequestParam("value") Long value,
                     @RequestParam("type") String type
@@ -30,7 +31,7 @@ public class AuxiliaryAPI {
         AuxService auxService = new AuxService();
         if (auxService.exists(id)) {
             try {
-                String requestJson = auxService.createRequestJson(BlockType.valueOf(type), id, from, to, value);
+                String requestJson = auxService.createRequestJson(BlockType.valueOf(type), id, from, currency, to, value);
                 return new ResponseEntity<>(requestJson, HttpStatus.OK);
             } catch (ChainException ignored){
             }

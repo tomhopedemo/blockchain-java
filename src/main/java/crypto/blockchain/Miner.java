@@ -1,18 +1,11 @@
 package crypto.blockchain;
 
 import crypto.blockchain.account.AccountTransactionsBlockFactory;
-import crypto.blockchain.account.AccountTransactionRequest;
-import crypto.blockchain.account.AccountTransactionRequests;
-import crypto.blockchain.signed.BlockDataWrapper;
 import crypto.blockchain.signed.SignedBlockFactory;
-import crypto.blockchain.signed.SignedDataRequest;
 import crypto.blockchain.simple.SimpleBlockFactory;
 import crypto.blockchain.utxo.UTXOBlockFactory;
-import crypto.blockchain.utxo.UTXORequest;
-import crypto.blockchain.utxo.UTXORequests;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public record Miner (String id) implements Runnable {
@@ -37,6 +30,7 @@ public record Miner (String id) implements Runnable {
             BlockFactory blockFactory = switch (blockType) {
                 case DATA -> new SimpleBlockFactory(id);
                 case SIGNED_DATA -> new SignedBlockFactory(id);
+                case CURRENCY -> new CurrencyBlockFactory(id);
                 case ACCOUNT -> new AccountTransactionsBlockFactory(id);
                 case UTXO -> new UTXOBlockFactory(id);
             };

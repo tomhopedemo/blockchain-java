@@ -44,6 +44,7 @@ public class ChainService {
         return switch(blockType){
             case DATA -> JSON.fromJson(requestJson, DataRequest.class);
             case SIGNED_DATA -> JSON.fromJson(requestJson, SignedDataRequest.class);
+            case CURRENCY -> JSON.fromJson(requestJson, CurrencyRequest.class);
             case ACCOUNT -> JSON.fromJson(requestJson, AccountTransactionRequest.class);
             case UTXO -> JSON.fromJson(requestJson, UTXORequest.class);
         };

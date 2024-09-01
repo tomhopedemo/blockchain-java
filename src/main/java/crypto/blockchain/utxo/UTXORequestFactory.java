@@ -1,14 +1,8 @@
 package crypto.blockchain.utxo;
 
 import crypto.blockchain.*;
-import crypto.cryptography.ECDSA;
-import crypto.encoding.Encoder;
 
-import java.security.GeneralSecurityException;
-import java.security.PrivateKey;
 import java.util.*;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class UTXORequestFactory {
 
@@ -18,8 +12,8 @@ public class UTXORequestFactory {
         return new UTXORequest(new ArrayList<>(), transactionOutputs);
     }
 
-    public static Optional<UTXORequest> createUTXORequest(Wallet wallet, String recipientPublicKeyAddress, long transactionValue, String id) throws ChainException{
-        Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(wallet, id);
+    public static Optional<UTXORequest> createUTXORequest(KeyPair keyPair, String recipientPublicKeyAddress, long transactionValue, String id) throws ChainException{
+        Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(keyPair, id);
         long balance = getBalance(unspentTransactionOutputsById);
         if (balance < transactionValue) {
             return Optional.empty();
@@ -29,7 +23,7 @@ public class UTXORequestFactory {
         long total = 0;
         for (Map.Entry<String, TransactionOutput> entry: unspentTransactionOutputsById.entrySet()){
             String transactionOutputHash = entry.getKey();
-            byte[] signature = Signing.sign(wallet, transactionOutputHash);
+            byte[] signature = Signing.sign(keyPair, transactionOutputHash);
             transactionInputs.add(new TransactionInput(transactionOutputHash, signature));
             TransactionOutput transactionOutput = entry.getValue();
             total += transactionOutput.getValue();
@@ -38,7 +32,7 @@ public class UTXORequestFactory {
 
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
         transactionOutputs.add(new TransactionOutput(recipientPublicKeyAddress, transactionValue));
-        transactionOutputs.add(new TransactionOutput(wallet.getPublicKeyAddress(), total - transactionValue));
+        transactionOutputs.add(new TransactionOutput(keyPair.getPublicKeyAddress(), total - transactionValue));
         UTXORequest transactionRequest = new UTXORequest(transactionInputs, transactionOutputs);
         return Optional.of(transactionRequest);
     }
@@ -48,13 +42,13 @@ public class UTXORequestFactory {
                 .map(transactionOutput -> transactionOutput.getValue()).mapToLong(Long::longValue).sum();
     }
 
-    public static Map<String, TransactionOutput> getTransactionOutputsById(Wallet wallet, String id) {
+    public static Map<String, TransactionOutput> getTransactionOutputsById(KeyPair keyPair, String id) {
         Map<String, TransactionOutput> transactionOutputsById = new HashMap<>();
         UTXOCache utxoCache = Data.getUTXOCache(id);
         if (utxoCache != null) {
             for (Map.Entry<String, TransactionOutput> item : utxoCache.entrySet()) {
                 TransactionOutput transactionOutput = item.getValue();
-                if (transactionOutput.getRecipient().equals(wallet.getPublicKeyAddress())) {
+                if (transactionOutput.getRecipient().equals(keyPair.getPublicKeyAddress())) {
                     transactionOutputsById.put(item.getKey(), transactionOutput);
                 }
             }

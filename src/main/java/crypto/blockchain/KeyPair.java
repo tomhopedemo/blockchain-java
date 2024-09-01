@@ -5,23 +5,23 @@ import crypto.encoding.Encoder;
 
 import java.security.*;
 
-public class Wallet {
+public class KeyPair {
     public String privateKey;
     public String publicKeyAddress;
 
-    private Wallet(PrivateKey privateKey, PublicKey publicKeyAddress) {
+    private KeyPair(PrivateKey privateKey, PublicKey publicKeyAddress) {
         this.privateKey = Encoder.encodeToString(privateKey);
         this.publicKeyAddress = Encoder.encodeToString(publicKeyAddress);
     }
 
-    public Wallet(String privateKey, String publicKeyAddress){
+    public KeyPair(String privateKey, String publicKeyAddress){
         this.privateKey = privateKey;
         this.publicKeyAddress = publicKeyAddress;
     }
 
-    public static Wallet generate() {
-        KeyPair keyPair = ECDSA.generateKeyPair();
-        return new Wallet(keyPair.getPrivate(), keyPair.getPublic());
+    public static KeyPair generate() {
+        java.security.KeyPair keyPair = ECDSA.generateKeyPair();
+        return new KeyPair(keyPair.getPrivate(), keyPair.getPublic());
     }
 
     public String getPrivateKey() {

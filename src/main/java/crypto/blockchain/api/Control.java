@@ -37,10 +37,24 @@ import java.security.Security;
  *  14. option for lock on the block itself for a simple block
  *  15. parametrize number of blocks generated in simulation
  *  16. create transaction for simple
- *  17. share logic for calculate signature
- *  18. change accounttransaction to account
- *  19. change wallet to keypair
- *  20. generateIntegratedHash is a bit odd
+ *  17. change accounttransaction to account
+ *  19. consider simplification of generateIntegratedHash
+ *  20. option to choose hashing mechanism
+ *  21. for account genesis indication either an explicit flag (requires extra data on object)?,
+ *  or based on being the first block (doesn't work with our type or future extensions to type system), or same as utxo (would have no signature - there could be a public private key) - quite like the idea as an option, but maybe not default as rewquires more data
+ *  why do we need a signature, is it okay for the signature to be empty?
+ *  how can we indicate it's supposed to be genesis? - i think a public private key is a really good idea.
+ *  so we'll need to include this somehow.
+ *  22. keypair block (public key, private key)
+ *  23. big one: data associated with transaction to be encrypted via public key
+ *  24. should accounttransactinorequest or accounttransactionrequests contiain knowledge of the coin - i think the next step is for the holder to contain info on coin. - public private key pair indicating that the coin is public for everyone.
+ *  25. separator character in pre-hash for all hashing;
+ *  26. consider moving hashing methods to a separate file
+ *  27. simulate and genesis to actually create required blocks for specific currency
+ *  28. in Data switch back to not creating objects on get
+ *  29. proof of work where machines are given codes for performing actual work
+ *  30. share code for block creation in blockfactory
+ *  31. deserialiseRequest to use enum
  */
 
 

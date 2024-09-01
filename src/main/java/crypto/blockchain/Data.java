@@ -1,6 +1,7 @@
 package crypto.blockchain;
 
 import crypto.blockchain.account.AccountCache;
+import crypto.blockchain.account.AccountCaches;
 import crypto.blockchain.utxo.UTXOCache;
 
 import java.util.*;
@@ -10,17 +11,17 @@ public class Data {
 
     static Map<String, Set<BlockType>> allowedBlocktypes;
     static Map<String, Blockchain> blockchains;
-    static Map<String, AccountCache> accountCaches;
+    static Map<String, AccountCaches> accountCaches;
     static Map<String, UTXOCache> utxoCaches;
 
-    static Map<String, WalletCache> walletCaches;
+    static Map<String, KeyPairCache> keyPairCaches;
 
     static {
         allowedBlocktypes = new ConcurrentHashMap<>();
         blockchains = new ConcurrentHashMap<>();
         accountCaches = new ConcurrentHashMap<>();
         utxoCaches = new ConcurrentHashMap<>();
-        walletCaches = new ConcurrentHashMap<>();
+        keyPairCaches = new ConcurrentHashMap<>();
     }
 
 
@@ -36,15 +37,12 @@ public class Data {
         return blockchains.containsKey(id);
     }
 
-
-    public static void addWallet(String id, Wallet wallet) {
-        walletCaches.putIfAbsent(id, new WalletCache());
-        walletCaches.get(id).addWallet(wallet);
+    public static void addKeyPair(String id, KeyPair keyPair) {
+        keyPairCaches.computeIfAbsent(id, _ ->  new KeyPairCache()).addKeyPair(keyPair);
     }
 
     public static void addUtxo(String id, String transactionOutputHash, TransactionOutput genesisTransactionOutput) {
-        utxoCaches.putIfAbsent(id, new UTXOCache());
-        utxoCaches.get(id).put(transactionOutputHash, genesisTransactionOutput);
+        utxoCaches.computeIfAbsent(id, _ ->  new UTXOCache()).put(transactionOutputHash, genesisTransactionOutput);
     }
 
     public static UTXOCache getUTXOCache(String id){
@@ -63,40 +61,40 @@ public class Data {
         return utxoCaches.get(id).get(transactionOutputHash);
     }
 
-    public static void addAccountBalance(String id, String recipient, long value) {
-        accountCaches.putIfAbsent(id, new AccountCache());
-        accountCaches.get(id).add(recipient, value);
+    public static void addAccountBalance(String id, String recipient, String currency, long value) {
+        accountCaches.computeIfAbsent(id, _ -> new AccountCaches()).add(recipient, currency, value);
     }
-
-    public static void subtractAccountBalance(String id, String from, long value) {
-        accountCaches.putIfAbsent(id, new AccountCache());
-        accountCaches.get(id).add(from, -value);
-    }
-
-
 
     public static void addType(String id, BlockType type) {
-        allowedBlocktypes.putIfAbsent(id, new HashSet<>());
-        allowedBlocktypes.get(id).add(type);
+        allowedBlocktypes.computeIfAbsent(id, _ -> new HashSet<>()).add(type);
     }
 
     public static Set<BlockType> getBlockTypes(String id){
         return allowedBlocktypes.get(id);
     }
 
-    public static Long getAccountBalance(String id, String publicKey){
-        AccountCache accountCache = accountCaches.get(id);
-        Long balance = accountCache == null ? 0L : accountCache.get(publicKey);
-        return balance == null ? 0L : balance;
-    }
-
     public static List<String> getKeys(String id) {
-        return walletCaches.get(id).getWallets().stream().map(w -> w.getPublicKeyAddress()).toList();
+        return keyPairCaches.get(id).getKeyPairs().stream().map(w -> w.getPublicKeyAddress()).toList();
     }
 
-    public static Optional<Wallet> getWallet(String id, String from) {
-        return walletCaches.get(id).getWallet(from);
+    public static Optional<KeyPair> getKeyPair(String id, String from) {
+        return keyPairCaches.get(id).getKeyPair(from);
     }
 
+    public static Long getAccountBalance(String id, String currency, String publicKey){
+        AccountCaches accountCaches = Data.accountCaches.get(id);
+        if (accountCaches == null){
+            return 0L;
+        }
+        return accountCaches.get(publicKey, currency);
+    }
 
+    //note that the currency can only be used by account chains for now
+    public static boolean hasCurrency(String id, String currency) {
+        AccountCaches accountCaches = Data.accountCaches.get(id);
+        if (accountCaches == null){
+            return false;
+        }
+        return accountCaches.hasCurrency(currency);
+    }
 }

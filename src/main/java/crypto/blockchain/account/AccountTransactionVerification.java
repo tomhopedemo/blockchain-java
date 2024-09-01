@@ -17,8 +17,8 @@ public class AccountTransactionVerification {
     public static boolean verify(AccountTransactionRequest transactionRequest, String id) {
         try {
             PublicKey publicKey = Encoder.decodeToPublicKey(transactionRequest.publicKey());
-            String integratedHash = transactionRequest.generateIntegratedHash();
-            boolean verified = ECDSA.verifyECDSASignature(publicKey, integratedHash.getBytes(UTF_8), Hex.decode(transactionRequest.signature()));
+            String hash = AccountTransactionRequest.generateHash(transactionRequest.publicKey(), transactionRequest.currency(), transactionRequest.transactionOutputs());
+            boolean verified = ECDSA.verifyECDSASignature(publicKey, hash.getBytes(UTF_8), Hex.decode(transactionRequest.signature()));
             if (!verified){
                 return false;
             }
@@ -40,7 +40,7 @@ public class AccountTransactionVerification {
         for (TransactionOutput transactionOutput : transactionRequest.transactionOutputs()) {
             sum += transactionOutput.getValue();
         }
-        Long balance = Data.getAccountBalance(id, transactionRequest.publicKey());
+        Long balance = Data.getAccountBalance(id, transactionRequest.currency(), transactionRequest.publicKey());
         return balance >= sum;
     }
 

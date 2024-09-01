@@ -29,7 +29,7 @@ public record SignedBlockFactory(String id) implements BlockFactory<BlockDataWra
     }
 
     @Override
-    public BlockDataWrapper prepareRequests(List<SignedDataRequest> requests) {
-        return new BlockDataWrapper(new ArrayList<>(requests));
+    public BlockDataWrapper<SignedDataRequest> prepareRequests(List<SignedDataRequest> requests) {
+        return new BlockDataWrapper<>(new ArrayList<>(requests));
     }
 }

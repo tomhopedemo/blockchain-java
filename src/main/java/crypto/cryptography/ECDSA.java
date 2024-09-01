@@ -1,5 +1,9 @@
 package crypto.cryptography;
 
+import crypto.encoding.Encoder;
+
+import javax.crypto.Cipher;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
 
@@ -12,6 +16,37 @@ public class ECDSA {
             return keyPairGenerator.generateKeyPair();
         } catch (GeneralSecurityException e){
             throw new RuntimeException(e);
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        KeyPair keyPair = ECDSA.generateKeyPair();
+
+        byte[] encrypt = encrypt(keyPair.getPublic(), "hellowhat".getBytes(StandardCharsets.UTF_8));
+        byte[] decrypt = decrypt(keyPair.getPrivate(), encrypt);
+        System.out.println(new String(decrypt));
+    }
+
+    public static byte[] encrypt(PublicKey key, byte[] plaintext) throws Exception {
+        Cipher cipher = Cipher.getInstance("ECIES");
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        return cipher.doFinal(plaintext);
+    }
+
+    public static byte[] decrypt(PrivateKey key, byte[] encrypted) throws Exception {
+        Cipher cipher = Cipher.getInstance("ECIES");
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        return cipher.doFinal(encrypted);
+    }
+
+    public static boolean checkKeyPair(String publicKey, String privateKey) {
+        byte[] signatureInput = "anyString".getBytes(StandardCharsets.UTF_8);
+        try {
+            byte[] signature = calculateECDSASignature(Encoder.decodeToPrivateKey(privateKey), signatureInput);
+            return verifyECDSASignature(Encoder.decodeToPublicKey(publicKey), signatureInput, signature);
+        } catch (Exception e){
+            return false;
         }
     }
 

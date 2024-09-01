@@ -22,6 +22,7 @@ public class GenesisAPI {
     @GetMapping("/chain/genesis")
     public ResponseEntity<?> genesis(@RequestParam("id") String id,
                    @RequestParam("publicKey") String publicKey,
+                   @RequestParam("currency") String currency,
                    @RequestParam("type") String type,
                    @RequestParam("value") Long value) {
         ChainService chainService = new ChainService();
@@ -29,7 +30,7 @@ public class GenesisAPI {
         if (chain != null) {
             BlockType blockType = BlockType.valueOf(type);
             try {
-                Optional<? extends Request> request = new AuxService().createGenesisRequest(id, blockType, publicKey, value);
+                Optional<? extends Request> request = new AuxService().createGenesisRequest(id, blockType, publicKey, currency, value);
                 if (request.isPresent()) {
                     chainService.submitRequest(id, blockType, request.get());
                     return new ResponseEntity<>(HttpStatus.OK);

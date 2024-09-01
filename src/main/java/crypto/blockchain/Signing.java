@@ -10,13 +10,15 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class Signing {
 
-    public static byte[] sign(Wallet wallet, String hash) throws ChainException {
+    public static byte[] sign(KeyPair keyPair, String hash) throws ChainException {
         byte[] preSignature = hash.getBytes(UTF_8);
         try {
-            PrivateKey privateKey = Encoder.decodeToPrivateKey(wallet.getPrivateKey());
+            PrivateKey privateKey = Encoder.decodeToPrivateKey(keyPair.getPrivateKey());
             return ECDSA.calculateECDSASignature(privateKey, preSignature);
         } catch (GeneralSecurityException e){
             throw new ChainException(e);
         }
     }
+
+
 }

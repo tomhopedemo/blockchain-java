@@ -39,9 +39,9 @@ public record AccountTransactionsBlockFactory(String id) implements BlockFactory
         //Update Caches
         for (AccountTransactionRequest transactionRequest : requests.transactionRequests()) {
             for (TransactionOutput transactionOutput : transactionRequest.transactionOutputs()) {
-                Data.addAccountBalance(id, transactionOutput.getRecipient(), transactionOutput.getValue());
+                Data.addAccountBalance(id, transactionOutput.getRecipient(), transactionRequest.currency(), transactionOutput.getValue());
                 if (blockchain.getMostRecent() != null) {
-                    Data.subtractAccountBalance(id, transactionOutput.getRecipient(), transactionOutput.getValue());
+                    Data.addAccountBalance(id, transactionOutput.getRecipient(), transactionRequest.currency(), -transactionOutput.getValue());
                 }
             }
         }

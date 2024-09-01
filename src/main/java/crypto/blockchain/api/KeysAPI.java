@@ -20,7 +20,7 @@ public class KeysAPI {
     //option to save key as well
 
     @GetMapping("/keys/create")
-    String wallet() {
-        return new AuxService().createWalletJson();
+    String keyPair() {
+        return new AuxService().createKeyPairJson();
     }
 }

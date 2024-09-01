@@ -7,6 +7,7 @@ import crypto.blockchain.utxo.UTXORequest;
 public enum BlockType {
     DATA(DataRequest.class),
     SIGNED_DATA(SignedDataRequest.class),
+    CURRENCY(CurrencyRequest.class),
     ACCOUNT(AccountTransactionRequest.class),
     UTXO(UTXORequest.class);
 

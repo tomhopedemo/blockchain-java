@@ -3,9 +3,7 @@ package crypto.blockchain.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
-import crypto.blockchain.account.AccountTransactionRequest;
 import crypto.blockchain.account.AccountTransactionRequestFactory;
-import crypto.blockchain.signed.SignedDataRequest;
 import crypto.blockchain.signed.SignedDataRequestFactory;
 import crypto.blockchain.utxo.UTXORequestFactory;
 
@@ -17,51 +15,53 @@ public class AuxService {
 
     static Gson JSON = new GsonBuilder().create();
 
-    public void registerWallet(String id, String publicKey, String privateKey) {
-        Data.addWallet(id, new Wallet(privateKey, publicKey));
+    public void registerKeyPair(String id, String publicKey, String privateKey) {
+        Data.addKeyPair(id, new KeyPair(privateKey, publicKey));
     }
 
     public boolean exists(String id){
         return Data.getChain(id) != null;
     }
 
-    public Optional<? extends Request> createGenesisRequest(String id, BlockType type, String key, Object value) throws ChainException {
-        Optional<Wallet> wallet = Data.getWallet(id, key);
-        if (wallet.isEmpty()){
+    public Optional<? extends Request> createGenesisRequest(String id, BlockType type, String key, String currency, Object value) throws ChainException {
+        Optional<KeyPair> KeyPair = Data.getKeyPair(id, key);
+        if (KeyPair.isEmpty()){
             return Optional.empty();
         }
         Request request = switch(type){
             case DATA -> new DataRequest((String) value);
-            case SIGNED_DATA -> SignedDataRequestFactory.createSignedDataRequest(wallet.get(), (String) value).get();
-            case ACCOUNT -> AccountTransactionRequest.create(wallet.get(), List.of(new TransactionOutput(key, (Long) value)));
-            case UTXO -> UTXORequestFactory.createGenesisRequest(wallet.get().getPublicKeyAddress(), (Long) value, id);
+            case SIGNED_DATA -> SignedDataRequestFactory.createSignedDataRequest(KeyPair.get(), (String) value).get();
+            case CURRENCY -> throw new UnsupportedOperationException();
+            case ACCOUNT -> AccountTransactionRequestFactory.create(KeyPair.get(), currency, List.of(new TransactionOutput(key, (Long) value)));
+            case UTXO -> UTXORequestFactory.createGenesisRequest(KeyPair.get().getPublicKeyAddress(), (Long) value, id);
         };
         return Optional.of(request);
     }
 
-    public Optional<? extends Request> createRequest(BlockType type, String id, String from, String to, Object value) throws ChainException {
-        Optional<Wallet> wallet = Data.getWallet(id, from);
-        if (wallet.isEmpty()){
+    public Optional<? extends Request> createRequest(BlockType type, String id, String from, String currency, String to, Object value) throws ChainException {
+        Optional<KeyPair> KeyPair = Data.getKeyPair(id, from);
+        if (KeyPair.isEmpty()){
             return Optional.empty();
         }
         return switch(type){
             case DATA -> Optional.empty();
-            case SIGNED_DATA -> SignedDataRequestFactory.createSignedDataRequest(wallet.get(), (String) value);
-            case ACCOUNT -> AccountTransactionRequestFactory.createTransactionRequest(wallet.get(), to, (Long) value, id);
-            case UTXO -> UTXORequestFactory.createUTXORequest(wallet.get(), to, (Long) value, id);
+            case SIGNED_DATA -> SignedDataRequestFactory.createSignedDataRequest(KeyPair.get(), (String) value);
+            case CURRENCY -> throw new UnsupportedOperationException();
+            case ACCOUNT -> AccountTransactionRequestFactory.createTransactionRequest(KeyPair.get(), currency, to, (Long) value, id);
+            case UTXO -> UTXORequestFactory.createUTXORequest(KeyPair.get(), to, (Long) value, id);
         };
     }
 
-    public String createWalletJson(){
-        return JSON.toJson(createWallet());
+    public String createKeyPairJson(){
+        return JSON.toJson(createKeyPair());
     }
 
-    public Wallet createWallet() {
-        return Wallet.generate();
+    public KeyPair createKeyPair() {
+        return KeyPair.generate();
     }
 
-    public String createRequestJson(BlockType type, String id, String from, String to, long value) throws ChainException {
-        Optional<? extends Request> request = createRequest(type, id, from, to, value);
+    public String createRequestJson(BlockType type, String id, String from, String currency, String to, long value) throws ChainException {
+        Optional<? extends Request> request = createRequest(type, id, from, currency, to, value);
         if (request.isEmpty()){
             return null;
         }

@@ -1,7 +1,6 @@
 package crypto.blockchain;
 
-import crypto.blockchain.account.AccountCache;
-import crypto.blockchain.account.AccountCaches;
+import crypto.blockchain.account.CurrencyAccountCache;
 import crypto.blockchain.utxo.UTXOCache;
 
 import java.util.*;
@@ -10,8 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Data {
 
     static Map<String, Set<BlockType>> allowedBlocktypes;
-    static Map<String, Blockchain> blockchains;
-    static Map<String, AccountCaches> accountCaches;
+    static Map<String, Blockchain> chains;
+    static Map<String, CurrencyAccountCache> currencyAccountCaches;
     static Map<String, UTXOCache> utxoCaches;
     static Map<String, CurrencyCache> currencyCache;
 
@@ -19,8 +18,8 @@ public class Data {
 
     static {
         allowedBlocktypes = new ConcurrentHashMap<>();
-        blockchains = new ConcurrentHashMap<>();
-        accountCaches = new ConcurrentHashMap<>();
+        chains = new ConcurrentHashMap<>();
+        currencyAccountCaches = new ConcurrentHashMap<>();
         utxoCaches = new ConcurrentHashMap<>();
         keyPairCaches = new ConcurrentHashMap<>();
         currencyCache = new ConcurrentHashMap<>();
@@ -28,23 +27,23 @@ public class Data {
 
 
     public static void addChain(Blockchain blockchain) {
-        blockchains.put(blockchain.id, blockchain);
+        chains.put(blockchain.id, blockchain);
     }
 
     public static Blockchain getChain(String id){
-        return blockchains.get(id);
+        return chains.get(id);
     }
 
     public static boolean hasChain(String id) {
-        return blockchains.containsKey(id);
+        return chains.containsKey(id);
     }
 
     public static void addKeyPair(String id, KeyPair keyPair) {
         keyPairCaches.computeIfAbsent(id, _ ->  new KeyPairCache()).addKeyPair(keyPair);
     }
 
-    public static void addUtxo(String id, String transactionOutputHash, TransactionOutput genesisTransactionOutput) {
-        utxoCaches.computeIfAbsent(id, _ ->  new UTXOCache()).put(transactionOutputHash, genesisTransactionOutput);
+    public static void addUtxo(String id, String transactionOutputHash, TransactionOutput transactionOutput) {
+        utxoCaches.computeIfAbsent(id, _ ->  new UTXOCache()).put(transactionOutputHash, transactionOutput);
     }
 
     public static UTXOCache getUTXOCache(String id){
@@ -64,7 +63,7 @@ public class Data {
     }
 
     public static void addAccountBalance(String id, String recipient, String currency, long value) {
-        accountCaches.computeIfAbsent(id, _ -> new AccountCaches()).add(recipient, currency, value);
+        currencyAccountCaches.computeIfAbsent(id, _ -> new CurrencyAccountCache()).add(recipient, currency, value);
     }
 
     public static void addType(String id, BlockType type) {
@@ -84,11 +83,11 @@ public class Data {
     }
 
     public static Long getAccountBalance(String id, String currency, String publicKey){
-        AccountCaches accountCaches = Data.accountCaches.get(id);
-        if (accountCaches == null){
+        CurrencyAccountCache currencyAccountCache = Data.currencyAccountCaches.get(id);
+        if (currencyAccountCache == null){
             return 0L;
         }
-        return accountCaches.get(publicKey, currency);
+        return currencyAccountCache.getBalance(publicKey, currency);
     }
 
     public static Optional<CurrencyRequest> getCurrency(String id, String currency) {
@@ -108,7 +107,7 @@ public class Data {
     }
 
     public static boolean hasAccountCache(String id, String currency) {
-        AccountCaches caches = accountCaches.get(id);
+        CurrencyAccountCache caches = currencyAccountCaches.get(id);
         if (caches == null){
             return false;
         }

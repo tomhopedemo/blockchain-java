@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
 import crypto.blockchain.account.AccountTransactionRequestFactory;
+import crypto.blockchain.api.data.TransactionalRequestParams;
 import crypto.blockchain.signed.SignedDataRequestFactory;
 import crypto.blockchain.utxo.UTXORequestFactory;
 
@@ -28,28 +29,33 @@ public class AuxService {
         if (keyPair.isEmpty()){
             return Optional.empty();
         }
-
         Request request = switch(type){
-            case DATA -> new DataRequest((String) value);
-            case SIGNED_DATA -> SignedDataRequestFactory.createSignedDataRequest(keyPair.get(), (String) value).get();
-            case CURRENCY -> throw new UnsupportedOperationException();
             case ACCOUNT -> AccountTransactionRequestFactory.createGenesis(id, currency, List.of(new TransactionOutput(publicKey, (Long) value)));
             case UTXO -> UTXORequestFactory.createGenesisRequest(keyPair.get().getPublicKeyAddress(), (Long) value, id);
+            default -> throw new IllegalStateException("Unexpected value: " + type);
         };
         return Optional.of(request);
     }
 
-    public Optional<? extends Request> createRequest(BlockType type, String id, String from, String currency, String to, Object value) throws ChainException {
-        Optional<KeyPair> KeyPair = Data.getKeyPair(id, from);
+    public Optional<? extends Request> createDataRequest(BlockType type, String id, String key, String value) throws ChainException {
+        Optional<KeyPair> KeyPair = Data.getKeyPair(id, key);
         if (KeyPair.isEmpty()){
             return Optional.empty();
         }
         return switch(type){
-            case DATA -> Optional.empty();
-            case SIGNED_DATA -> SignedDataRequestFactory.createSignedDataRequest(KeyPair.get(), (String) value);
-            case CURRENCY -> throw new UnsupportedOperationException();
-            case ACCOUNT -> AccountTransactionRequestFactory.createTransactionRequest(KeyPair.get(), currency, to, (Long) value, id);
-            case UTXO -> UTXORequestFactory.createUTXORequest(KeyPair.get(), to, (Long) value, id);
+            case DATA -> Optional.of(new DataRequest(value));
+            case SIGNED_DATA -> SignedDataRequestFactory.createSignedDataRequest(KeyPair.get(), value);
+            case CURRENCY -> Optional.of(new CurrencyRequest(value, KeyPair.get().publicKeyAddress, KeyPair.get().privateKey));
+            default -> throw new IllegalStateException("Unexpected value: " + type);
+        };
+    }
+
+    public Optional<? extends Request> createTransactionRequest(String id, TransactionalRequestParams transactionalRequestParams) throws ChainException {
+        BlockType type = BlockType.valueOf(transactionalRequestParams.type());
+        return switch(type){
+            case ACCOUNT -> AccountTransactionRequestFactory.createTransactionRequest(id, transactionalRequestParams);
+            case UTXO -> UTXORequestFactory.createUTXORequest(id, transactionalRequestParams);
+            default -> throw new IllegalStateException("Unexpected value: " + type);
         };
     }
 
@@ -59,14 +65,6 @@ public class AuxService {
 
     public KeyPair createKeyPair() {
         return KeyPair.generate();
-    }
-
-    public String createRequestJson(BlockType type, String id, String from, String currency, String to, long value) throws ChainException {
-        Optional<? extends Request> request = createRequest(type, id, from, currency, to, value);
-        if (request.isEmpty()){
-            return null;
-        }
-        return JSON.toJson(request.get(), type.getRequestClass());
     }
 
     public boolean validate(String id) {

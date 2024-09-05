@@ -2,6 +2,7 @@ package crypto.blockchain.account;
 
 import crypto.blockchain.*;
 import crypto.blockchain.Data;
+import crypto.blockchain.api.data.TransactionalRequestParams;
 import crypto.encoding.Encoder;
 
 import java.util.*;
@@ -9,14 +10,18 @@ import java.util.*;
 
 public class AccountTransactionRequestFactory {
 
-    public static Optional<AccountTransactionRequest> createTransactionRequest(KeyPair keyPair, String currency, String recipient, long transactionValue, String id) throws ChainException {
-        Long balance = Data.getAccountBalance(id, currency, keyPair.getPublicKeyAddress());
-        if (balance < transactionValue) {
+    public static Optional<AccountTransactionRequest> createTransactionRequest(String id, TransactionalRequestParams transactionalRequestParams) throws ChainException {
+        Optional<KeyPair> keyPair = Data.getKeyPair(id, transactionalRequestParams.from());
+        if (keyPair.isEmpty()){
+            return Optional.empty();
+        }
+        Long balance = Data.getAccountBalance(id, transactionalRequestParams.currency(), keyPair.get().getPublicKeyAddress());
+        if (balance < transactionalRequestParams.value()) {
             return Optional.empty();
         }
 
-        List<TransactionOutput> transactionOutputs = List.of(new TransactionOutput(recipient, transactionValue));
-        AccountTransactionRequest accountTransactionRequest = create(keyPair, currency, transactionOutputs);
+        List<TransactionOutput> transactionOutputs = List.of(new TransactionOutput(transactionalRequestParams.to(), transactionalRequestParams.value()));
+        AccountTransactionRequest accountTransactionRequest = create(keyPair.get(), transactionalRequestParams.currency(), transactionOutputs);
         return Optional.of(accountTransactionRequest);
     }
 

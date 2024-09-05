@@ -1,6 +1,7 @@
 package crypto.blockchain.utxo;
 
 import crypto.blockchain.*;
+import crypto.blockchain.api.data.TransactionalRequestParams;
 
 import java.util.*;
 
@@ -12,10 +13,14 @@ public class UTXORequestFactory {
         return new UTXORequest(new ArrayList<>(), transactionOutputs);
     }
 
-    public static Optional<UTXORequest> createUTXORequest(KeyPair keyPair, String recipientPublicKeyAddress, long transactionValue, String id) throws ChainException{
-        Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(keyPair, id);
+    public static Optional<UTXORequest> createUTXORequest(String id, TransactionalRequestParams transactionalRequestParams) throws ChainException{
+        Optional<KeyPair> keyPair = Data.getKeyPair(id, transactionalRequestParams.from());
+        if (keyPair.isEmpty()){
+            return Optional.empty();
+        }
+        Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(keyPair.get(), id);
         long balance = getBalance(unspentTransactionOutputsById);
-        if (balance < transactionValue) {
+        if (balance < transactionalRequestParams.value()) {
             return Optional.empty();
         }
 
@@ -23,16 +28,16 @@ public class UTXORequestFactory {
         long total = 0;
         for (Map.Entry<String, TransactionOutput> entry: unspentTransactionOutputsById.entrySet()){
             String transactionOutputHash = entry.getKey();
-            byte[] signature = Signing.sign(keyPair, transactionOutputHash);
+            byte[] signature = Signing.sign(keyPair.get(), transactionOutputHash);
             transactionInputs.add(new TransactionInput(transactionOutputHash, signature));
             TransactionOutput transactionOutput = entry.getValue();
             total += transactionOutput.getValue();
-            if (total >= transactionValue) break;
+            if (total >= transactionalRequestParams.value()) break;
         }
 
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
-        transactionOutputs.add(new TransactionOutput(recipientPublicKeyAddress, transactionValue));
-        transactionOutputs.add(new TransactionOutput(keyPair.getPublicKeyAddress(), total - transactionValue));
+        transactionOutputs.add(new TransactionOutput(transactionalRequestParams.to(), transactionalRequestParams.value()));
+        transactionOutputs.add(new TransactionOutput(keyPair.get().getPublicKeyAddress(), total - transactionalRequestParams.value()));
         UTXORequest transactionRequest = new UTXORequest(transactionInputs, transactionOutputs);
         return Optional.of(transactionRequest);
     }

@@ -58,6 +58,8 @@ import java.security.Security;
  *  32. allow currencies for utxo chains too
  *  33. remove check for  if (blockchain.getMostRecent() != null)  in atbf
  *  34. auxService.createRequest has too many parameters, consider alternative invocations
+ *  35. create object the same as currency request with a different name (like an empty wrapper)
+ *  37. your wallet undefied types
  */
 
 

@@ -1,7 +1,11 @@
 package crypto.blockchain.api;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import crypto.blockchain.BlockType;
 import crypto.blockchain.ChainException;
+import crypto.blockchain.Request;
+import crypto.blockchain.api.data.TransactionalRequestParams;
 import crypto.blockchain.service.AuxService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,29 +14,55 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 import static crypto.blockchain.api.Control.CORS;
 
 @RestController  @CrossOrigin(origins = CORS)
 public class AuxiliaryAPI {
+
+    static Gson JSON = new GsonBuilder().create();
 
     @GetMapping("/auxiliary/keys/add")
     public void addKey(@RequestParam("id") String id, @RequestParam("publicKey") String publicKey, @RequestParam("privateKey") String privateKey){
         new AuxService().registerKeyPair(id, publicKey, privateKey);
     }
 
-    @GetMapping("/auxiliary/request/create")
-    public ResponseEntity<?> create(@RequestParam("id") String id,
-                    @RequestParam("from") String from,
-                    @RequestParam("currency") String currency,
-                    @RequestParam("to") String to,
-                    @RequestParam("value") Long value,
+    @GetMapping("/auxiliary/request/transactional/create")
+    public ResponseEntity<?> createTransactional(@RequestParam("id") String id,
+                                                 @RequestParam("transactionalRequestParams") TransactionalRequestParams transactionalRequestParams
+    )  {
+        AuxService auxService = new AuxService();
+        if (auxService.exists(id)) {
+            try {
+                BlockType blockType = BlockType.valueOf(transactionalRequestParams.type());
+                Optional<? extends Request> request = auxService.createTransactionRequest(id, transactionalRequestParams);
+                if (request.isPresent()) {
+                    String requestJson = JSON.toJson(request.get(), blockType.getRequestClass());
+                    return new ResponseEntity<>(requestJson, HttpStatus.OK);
+                }
+            } catch (ChainException ignored){
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    @GetMapping("/auxiliary/request/data/create")
+    public ResponseEntity<?> createData(@RequestParam("id") String id,
+                    @RequestParam("key") String key,
+                    @RequestParam("value") String value,
                     @RequestParam("type") String type
     )  {
         AuxService auxService = new AuxService();
         if (auxService.exists(id)) {
             try {
-                String requestJson = auxService.createRequestJson(BlockType.valueOf(type), id, from, currency, to, value);
-                return new ResponseEntity<>(requestJson, HttpStatus.OK);
+                BlockType blockType = BlockType.valueOf(type);
+                Optional<? extends Request> request = auxService.createDataRequest(blockType, id, key, value);
+                if (request.isPresent()) {
+                    String requestJson = JSON.toJson(request.get(), blockType.getRequestClass());
+                    return new ResponseEntity<>(requestJson, HttpStatus.OK);
+                }
             } catch (ChainException ignored){
             }
         }

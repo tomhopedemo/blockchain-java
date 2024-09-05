@@ -1,6 +1,8 @@
 package crypto.blockchain.api;
 
 import crypto.blockchain.*;
+import crypto.blockchain.api.data.TransactionalRequestParams;
+import crypto.blockchain.api.data.TransactionalRequestParams.TransactionalRequestParamsBuilder;
 import crypto.blockchain.service.AuxService;
 import crypto.blockchain.service.ChainService;
 import org.springframework.http.HttpStatus;
@@ -87,22 +89,12 @@ public class SimulateAPI {
         AuxService auxService = new AuxService();
         KeyPair keyPair = auxService.createKeyPair();
         auxService.registerKeyPair(id, keyPair.getPublicKeyAddress(), keyPair.getPrivateKey());
-
-        Optional<? extends Request> genesisRequest = auxService.createGenesisRequest(id, blockType, keyPair.getPublicKeyAddress(), null, "ABCDE");
-        if (genesisRequest.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        chainService.submitRequest(id, blockType, genesisRequest.get());
-        Miner miner = new Miner(id);
-        miner.runSynch();
-
-        KeyPair anotherKeyPair = auxService.createKeyPair();
-        auxService.registerKeyPair(id, anotherKeyPair.getPublicKeyAddress(), anotherKeyPair.getPrivateKey());
-        Optional<? extends Request> request = auxService.createRequest(blockType, id, anotherKeyPair.getPublicKeyAddress(), null, null, "GHIJK");
+        Optional<? extends Request> request = auxService.createDataRequest(blockType, id, keyPair.getPublicKeyAddress(), "ABCDE");
         if (request.isEmpty()){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         chainService.submitRequest(id, blockType, request.get());
+        Miner miner = new Miner(id);
         miner.runSynch();
         return new ResponseEntity<>(chainService.getChainJson(id), HttpStatus.OK);
     }
@@ -123,7 +115,15 @@ public class SimulateAPI {
         miner.runSynch();
 
         KeyPair toKeyPair = auxService.createKeyPair();
-        Optional<? extends Request> request = auxService.createRequest(blockType, id, keyPair.getPublicKeyAddress(), CURRENCY, toKeyPair.getPublicKeyAddress(), 5L);
+        Optional<? extends Request> request = auxService.createTransactionRequest(id,
+                new TransactionalRequestParamsBuilder()
+                        .setCurrency(CURRENCY)
+                        .setFrom(keyPair.getPublicKeyAddress())
+                        .setType(blockType.name())
+                        .setTo(toKeyPair.getPublicKeyAddress())
+                        .setValue(5L)
+                        .build());
+
         if (request.isEmpty()){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

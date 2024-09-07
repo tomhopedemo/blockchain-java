@@ -18,41 +18,21 @@ public record UTXOFactory(String id) implements BlockFactory<UTXORequest>{
 
     @Override
     public void mine(BlockData<UTXORequest> requests) {
-        Blockchain chain = Data.getChain(id);
-        String mostRecentHash = chain.getMostRecentHash();
-
-        //Individual Transaction Verification
-        if (mostRecentHash != null) {
+        if (Data.getChain(id).getMostRecentHash() != null) {
             for (UTXORequest transactionRequest : requests.data()) {
-                boolean verified = verify(transactionRequest);
-                if (!verified) {
-                    return;
-                }
-                boolean inputSumEqualsOutputSum = checkInputSumEqualToOutputSum(transactionRequest, id);
-                if (!inputSumEqualsOutputSum) {
-                    return;
-                }
+                if (!verify(transactionRequest)) return;
+                if (!checkInputSumEqualToOutputSum(transactionRequest, id)) return;
             }
         }
 
-        //Overall Verification (no repeats)
         Set<String> inputs = new HashSet<>();
         for (UTXORequest utxoRequest : requests.data()) {
             for (TransactionInput transactionInput : utxoRequest.getTransactionInputs()) {
-                if (inputs.contains(transactionInput.transactionOutputHash())){
-                    return;
-                } else {
-                    inputs.add(transactionInput.transactionOutputHash());
-                }
+                if (inputs.contains(transactionInput.transactionOutputHash())) return;
+                inputs.add(transactionInput.transactionOutputHash());
             }
         }
-
-        //Create block
-        Block block = new Block(requests, mostRecentHash);
-        BlockMiner.mineBlockHash(block, "0".repeat(1));
-        chain.add(block);
-
-        //Update Caches
+        addBlock(id, requests);
         for (UTXORequest utxoRequest : requests.data()) {
             for (TransactionOutput transactionOutput : utxoRequest.getTransactionOutputs()) {
                 Data.addUtxo(id, transactionOutput.generateTransactionOutputHash(utxoRequest.getTransactionRequestHash()), transactionOutput);
@@ -94,23 +74,15 @@ public record UTXOFactory(String id) implements BlockFactory<UTXORequest>{
         for (TransactionInput transactionInput : request.getTransactionInputs()) {
             String transactionOutputHash = transactionInput.transactionOutputHash();
             TransactionOutput transactionOutput = Data.getUtxo(id, transactionOutputHash);
-            if (transactionOutput == null){
-                return false;
-            }
+            if (transactionOutput == null) return false;
             try {
                 PublicKey publicKey = Encoder.decodeToPublicKey(transactionOutput.getRecipient());
-                boolean verified = ECDSA.verifyECDSASignature(publicKey, transactionOutputHash.getBytes(UTF_8), Hex.decode(transactionInput.signature()));
-                if (!verified){
-                    return false;
-                }
+                if (!ECDSA.verifyECDSASignature(publicKey, transactionOutputHash.getBytes(UTF_8), Hex.decode(transactionInput.signature()))) return false;
             } catch (GeneralSecurityException e){
                 return false;
             }
         }
-        boolean inputSumEqualToOutputSum = isInputSumEqualToOutputSum(request);
-        if (!inputSumEqualToOutputSum) {
-            return false;
-        }
+        if (!isInputSumEqualToOutputSum(request)) return false;
         return true;
     }
 

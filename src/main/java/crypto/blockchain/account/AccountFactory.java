@@ -34,10 +34,7 @@ public record AccountFactory(String id) implements BlockFactory<AccountRequest> 
     public BlockData<AccountRequest> prepare(List<AccountRequest> requests) {
         List<AccountRequest> selected = new ArrayList<>();
         for (AccountRequest request : requests) {
-            boolean verified = verify(request);
-            if (!verified){
-                continue;
-            }
+            if (!verify(request)) continue;
             selected.add(request);
         }
         return selected.isEmpty() ? null : new BlockData<>(selected);
@@ -48,10 +45,7 @@ public record AccountFactory(String id) implements BlockFactory<AccountRequest> 
         try {
             PublicKey publicKey = Encoder.decodeToPublicKey(request.publicKey());
             String hash = AccountRequest.generateHash(request.publicKey(), request.currency(), request.transactionOutputs());
-            boolean verified = ECDSA.verifyECDSASignature(publicKey, hash.getBytes(UTF_8), Hex.decode(request.signature()));
-            if (!verified){
-                return false;
-            }
+            if (!ECDSA.verifyECDSASignature(publicKey, hash.getBytes(UTF_8), Hex.decode(request.signature()))) return false;
         } catch (GeneralSecurityException e){
             return false;
         }
@@ -62,24 +56,16 @@ public record AccountFactory(String id) implements BlockFactory<AccountRequest> 
                 sum += transactionOutput.getValue();
             }
             Long balance = Data.getAccountBalance(id, request.currency(), request.publicKey());
-            if (!(balance >= sum)) {
-                return false;
-            }
+            if (!(balance >= sum)) return false;
         }
         return true;
     }
 
     public AccountRequest create(TransactionRequestParams params) throws ChainException {
         Optional<KeyPair> keyPair = Data.getKeyPair(id, params.from());
-
-        if (keyPair.isEmpty()){
-            return null;
-        }
+        if (keyPair.isEmpty()) return null;
         Long balance = Data.getAccountBalance(id, params.currency(), keyPair.get().getPublicKeyAddress());
-        if (balance < params.value()) {
-            return null;
-        }
-
+        if (balance < params.value()) return null;
         List<TransactionOutput> transactionOutputs = List.of(new TransactionOutput(params.to(), params.value()));
         return create(keyPair.get(), params.currency(), transactionOutputs);
     }
@@ -89,6 +75,4 @@ public record AccountFactory(String id) implements BlockFactory<AccountRequest> 
         byte[] signature = Signing.sign(keyPair, hash);
         return new AccountRequest(keyPair.getPublicKeyAddress(), currency, transactionOutputs, Encoder.encodeToHexadecimal(signature));
     }
-
-
 }

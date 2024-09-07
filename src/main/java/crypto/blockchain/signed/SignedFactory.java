@@ -16,23 +16,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public record SignedFactory(String id) implements BlockFactory<SignedRequest>{
 
     @Override
-    public void mine(BlockData<SignedRequest> requests) {
-        //Data Request Verification
-        for (SignedRequest signedRequest : requests.data()) {
-            boolean verified = verify(signedRequest);
-            if (!verified) {
-                return;
-            }
-        }
-
-        //Create block
-        Blockchain chain = Data.getChain(id);
-        Block block = new Block(requests, chain.getMostRecentHash());
-        BlockMiner.mineBlockHash(block, "0".repeat(1));
-        chain.add(block);
-
-        //Update caches
-        Requests.remove(id, requests.data(), BlockType.SIGNED_DATA);
+    public void mine(BlockData<SignedRequest> blockData) {
+        if (!verify(blockData)) return;
+        addBlock(id, blockData);
+        Requests.remove(id, blockData.data(), BlockType.SIGNED_DATA);
     }
 
     @Override

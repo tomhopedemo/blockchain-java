@@ -11,9 +11,7 @@ public record SimpleBlockFactory(String id) implements BlockFactory<DataRequest>
     @Override
     public void mine(BlockData<DataRequest> blockData) {
         Blockchain chain = Data.getChain(id);
-        Block mostRecentBlock = chain.getMostRecent();
-        String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
-        Block nextBlock = new Block(blockData, previousBlockHash);
+        Block nextBlock = new Block(blockData, chain.getMostRecentHash());
         BlockMiner.mineBlockHash(nextBlock, "0".repeat(1));
         chain.add(nextBlock);
         Requests.remove(id, blockData.data(), BlockType.DATA);

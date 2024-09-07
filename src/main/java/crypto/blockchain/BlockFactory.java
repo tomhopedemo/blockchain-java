@@ -19,7 +19,7 @@ public interface BlockFactory<R extends Request> {
 
     default void addBlock(String id, BlockData<R> blockData){
         Blockchain chain = Data.getChain(id);
-        Block block = new Block(blockData, chain.getMostRecent().getBlockHashId());
+        Block block = new Block(blockData, chain.getMostRecentHash());
         BlockMiner.mineBlockHash(block, "0".repeat(1));
         chain.add(block);
     }

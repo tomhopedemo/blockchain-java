@@ -30,7 +30,7 @@ public record Miner (String id) implements Runnable {
             BlockFactory blockFactory = switch (blockType) {
                 case DATA -> new SimpleBlockFactory(id);
                 case SIGNED_DATA -> new SignedFactory(id);
-                case CURRENCY -> new CurrencyBlockFactory(id);
+                case CURRENCY -> new CurrencyFactory(id);
                 case ACCOUNT -> new AccountFactory(id);
                 case UTXO -> new UTXOFactory(id);
             };

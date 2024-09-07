@@ -16,11 +16,9 @@ public class Blockchain {
         this.blocks.add(block);
     }
 
-    public Block getMostRecent(){
-        if (blocks.isEmpty()){
-            return null;
-        }
-        return blocks.getLast();
+    public String getMostRecentHash(){
+        if (blocks.isEmpty()) return null;
+        return blocks.getLast().getBlockHashId();
     }
 
     public Block get(int index){

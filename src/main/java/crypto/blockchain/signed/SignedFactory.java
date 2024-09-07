@@ -27,9 +27,7 @@ public record SignedFactory(String id) implements BlockFactory<SignedRequest>{
 
         //Create block
         Blockchain chain = Data.getChain(id);
-        Block mostRecentBlock = chain.getMostRecent();
-        String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
-        Block block = new Block(requests, previousBlockHash);
+        Block block = new Block(requests, chain.getMostRecentHash());
         BlockMiner.mineBlockHash(block, "0".repeat(1));
         chain.add(block);
 

@@ -19,11 +19,10 @@ public record UTXOFactory(String id) implements BlockFactory<UTXORequest>{
     @Override
     public void mine(BlockData<UTXORequest> requests) {
         Blockchain chain = Data.getChain(id);
-        Block mostRecentBlock = chain.getMostRecent();
-        String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
+        String mostRecentHash = chain.getMostRecentHash();
 
         //Individual Transaction Verification
-        if (chain.getMostRecent() != null) {
+        if (mostRecentHash != null) {
             for (UTXORequest transactionRequest : requests.data()) {
                 boolean verified = verify(transactionRequest);
                 if (!verified) {
@@ -49,7 +48,7 @@ public record UTXOFactory(String id) implements BlockFactory<UTXORequest>{
         }
 
         //Create block
-        Block block = new Block(requests, previousBlockHash);
+        Block block = new Block(requests, mostRecentHash);
         BlockMiner.mineBlockHash(block, "0".repeat(1));
         chain.add(block);
 
@@ -70,13 +69,13 @@ public record UTXOFactory(String id) implements BlockFactory<UTXORequest>{
         Set<String> inputsReferenced = new HashSet<>();
         List<UTXORequest> included = new ArrayList<>();
         Blockchain chain = Data.getChain(id);
-        if (chain.getMostRecent() == null){
+        if (chain.getMostRecentHash() == null){
             requests = requests.stream().filter(r -> r.transactionInputs.isEmpty()).toList();
         }
 
         for (UTXORequest request : requests) {
             boolean shouldInclude;
-            if (chain.getMostRecent() == null){
+            if (chain.getMostRecentHash() == null){
                 shouldInclude = includeGenesisRequest(request);
             } else {
                 shouldInclude = includeUtxoRequest(request, inputsReferenced);

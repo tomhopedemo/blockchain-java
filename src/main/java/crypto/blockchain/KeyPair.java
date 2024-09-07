@@ -5,18 +5,10 @@ import crypto.encoding.Encoder;
 
 import java.security.*;
 
-public class KeyPair {
-    public String privateKey;
-    public String publicKeyAddress;
+public record KeyPair (String privateKey, String publicKey) implements Request {
 
-    private KeyPair(PrivateKey privateKey, PublicKey publicKeyAddress) {
-        this.privateKey = Encoder.encodeToString(privateKey);
-        this.publicKeyAddress = Encoder.encodeToString(publicKeyAddress);
-    }
-
-    public KeyPair(String privateKey, String publicKeyAddress){
-        this.privateKey = privateKey;
-        this.publicKeyAddress = publicKeyAddress;
+    private KeyPair(PrivateKey privateKey, PublicKey publicKey) {
+        this(Encoder.encodeToString(privateKey), Encoder.encodeToString(publicKey));
     }
 
     public static KeyPair generate() {
@@ -24,11 +16,8 @@ public class KeyPair {
         return new KeyPair(keyPair.getPrivate(), keyPair.getPublic());
     }
 
-    public String getPrivateKey() {
-        return privateKey;
-    }
-
-    public String getPublicKeyAddress() {
-        return publicKeyAddress;
+    @Override
+    public String getPreHash() {
+        return privateKey + "~" + publicKey;
     }
 }

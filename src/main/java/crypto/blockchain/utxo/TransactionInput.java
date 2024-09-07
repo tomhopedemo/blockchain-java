@@ -9,7 +9,7 @@ public record TransactionInput (String transactionOutputHash, String signature) 
     }
 
     public String serialise(){
-        return this.transactionOutputHash + this.signature;
+        return transactionOutputHash + signature;
     }
 
 }

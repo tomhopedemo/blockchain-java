@@ -1,5 +1,6 @@
 package crypto.blockchain;
 
+import crypto.blockchain.currency.CurrencyRequest;
 import crypto.blockchain.utxo.UTXOCache;
 
 import java.util.*;
@@ -74,11 +75,11 @@ public class Data {
     }
 
     public static List<String> getKeys(String id) {
-        return keyPairCaches.get(id).getKeyPairs().stream().map(w -> w.getPublicKeyAddress()).toList();
+        return keyPairCaches.get(id).getKeyPairs().stream().map(w -> w.publicKey()).toList();
     }
 
-    public static Optional<KeyPair> getKeyPair(String id, String from) {
-        return keyPairCaches.get(id).getKeyPair(from);
+    public static KeyPair getKeyPair(String id, String publicKey) {
+        return keyPairCaches.get(id).getKeyPair(publicKey);
     }
 
     public static Long getAccountBalance(String id, String currency, String publicKey){
@@ -107,6 +108,10 @@ public class Data {
         return getCurrency(id, currency) != null;
     }
 
+    public static boolean hasKey(String id, String publicKey) {
+        return getKeyPair(id, publicKey) != null;
+    }
+
     public static void addCurrency(String id, CurrencyRequest currency) {
         currencyCache.computeIfAbsent(id, _ -> new CurrencyCache()).add(currency);
     }
@@ -118,4 +123,5 @@ public class Data {
         }
         return caches.hasCurrency(currency);
     }
+
 }

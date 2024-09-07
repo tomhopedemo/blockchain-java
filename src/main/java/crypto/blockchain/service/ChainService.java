@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
 import crypto.blockchain.account.AccountRequest;
+import crypto.blockchain.currency.CurrencyRequest;
 import crypto.blockchain.signed.SignedRequest;
 import crypto.blockchain.utxo.UTXORequest;
 
@@ -38,16 +39,6 @@ public class ChainService {
 
     public void submitRequest(String id, BlockType type, Request request) {
         Requests.add(id, type, request);
-    }
-
-    public Request deserialiseRequest(BlockType blockType, String requestJson) {
-        return switch(blockType){
-            case DATA -> JSON.fromJson(requestJson, DataRequest.class);
-            case SIGNED_DATA -> JSON.fromJson(requestJson, SignedRequest.class);
-            case CURRENCY -> JSON.fromJson(requestJson, CurrencyRequest.class);
-            case ACCOUNT -> JSON.fromJson(requestJson, AccountRequest.class);
-            case UTXO -> JSON.fromJson(requestJson, UTXORequest.class);
-        };
     }
 
     public void requestMiner(String id) {

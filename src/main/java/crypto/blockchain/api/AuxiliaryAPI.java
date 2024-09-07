@@ -24,10 +24,9 @@ public class AuxiliaryAPI {
     static Gson JSON = new GsonBuilder().create();
 
     @GetMapping("/auxiliary/keys/add")
-    public void addKey(@RequestParam("id") String id,
-                       @RequestParam("publicKey") String publicKey,
+    public void addKey(@RequestParam("publicKey") String publicKey,
                        @RequestParam("privateKey") String privateKey){
-        new AuxService().registerKeyPair(id, publicKey, privateKey);
+        new AuxService().registerKeyPair(publicKey, privateKey);
     }
 
     @GetMapping("/auxiliary/request/transactional/create")

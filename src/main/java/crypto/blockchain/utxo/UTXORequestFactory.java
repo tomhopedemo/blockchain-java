@@ -7,18 +7,16 @@ import java.util.*;
 
 public class UTXORequestFactory {
 
-    public static UTXORequest createGenesisRequest(String recipientPublicKeyAddress, long transactionValue, String id) {
+    public static UTXORequest createGenesisRequest(String recipientPublicKey, long transactionValue, String id) {
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
-        transactionOutputs.add(new TransactionOutput(recipientPublicKeyAddress, transactionValue));
+        transactionOutputs.add(new TransactionOutput(recipientPublicKey, transactionValue));
         return new UTXORequest(new ArrayList<>(), transactionOutputs);
     }
 
     public static UTXORequest createUTXORequest(String id, TransactionRequestParams transactionRequestParams) throws ChainException{
-        Optional<KeyPair> keyPair = Data.getKeyPair(id, transactionRequestParams.from());
-        if (keyPair.isEmpty()){
-            return null;
-        }
-        Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(keyPair.get(), id);
+        KeyPair keyPair = Data.getKeyPair(id, transactionRequestParams.from());
+        if (keyPair == null) return null;
+        Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(keyPair, id);
         long balance = getBalance(unspentTransactionOutputsById);
         if (balance < transactionRequestParams.value()) {
             return null;
@@ -28,7 +26,7 @@ public class UTXORequestFactory {
         long total = 0;
         for (Map.Entry<String, TransactionOutput> entry: unspentTransactionOutputsById.entrySet()){
             String transactionOutputHash = entry.getKey();
-            byte[] signature = Signing.sign(keyPair.get(), transactionOutputHash);
+            byte[] signature = Signing.sign(keyPair, transactionOutputHash);
             transactionInputs.add(new TransactionInput(transactionOutputHash, signature));
             TransactionOutput transactionOutput = entry.getValue();
             total += transactionOutput.getValue();
@@ -37,7 +35,7 @@ public class UTXORequestFactory {
 
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
         transactionOutputs.add(new TransactionOutput(transactionRequestParams.to(), transactionRequestParams.value()));
-        transactionOutputs.add(new TransactionOutput(keyPair.get().getPublicKeyAddress(), total - transactionRequestParams.value()));
+        transactionOutputs.add(new TransactionOutput(keyPair.publicKey(), total - transactionRequestParams.value()));
         return new UTXORequest(transactionInputs, transactionOutputs);
     }
 
@@ -52,7 +50,7 @@ public class UTXORequestFactory {
         if (utxoCache != null) {
             for (Map.Entry<String, TransactionOutput> item : utxoCache.entrySet()) {
                 TransactionOutput transactionOutput = item.getValue();
-                if (transactionOutput.getRecipient().equals(keyPair.getPublicKeyAddress())) {
+                if (transactionOutput.getRecipient().equals(keyPair.publicKey())) {
                     transactionOutputsById.put(item.getKey(), transactionOutput);
                 }
             }

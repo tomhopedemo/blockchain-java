@@ -1,9 +1,9 @@
 package crypto.blockchain;
 
-public record DataRequest (String data) implements Request, BlockDataHashable {
+public record DataRequest (String data) implements Request {
 
     @Override
-    public String getBlockDataHash() {
+    public String getPreHash() {
         return data;
     }
 

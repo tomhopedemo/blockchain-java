@@ -8,8 +8,9 @@ public class KeyPairCache {
 
     private final List<KeyPair> keyPairs = new ArrayList<>();
 
-    public Optional<KeyPair> getKeyPair(String publicKey){
-        return keyPairs.stream().filter(w -> publicKey.equals(w.getPublicKeyAddress())).findAny();
+    public KeyPair getKeyPair(String publicKey){
+        Optional<KeyPair> keyPairOptional = keyPairs.stream().filter(w -> publicKey.equals(w.publicKey())).findFirst();
+        return keyPairOptional.isPresent() ? keyPairOptional.get() : null;
     }
 
     public List<KeyPair> getKeyPairs(){

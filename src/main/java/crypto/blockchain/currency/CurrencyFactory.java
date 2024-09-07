@@ -1,5 +1,6 @@
-package crypto.blockchain;
+package crypto.blockchain.currency;
 
+import crypto.blockchain.*;
 import crypto.cryptography.ECDSA;
 
 import java.util.ArrayList;
@@ -10,8 +11,8 @@ public record CurrencyFactory(String id) implements BlockFactory<CurrencyRequest
     @Override
     public void mine(BlockData<CurrencyRequest> blockData) {
         for (CurrencyRequest request : blockData.data()) {
-            if (!ECDSA.checkKeyPair(request.publicKey(), request.privateKey())) return;
-            if (!Data.hasCurrency(id, request.currency())) return;
+            if (!Data.hasKey(id, request.publicKey())) return;
+            if (Data.hasCurrency(id, request.currency())) return;
         }
         addBlock(id, blockData);
         blockData.data().forEach(request -> Data.addCurrency(id, request));

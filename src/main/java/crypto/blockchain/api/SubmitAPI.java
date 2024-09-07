@@ -1,5 +1,7 @@
 package crypto.blockchain.api;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
 import crypto.blockchain.service.ChainService;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,8 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController @CrossOrigin(origins = CORS)
 public class SubmitAPI {
 
+    static Gson JSON = new GsonBuilder().create();
+
     @GetMapping("/submit")
     public ResponseEntity<?> submit(@RequestParam("id") String id,
                           @RequestParam("type") String type,
@@ -22,7 +26,7 @@ public class SubmitAPI {
         ChainService chainService = new ChainService();
         if (chainService.hasChain(id)) {
             BlockType blockType = BlockType.valueOf(type);
-            Request request = chainService.deserialiseRequest(blockType, requestJson);
+            Request request = JSON.fromJson(requestJson, blockType.getRequestClass());
             chainService.submitRequest(id, blockType, request);
             chainService.requestMiner(id);
             return new ResponseEntity<>(chainService.getChainJson(id), OK);

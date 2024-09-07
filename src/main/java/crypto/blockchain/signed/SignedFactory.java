@@ -1,7 +1,6 @@
 package crypto.blockchain.signed;
 
 import crypto.blockchain.*;
-import crypto.blockchain.account.AccountRequest;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;
@@ -30,8 +29,8 @@ public record SignedFactory(String id) implements BlockFactory<SignedRequest>{
     @Override
     public boolean verify(SignedRequest request) {
         try {
-            PublicKey publicKey = Encoder.decodeToPublicKey(request.publicKeyAddress());
-            String hash = SignedRequest.generateHash(request.publicKeyAddress(), request.value());
+            PublicKey publicKey = Encoder.decodeToPublicKey(request.publicKey());
+            String hash = SignedRequest.generateHash(request.publicKey(), request.value());
             return ECDSA.verifyECDSASignature(publicKey, hash.getBytes(UTF_8), Hex.decode(request.signature()));
         } catch (GeneralSecurityException e){
             return false;
@@ -39,9 +38,9 @@ public record SignedFactory(String id) implements BlockFactory<SignedRequest>{
     }
 
     public static SignedRequest createSignedDataRequest(KeyPair keyPair, String value) throws ChainException {
-        String hash = SignedRequest.generateHash(keyPair.getPublicKeyAddress(), value);
+        String hash = SignedRequest.generateHash(keyPair.publicKey(), value);
         byte[] signature = Signing.sign(keyPair, hash);
-        return new SignedRequest(keyPair.getPublicKeyAddress(), value, Encoder.encodeToHexadecimal(signature));
+        return new SignedRequest(keyPair.publicKey(), value, Encoder.encodeToHexadecimal(signature));
     }
 
 }

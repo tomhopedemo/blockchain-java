@@ -45,7 +45,7 @@ import java.security.Security;
  *  why do we need a signature, is it okay for the signature to be empty?
  *  how can we indicate it's supposed to be genesis? - i think a public private key is a really good idea.
  *  so we'll need to include this somehow.
- *  22. keypair block (public key, private key)
+ *  22. keypair block (public key, private key) - we have currency
  *  23. big one: data associated with transaction to be encrypted via public key
  *  24. should accounttransactinorequest or accounttransactionrequests contiain knowledge of the coin - i think the next step is for the holder to contain info on coin. - public private key pair indicating that the coin is public for everyone.
  *  25. separator character in pre-hash for all hashing;
@@ -63,7 +63,9 @@ import java.security.Security;
  *  40. add currency keypair to keypari cache
  *  41. TransactionRequestParams remove type
  *  42. second currencyrequest object just called currencybase or something
- *  43. simulate chain has chain - do this properly, e.g w/ UUID.
+ *  44. ability to create own schema for block type
+ *  48. transaction output convert to record
+ *  49. simulate return types to be updated
  */
 
 

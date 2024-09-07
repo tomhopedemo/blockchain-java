@@ -7,13 +7,13 @@ public class TransactionOutput {
     String recipient;
     String value;
 
-    public TransactionOutput(String recipientPublicKeyAddress, long value) {
-        this.recipient = recipientPublicKeyAddress;
+    public TransactionOutput(String recipientPublicKey, long value) {
+        this.recipient = recipientPublicKey;
         this.value = String.valueOf(value);
     }
 
-    public TransactionOutput(String publicKeyAddress, String value) {
-        this.recipient = publicKeyAddress;
+    public TransactionOutput(String publicKey, String value) {
+        this.recipient = publicKey;
         this.value = String.valueOf(value);
     }
 

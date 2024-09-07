@@ -6,12 +6,11 @@ import crypto.hashing.Hashing;
 
 import java.util.List;
 
-public record AccountRequest(String publicKey, String currency, List<TransactionOutput> transactionOutputs, String signature) implements BlockDataHashable, Request {
+public record AccountRequest(String publicKey, String currency, List<TransactionOutput> transactionOutputs, String signature) implements Request {
 
     @Override
-    public String getBlockDataHash() {
-        byte[] hash = Hashing.hash(signature);
-        return Encoder.encodeToHexadecimal(hash);
+    public String getPreHash() {
+        return signature;
     }
 
     public static String generateHash(String publicKey, String currency, List<TransactionOutput> transactionOutputs) {

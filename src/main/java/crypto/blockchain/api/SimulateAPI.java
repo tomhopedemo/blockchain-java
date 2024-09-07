@@ -2,6 +2,7 @@ package crypto.blockchain.api;
 
 import crypto.blockchain.*;
 import crypto.blockchain.api.data.TransactionRequestParams.Builder;
+import crypto.blockchain.currency.CurrencyRequest;
 import crypto.blockchain.service.AuxService;
 import crypto.blockchain.service.ChainService;
 import org.springframework.http.HttpStatus;
@@ -11,8 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 import static crypto.blockchain.api.Control.CORS;
 
@@ -24,16 +25,11 @@ public class SimulateAPI {
     @GetMapping("/simulate")
     public ResponseEntity<?> simulate(@RequestParam("type") String type) {
         BlockType blockType = BlockType.valueOf(type);
-        String id = randomString(5);
+        String id = UUID.randomUUID().toString();
         ChainService chainService = new ChainService();
-        if (chainService.hasChain(id)){ //let's do this properly
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
         chainService.createChain(id);
         chainService.disableAutoMining(id);
         chainService.allowBlockType(id, blockType);
-
         try {
             switch (blockType) {
                 case DATA -> simulateData(id);
@@ -72,8 +68,8 @@ public class SimulateAPI {
         chainService.allowBlockType(id, blockType);
         AuxService auxService = new AuxService();
         KeyPair keyPair = auxService.createKeyPair();
-        auxService.registerKeyPair(id, keyPair.getPublicKeyAddress(), keyPair.getPrivateKey());
-        CurrencyRequest currencyRequest = new CurrencyRequest(CURRENCY, keyPair.getPublicKeyAddress(), keyPair.getPrivateKey());
+        auxService.registerKeyPair(keyPair.publicKey(), keyPair.privateKey());
+        CurrencyRequest currencyRequest = new CurrencyRequest(CURRENCY, keyPair.publicKey());
         chainService.submitRequest(id, blockType, currencyRequest);
         Miner miner = new Miner(id);
         miner.runSynch();
@@ -87,8 +83,8 @@ public class SimulateAPI {
         ChainService chainService = new ChainService();
         AuxService auxService = new AuxService();
         KeyPair keyPair = auxService.createKeyPair();
-        auxService.registerKeyPair(id, keyPair.getPublicKeyAddress(), keyPair.getPrivateKey());
-        Request request = auxService.createDataRequest(blockType, id, keyPair.getPublicKeyAddress(), "ABCDE");
+        auxService.registerKeyPair(keyPair.publicKey(), keyPair.privateKey());
+        Request request = auxService.createDataRequest(blockType, id, keyPair.publicKey(), "ABCDE");
         chainService.submitRequest(id, blockType, request);
         Miner miner = new Miner(id);
         miner.runSynch();
@@ -99,9 +95,9 @@ public class SimulateAPI {
         AuxService auxService = new AuxService();
 
         KeyPair keyPair = auxService.createKeyPair();
-        auxService.registerKeyPair(id, keyPair.getPublicKeyAddress(), keyPair.getPrivateKey());
+        auxService.registerKeyPair(keyPair.publicKey(), keyPair.privateKey());
 
-        Request genesisRequest = auxService.createGenesisRequest(id, blockType, keyPair.getPublicKeyAddress(), CURRENCY, 100L);
+        Request genesisRequest = auxService.createGenesisRequest(id, blockType, keyPair.publicKey(), CURRENCY, 100L);
         chainService.submitRequest(id, blockType, genesisRequest);
         Miner miner = new Miner(id);
         miner.runSynch();
@@ -110,8 +106,8 @@ public class SimulateAPI {
         Request request = auxService.createTransactionRequest(id, blockType.name(),
                 new Builder()
                         .setCurrency(CURRENCY)
-                        .setFrom(keyPair.getPublicKeyAddress())
-                        .setTo(toKeyPair.getPublicKeyAddress())
+                        .setFrom(keyPair.publicKey())
+                        .setTo(toKeyPair.publicKey())
                         .setValue(5L)
                         .build());
         chainService.submitRequest(id, blockType, request);

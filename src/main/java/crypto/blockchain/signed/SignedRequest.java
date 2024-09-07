@@ -5,12 +5,11 @@ import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
 
 
-public record SignedRequest (String publicKeyAddress, String value, String signature) implements Request {
+public record SignedRequest (String publicKey, String value, String signature) implements Request {
 
     @Override
-    public String getBlockDataHash() {
-        byte[] hash = Hashing.hash(signature);
-        return Encoder.encodeToHexadecimal(hash);
+    public String getPreHash() {
+        return signature;
     }
 
     public static String generateHash(String publicKey, String value) {

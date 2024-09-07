@@ -1,9 +1,9 @@
 package crypto.blockchain;
 
-import crypto.blockchain.account.AccountTransactionsBlockFactory;
-import crypto.blockchain.signed.SignedBlockFactory;
+import crypto.blockchain.account.AccountFactory;
+import crypto.blockchain.signed.SignedFactory;
 import crypto.blockchain.simple.SimpleBlockFactory;
-import crypto.blockchain.utxo.UTXOBlockFactory;
+import crypto.blockchain.utxo.UTXOFactory;
 
 import java.util.List;
 import java.util.Set;
@@ -29,15 +29,15 @@ public record Miner (String id) implements Runnable {
 
             BlockFactory blockFactory = switch (blockType) {
                 case DATA -> new SimpleBlockFactory(id);
-                case SIGNED_DATA -> new SignedBlockFactory(id);
+                case SIGNED_DATA -> new SignedFactory(id);
                 case CURRENCY -> new CurrencyBlockFactory(id);
-                case ACCOUNT -> new AccountTransactionsBlockFactory(id);
-                case UTXO -> new UTXOBlockFactory(id);
+                case ACCOUNT -> new AccountFactory(id);
+                case UTXO -> new UTXOFactory(id);
             };
 
-            BlockDataHashable blockDataHashable = blockFactory.prepareRequests(requests);
+            BlockData blockDataHashable = blockFactory.prepare(requests);
             if (blockDataHashable != null) {
-                blockFactory.mineNextBlock(blockDataHashable);
+                blockFactory.mine(blockDataHashable);
             }
         }
     }

@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import crypto.blockchain.BlockType;
 import crypto.blockchain.ChainException;
 import crypto.blockchain.Request;
-import crypto.blockchain.api.data.TransactionalRequestParams;
+import crypto.blockchain.api.data.TransactionRequestParams;
 import crypto.blockchain.service.AuxService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,21 +24,24 @@ public class AuxiliaryAPI {
     static Gson JSON = new GsonBuilder().create();
 
     @GetMapping("/auxiliary/keys/add")
-    public void addKey(@RequestParam("id") String id, @RequestParam("publicKey") String publicKey, @RequestParam("privateKey") String privateKey){
+    public void addKey(@RequestParam("id") String id,
+                       @RequestParam("publicKey") String publicKey,
+                       @RequestParam("privateKey") String privateKey){
         new AuxService().registerKeyPair(id, publicKey, privateKey);
     }
 
     @GetMapping("/auxiliary/request/transactional/create")
     public ResponseEntity<?> createTransactional(@RequestParam("id") String id,
-                                                 @RequestParam("transactionalRequestParams") TransactionalRequestParams transactionalRequestParams
+                                                 @RequestParam("type") String type,
+                                                 @RequestParam("transactionRequestParams") TransactionRequestParams transactionRequestParams
     )  {
         AuxService auxService = new AuxService();
         if (auxService.exists(id)) {
             try {
-                BlockType blockType = BlockType.valueOf(transactionalRequestParams.type());
-                Optional<? extends Request> request = auxService.createTransactionRequest(id, transactionalRequestParams);
-                if (request.isPresent()) {
-                    String requestJson = JSON.toJson(request.get(), blockType.getRequestClass());
+                BlockType blockType = BlockType.valueOf(type);
+                Request request = auxService.createTransactionRequest(id, type, transactionRequestParams);
+                if (request != null) {
+                    String requestJson = JSON.toJson(request, blockType.getRequestClass());
                     return new ResponseEntity<>(requestJson, HttpStatus.OK);
                 }
             } catch (ChainException ignored){
@@ -58,9 +61,9 @@ public class AuxiliaryAPI {
         if (auxService.exists(id)) {
             try {
                 BlockType blockType = BlockType.valueOf(type);
-                Optional<? extends Request> request = auxService.createDataRequest(blockType, id, key, value);
-                if (request.isPresent()) {
-                    String requestJson = JSON.toJson(request.get(), blockType.getRequestClass());
+                Request request = auxService.createDataRequest(blockType, id, key, value);
+                if (request != null) {
+                    String requestJson = JSON.toJson(request, blockType.getRequestClass());
                     return new ResponseEntity<>(requestJson, HttpStatus.OK);
                 }
             } catch (ChainException ignored){

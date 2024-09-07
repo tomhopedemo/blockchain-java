@@ -2,23 +2,30 @@ package crypto.blockchain.utxo;
 
 import crypto.blockchain.*;
 import crypto.blockchain.Data;
+import crypto.blockchain.BlockData;
+import crypto.cryptography.ECDSA;
+import crypto.encoding.Encoder;
+import org.bouncycastle.util.encoders.Hex;
 
+import java.security.GeneralSecurityException;
+import java.security.PublicKey;
 import java.util.*;
 
 import static crypto.blockchain.BlockType.UTXO;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
-public record UTXOBlockFactory(String id) implements BlockFactory<UTXORequests, UTXORequest>{
+public record UTXOFactory(String id) implements BlockFactory<UTXORequest>{
 
     @Override
-    public void mineNextBlock(UTXORequests requests) {
+    public void mine(BlockData<UTXORequest> requests) {
         Blockchain chain = Data.getChain(id);
         Block mostRecentBlock = chain.getMostRecent();
         String previousBlockHash = mostRecentBlock == null ? null : mostRecentBlock.getBlockHashId();
 
         //Individual Transaction Verification
         if (chain.getMostRecent() != null) {
-            for (UTXORequest transactionRequest : requests.getTransactionRequests()) {
-                boolean verified = UTXOVerification.verifySignature(transactionRequest, id);
+            for (UTXORequest transactionRequest : requests.data()) {
+                boolean verified = verify(transactionRequest);
                 if (!verified) {
                     return;
                 }
@@ -31,7 +38,7 @@ public record UTXOBlockFactory(String id) implements BlockFactory<UTXORequests, 
 
         //Overall Verification (no repeats)
         Set<String> inputs = new HashSet<>();
-        for (UTXORequest utxoRequest : requests.getTransactionRequests()) {
+        for (UTXORequest utxoRequest : requests.data()) {
             for (TransactionInput transactionInput : utxoRequest.getTransactionInputs()) {
                 if (inputs.contains(transactionInput.transactionOutputHash())){
                     return;
@@ -47,7 +54,7 @@ public record UTXOBlockFactory(String id) implements BlockFactory<UTXORequests, 
         chain.add(block);
 
         //Update Caches
-        for (UTXORequest utxoRequest : requests.getTransactionRequests()) {
+        for (UTXORequest utxoRequest : requests.data()) {
             for (TransactionOutput transactionOutput : utxoRequest.getTransactionOutputs()) {
                 Data.addUtxo(id, transactionOutput.generateTransactionOutputHash(utxoRequest.getTransactionRequestHash()), transactionOutput);
             }
@@ -55,19 +62,19 @@ public record UTXOBlockFactory(String id) implements BlockFactory<UTXORequests, 
                 Data.removeUtxo(id, transactionInput.transactionOutputHash());
             }
         }
-        Requests.remove(id, requests.getTransactionRequests(), UTXO);
+        Requests.remove(id, requests.data(), UTXO);
     }
 
     @Override
-    public UTXORequests prepareRequests(List<UTXORequest> availableRequests) {
+    public BlockData<UTXORequest> prepare(List<UTXORequest> requests) {
         Set<String> inputsReferenced = new HashSet<>();
-        List<UTXORequest> requests = new ArrayList<>();
+        List<UTXORequest> included = new ArrayList<>();
         Blockchain chain = Data.getChain(id);
         if (chain.getMostRecent() == null){
-            availableRequests = availableRequests.stream().filter(r -> r.transactionInputs.isEmpty()).toList();
+            requests = requests.stream().filter(r -> r.transactionInputs.isEmpty()).toList();
         }
 
-        for (UTXORequest request : availableRequests) {
+        for (UTXORequest request : requests) {
             boolean shouldInclude;
             if (chain.getMostRecent() == null){
                 shouldInclude = includeGenesisRequest(request);
@@ -76,11 +83,36 @@ public record UTXOBlockFactory(String id) implements BlockFactory<UTXORequests, 
             }
 
             if (shouldInclude) {
-                requests.add(request);
+                included.add(request);
                 inputsReferenced.addAll(request.getTransactionInputs().stream().map(t -> t.transactionOutputHash()).toList());
             }
         }
-        return requests.isEmpty() ? null : new UTXORequests(requests);
+        return included.isEmpty() ? null : new BlockData<>(included);
+    }
+
+    @Override
+    public boolean verify(UTXORequest request) {
+        for (TransactionInput transactionInput : request.getTransactionInputs()) {
+            String transactionOutputHash = transactionInput.transactionOutputHash();
+            TransactionOutput transactionOutput = Data.getUtxo(id, transactionOutputHash);
+            if (transactionOutput == null){
+                return false;
+            }
+            try {
+                PublicKey publicKey = Encoder.decodeToPublicKey(transactionOutput.getRecipient());
+                boolean verified = ECDSA.verifyECDSASignature(publicKey, transactionOutputHash.getBytes(UTF_8), Hex.decode(transactionInput.signature()));
+                if (!verified){
+                    return false;
+                }
+            } catch (GeneralSecurityException e){
+                return false;
+            }
+        }
+        boolean inputSumEqualToOutputSum = isInputSumEqualToOutputSum(request);
+        if (!inputSumEqualToOutputSum) {
+            return false;
+        }
+        return true;
     }
 
     private boolean includeGenesisRequest(UTXORequest request) {
@@ -88,7 +120,7 @@ public record UTXOBlockFactory(String id) implements BlockFactory<UTXORequests, 
     }
 
     private boolean includeUtxoRequest(UTXORequest request, Set<String> inputsReferenced) {
-        if (!UTXOVerification.verifySignature(request, id)) {
+        if (!verify(request)) {
             return false;
         }
 
@@ -112,21 +144,34 @@ public record UTXOBlockFactory(String id) implements BlockFactory<UTXORequests, 
         return true;
     }
 
-    private static boolean checkInputSumEqualToOutputSum(UTXORequest transactionRequest, String id) {
+    private static boolean checkInputSumEqualToOutputSum(UTXORequest request, String id) {
         long sumOfInputs = 0L;
         long sumOfOutputs = 0L;
-        for (TransactionInput transactionInput : transactionRequest.getTransactionInputs()) {
+        for (TransactionInput transactionInput : request.getTransactionInputs()) {
             TransactionOutput transactionOutput = Data.getUtxo(id, transactionInput.transactionOutputHash());
             long transactionOutputValue = transactionOutput.getValue();
             sumOfInputs += transactionOutputValue;
         }
 
-        for (TransactionOutput transactionOutput : transactionRequest.getTransactionOutputs()) {
+        for (TransactionOutput transactionOutput : request.getTransactionOutputs()) {
             long transactionOutputValue = transactionOutput.getValue();
             sumOfOutputs += transactionOutputValue;
         }
 
         return sumOfInputs == sumOfOutputs;
     }
+
+    private boolean isInputSumEqualToOutputSum(UTXORequest request) {
+        long sum = 0L;
+        for (TransactionInput transactionInput : request.getTransactionInputs()) {
+            TransactionOutput transactionOutput = Data.getUtxo(id, transactionInput.transactionOutputHash());
+            sum += transactionOutput.getValue();
+        }
+        for (TransactionOutput transactionOutput : request.getTransactionOutputs()) {
+            sum -= transactionOutput.getValue();
+        }
+        return sum == 0L;
+    }
+
 
 }

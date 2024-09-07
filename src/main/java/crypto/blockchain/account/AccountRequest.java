@@ -1,17 +1,12 @@
 package crypto.blockchain.account;
 
 import crypto.blockchain.*;
-import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
 
-import java.security.GeneralSecurityException;
-import java.security.PrivateKey;
 import java.util.List;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-public record AccountTransactionRequest (String publicKey, String currency, List<TransactionOutput> transactionOutputs, String signature) implements BlockDataHashable, Request {
+public record AccountRequest(String publicKey, String currency, List<TransactionOutput> transactionOutputs, String signature) implements BlockDataHashable, Request {
 
     @Override
     public String getBlockDataHash() {

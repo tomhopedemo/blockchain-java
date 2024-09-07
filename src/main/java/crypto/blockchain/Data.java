@@ -1,6 +1,5 @@
 package crypto.blockchain;
 
-import crypto.blockchain.account.CurrencyAccountCache;
 import crypto.blockchain.utxo.UTXOCache;
 
 import java.util.*;
@@ -14,7 +13,7 @@ public class Data {
     static Map<String, UTXOCache> utxoCaches;
     static Map<String, CurrencyCache> currencyCache;
 
-    static Map<String, KeyPairCache> keyPairCaches;
+    static Map<String, KeyPairCache> keyPairCaches; //the key pair from the currency cache can be used also.
 
     static {
         allowedBlocktypes = new ConcurrentHashMap<>();
@@ -90,16 +89,22 @@ public class Data {
         return currencyAccountCache.getBalance(publicKey, currency);
     }
 
-    public static Optional<CurrencyRequest> getCurrency(String id, String currency) {
+    public static CurrencyRequest getCurrency(String id, String currency) {
         CurrencyCache currencies = currencyCache.get(id);
         if (currencies == null){
-            return Optional.empty();
+            return null;
         }
-        return currencies.get(currency);
+        Optional<CurrencyRequest> currencyRequest = currencies.get(currency);
+        if (currencyRequest.isPresent()){
+            return currencyRequest.get();
+        } else {
+            return null;
+        }
+
     }
 
     public static boolean hasCurrency(String id, String currency) {
-        return getCurrency(id, currency).isPresent();
+        return getCurrency(id, currency) != null;
     }
 
     public static void addCurrency(String id, CurrencyRequest currency) {

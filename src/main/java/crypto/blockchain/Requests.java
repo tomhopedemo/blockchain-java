@@ -1,7 +1,7 @@
 package crypto.blockchain;
 
-import crypto.blockchain.account.AccountTransactionRequest;
-import crypto.blockchain.signed.SignedDataRequest;
+import crypto.blockchain.account.AccountRequest;
+import crypto.blockchain.signed.SignedRequest;
 import crypto.blockchain.utxo.UTXORequest;
 
 import java.util.ArrayList;
@@ -11,10 +11,10 @@ import java.util.Map;
 
 public class Requests {
 
-    static Map<String, List<AccountTransactionRequest>> accountRequests = new HashMap<>();
+    static Map<String, List<AccountRequest>> accountRequests = new HashMap<>();
     static Map<String, List<UTXORequest>> utxoRequests = new HashMap<>();
     static Map<String, List<DataRequest>> dataRequests = new HashMap<>();
-    static Map<String, List<SignedDataRequest>> signedDataRequests = new HashMap<>();
+    static Map<String, List<SignedRequest>> signedDataRequests = new HashMap<>();
     static Map<String, List<CurrencyRequest>> currencyRequests = new HashMap<>();
 
     public static void add(String id, BlockType blockType, Request request) {

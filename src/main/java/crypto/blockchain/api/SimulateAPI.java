@@ -1,8 +1,7 @@
 package crypto.blockchain.api;
 
 import crypto.blockchain.*;
-import crypto.blockchain.api.data.TransactionalRequestParams;
-import crypto.blockchain.api.data.TransactionalRequestParams.TransactionalRequestParamsBuilder;
+import crypto.blockchain.api.data.TransactionRequestParams.Builder;
 import crypto.blockchain.service.AuxService;
 import crypto.blockchain.service.ChainService;
 import org.springframework.http.HttpStatus;
@@ -27,7 +26,7 @@ public class SimulateAPI {
         BlockType blockType = BlockType.valueOf(type);
         String id = randomString(5);
         ChainService chainService = new ChainService();
-        if (chainService.hasChain(id)){
+        if (chainService.hasChain(id)){ //let's do this properly
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -36,22 +35,24 @@ public class SimulateAPI {
         chainService.allowBlockType(id, blockType);
 
         try {
-            return switch (blockType) {
+            switch (blockType) {
                 case DATA -> simulateData(id);
                 case SIGNED_DATA -> simulateSignedData(id);
                 case CURRENCY -> simulateCurrency(id);
                 case ACCOUNT -> {
                     simulateCurrency(id);
-                    yield simulateTransactional(id, BlockType.ACCOUNT);
+                    simulateTransactional(id, BlockType.ACCOUNT);
                 }
                 case UTXO -> simulateTransactional(id, BlockType.UTXO);
-            };
-        } catch (ChainException ignored){
+            }
+            return new ResponseEntity<>(chainService.getChainJson(id), HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
         }
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private ResponseEntity<?> simulateData(String id)  {
+    private void simulateData(String id)  {
         BlockType blockType = BlockType.DATA;
         ChainService chainService = new ChainService();
 
@@ -63,8 +64,6 @@ public class SimulateAPI {
         Request request = new DataRequest(randomString(10));
         chainService.submitRequest(id, blockType, request);
         miner.runSynch();
-
-        return new ResponseEntity<>(chainService.getChainJson(id), HttpStatus.OK);
     }
 
     private ResponseEntity<?> simulateCurrency(String id) {
@@ -83,54 +82,40 @@ public class SimulateAPI {
 
 
 
-    private ResponseEntity<?> simulateSignedData(String id) throws ChainException {
+    private void simulateSignedData(String id) throws ChainException {
         BlockType blockType = BlockType.SIGNED_DATA;
         ChainService chainService = new ChainService();
         AuxService auxService = new AuxService();
         KeyPair keyPair = auxService.createKeyPair();
         auxService.registerKeyPair(id, keyPair.getPublicKeyAddress(), keyPair.getPrivateKey());
-        Optional<? extends Request> request = auxService.createDataRequest(blockType, id, keyPair.getPublicKeyAddress(), "ABCDE");
-        if (request.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        chainService.submitRequest(id, blockType, request.get());
+        Request request = auxService.createDataRequest(blockType, id, keyPair.getPublicKeyAddress(), "ABCDE");
+        chainService.submitRequest(id, blockType, request);
         Miner miner = new Miner(id);
         miner.runSynch();
-        return new ResponseEntity<>(chainService.getChainJson(id), HttpStatus.OK);
     }
 
-    private ResponseEntity<?> simulateTransactional(String id, BlockType blockType) throws ChainException {
+    private void simulateTransactional(String id, BlockType blockType) throws ChainException {
         ChainService chainService = new ChainService();
         AuxService auxService = new AuxService();
 
         KeyPair keyPair = auxService.createKeyPair();
         auxService.registerKeyPair(id, keyPair.getPublicKeyAddress(), keyPair.getPrivateKey());
 
-        Optional<? extends Request> genesisRequest = auxService.createGenesisRequest(id, blockType, keyPair.getPublicKeyAddress(), CURRENCY, 100L);
-        if (genesisRequest.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        chainService.submitRequest(id, blockType, genesisRequest.get());
+        Request genesisRequest = auxService.createGenesisRequest(id, blockType, keyPair.getPublicKeyAddress(), CURRENCY, 100L);
+        chainService.submitRequest(id, blockType, genesisRequest);
         Miner miner = new Miner(id);
         miner.runSynch();
 
         KeyPair toKeyPair = auxService.createKeyPair();
-        Optional<? extends Request> request = auxService.createTransactionRequest(id,
-                new TransactionalRequestParamsBuilder()
+        Request request = auxService.createTransactionRequest(id, blockType.name(),
+                new Builder()
                         .setCurrency(CURRENCY)
                         .setFrom(keyPair.getPublicKeyAddress())
-                        .setType(blockType.name())
                         .setTo(toKeyPair.getPublicKeyAddress())
                         .setValue(5L)
                         .build());
-
-        if (request.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        chainService.submitRequest(id, blockType, request.get());
+        chainService.submitRequest(id, blockType, request);
         miner.runSynch();
-
-        return new ResponseEntity<>(chainService.getChainJson(id), HttpStatus.OK);
     }
 
     private String randomString(int length){

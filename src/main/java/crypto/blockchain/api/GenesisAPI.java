@@ -30,11 +30,10 @@ public class GenesisAPI {
         if (chain != null) {
             BlockType blockType = BlockType.valueOf(type);
             try {
-                Optional<? extends Request> request = new AuxService().createGenesisRequest(id, blockType, publicKey, currency, value);
-                if (request.isPresent()) {
-                    chainService.submitRequest(id, blockType, request.get());
-                    return new ResponseEntity<>(HttpStatus.OK);
-                }
+                Request request = new AuxService().createGenesisRequest(id, blockType, publicKey, currency, value);
+                chainService.submitRequest(id, blockType, request);
+                return new ResponseEntity<>(HttpStatus.OK);
+
             } catch (ChainException ignored){
             }
         }

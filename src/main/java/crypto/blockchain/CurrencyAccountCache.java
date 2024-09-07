@@ -1,4 +1,4 @@
-package crypto.blockchain.account;
+package crypto.blockchain;
 
 import java.util.concurrent.ConcurrentHashMap;
 

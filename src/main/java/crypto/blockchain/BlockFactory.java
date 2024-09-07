@@ -2,10 +2,26 @@ package crypto.blockchain;
 
 import java.util.List;
 
-public interface BlockFactory<B extends BlockDataHashable, R extends Request> {
+public interface BlockFactory<R extends Request> {
 
-    void mineNextBlock(B b);
+    void mine(BlockData<R> b);
 
-    B prepareRequests(List<R> requests);
+    BlockData<R> prepare(List<R> requests);
+
+    boolean verify(R request);
+
+    default boolean verify(BlockData<R> blockData){
+        for (R request : blockData.data()) {
+            if (!verify(request)) return false;
+        }
+        return true;
+    }
+
+    default void addBlock(String id, BlockData<R> blockData){
+        Blockchain chain = Data.getChain(id);
+        Block block = new Block(blockData, chain.getMostRecent().getBlockHashId());
+        BlockMiner.mineBlockHash(block, "0".repeat(1));
+        chain.add(block);
+    }
 
 }

@@ -3,12 +3,11 @@ package crypto.blockchain.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
-import crypto.blockchain.account.AccountTransactionRequestFactory;
-import crypto.blockchain.api.data.TransactionalRequestParams;
-import crypto.blockchain.signed.SignedDataRequestFactory;
+import crypto.blockchain.account.AccountFactory;
+import crypto.blockchain.api.data.TransactionRequestParams;
+import crypto.blockchain.signed.SignedFactory;
 import crypto.blockchain.utxo.UTXORequestFactory;
 
-import java.util.List;
 import java.util.Optional;
 
 
@@ -24,37 +23,47 @@ public class AuxService {
         return Data.getChain(id) != null;
     }
 
-    public Optional<? extends Request> createGenesisRequest(String id, BlockType type, String publicKey, String currency, Object value) throws ChainException {
+    public Request createGenesisRequest(String id, BlockType type, String publicKey, String currency, Object value) throws ChainException {
         Optional<KeyPair> keyPair = Data.getKeyPair(id, publicKey);
         if (keyPair.isEmpty()){
-            return Optional.empty();
+            return null;
         }
-        Request request = switch(type){
-            case ACCOUNT -> AccountTransactionRequestFactory.createGenesis(id, currency, List.of(new TransactionOutput(publicKey, (Long) value)));
+        return switch(type){
+            case ACCOUNT -> {
+                CurrencyRequest currencyRequest = Data.getCurrency(id, currency);
+                if (currencyRequest == null){
+                    yield null;
+                }
+                TransactionRequestParams params = new TransactionRequestParams.Builder()
+                        .setCurrency(currency)
+                        .setFrom(currencyRequest.publicKey())
+                        .setTo(publicKey)
+                        .setValue((Long)value)
+                        .build();
+                yield new AccountFactory(id).create(params);
+            }
             case UTXO -> UTXORequestFactory.createGenesisRequest(keyPair.get().getPublicKeyAddress(), (Long) value, id);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
-        return Optional.of(request);
     }
 
-    public Optional<? extends Request> createDataRequest(BlockType type, String id, String key, String value) throws ChainException {
+    public Request createDataRequest(BlockType type, String id, String key, String value) throws ChainException {
         Optional<KeyPair> KeyPair = Data.getKeyPair(id, key);
         if (KeyPair.isEmpty()){
-            return Optional.empty();
+            return null;
         }
         return switch(type){
-            case DATA -> Optional.of(new DataRequest(value));
-            case SIGNED_DATA -> SignedDataRequestFactory.createSignedDataRequest(KeyPair.get(), value);
-            case CURRENCY -> Optional.of(new CurrencyRequest(value, KeyPair.get().publicKeyAddress, KeyPair.get().privateKey));
+            case DATA -> new DataRequest(value);
+            case SIGNED_DATA -> SignedFactory.createSignedDataRequest(KeyPair.get(), value);
+            case CURRENCY -> new CurrencyRequest(value, KeyPair.get().publicKeyAddress, KeyPair.get().privateKey);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
     }
 
-    public Optional<? extends Request> createTransactionRequest(String id, TransactionalRequestParams transactionalRequestParams) throws ChainException {
-        BlockType type = BlockType.valueOf(transactionalRequestParams.type());
-        return switch(type){
-            case ACCOUNT -> AccountTransactionRequestFactory.createTransactionRequest(id, transactionalRequestParams);
-            case UTXO -> UTXORequestFactory.createUTXORequest(id, transactionalRequestParams);
+    public Request createTransactionRequest(String id, String type, TransactionRequestParams transactionRequestParams) throws ChainException {
+        return switch(BlockType.valueOf(type)){
+            case ACCOUNT -> new AccountFactory(id).create(transactionRequestParams);
+            case UTXO -> UTXORequestFactory.createUTXORequest(id, transactionRequestParams);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
     }

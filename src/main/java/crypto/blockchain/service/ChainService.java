@@ -3,8 +3,8 @@ package crypto.blockchain.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
-import crypto.blockchain.account.AccountTransactionRequest;
-import crypto.blockchain.signed.SignedDataRequest;
+import crypto.blockchain.account.AccountRequest;
+import crypto.blockchain.signed.SignedRequest;
 import crypto.blockchain.utxo.UTXORequest;
 
 public class ChainService {
@@ -43,9 +43,9 @@ public class ChainService {
     public Request deserialiseRequest(BlockType blockType, String requestJson) {
         return switch(blockType){
             case DATA -> JSON.fromJson(requestJson, DataRequest.class);
-            case SIGNED_DATA -> JSON.fromJson(requestJson, SignedDataRequest.class);
+            case SIGNED_DATA -> JSON.fromJson(requestJson, SignedRequest.class);
             case CURRENCY -> JSON.fromJson(requestJson, CurrencyRequest.class);
-            case ACCOUNT -> JSON.fromJson(requestJson, AccountTransactionRequest.class);
+            case ACCOUNT -> JSON.fromJson(requestJson, AccountRequest.class);
             case UTXO -> JSON.fromJson(requestJson, UTXORequest.class);
         };
     }

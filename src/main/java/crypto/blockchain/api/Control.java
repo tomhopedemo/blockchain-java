@@ -56,10 +56,14 @@ import java.security.Security;
  *  30. share code for block creation in blockfactory
  *  31. deserialiseRequest to use enum
  *  32. allow currencies for utxo chains too
- *  33. remove check for  if (blockchain.getMostRecent() != null)  in atbf
- *  34. auxService.createRequest has too many parameters, consider alternative invocations
  *  35. create object the same as currency request with a different name (like an empty wrapper)
  *  37. your wallet undefied types
+ *  38. create next app rename title to blockchains
+ *  39. add text to the account transaction to act as a nonce ( and don't allow a transaction to reoccur w/ same signature)
+ *  40. add currency keypair to keypari cache
+ *  41. TransactionRequestParams remove type
+ *  42. second currencyrequest object just called currencybase or something
+ *  43. simulate chain has chain - do this properly, e.g w/ UUID.
  */
 
 

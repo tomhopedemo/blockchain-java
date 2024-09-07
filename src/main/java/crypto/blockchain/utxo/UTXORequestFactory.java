@@ -1,7 +1,7 @@
 package crypto.blockchain.utxo;
 
 import crypto.blockchain.*;
-import crypto.blockchain.api.data.TransactionalRequestParams;
+import crypto.blockchain.api.data.TransactionRequestParams;
 
 import java.util.*;
 
@@ -13,15 +13,15 @@ public class UTXORequestFactory {
         return new UTXORequest(new ArrayList<>(), transactionOutputs);
     }
 
-    public static Optional<UTXORequest> createUTXORequest(String id, TransactionalRequestParams transactionalRequestParams) throws ChainException{
-        Optional<KeyPair> keyPair = Data.getKeyPair(id, transactionalRequestParams.from());
+    public static UTXORequest createUTXORequest(String id, TransactionRequestParams transactionRequestParams) throws ChainException{
+        Optional<KeyPair> keyPair = Data.getKeyPair(id, transactionRequestParams.from());
         if (keyPair.isEmpty()){
-            return Optional.empty();
+            return null;
         }
         Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(keyPair.get(), id);
         long balance = getBalance(unspentTransactionOutputsById);
-        if (balance < transactionalRequestParams.value()) {
-            return Optional.empty();
+        if (balance < transactionRequestParams.value()) {
+            return null;
         }
 
         List<TransactionInput> transactionInputs = new ArrayList<>();
@@ -32,14 +32,13 @@ public class UTXORequestFactory {
             transactionInputs.add(new TransactionInput(transactionOutputHash, signature));
             TransactionOutput transactionOutput = entry.getValue();
             total += transactionOutput.getValue();
-            if (total >= transactionalRequestParams.value()) break;
+            if (total >= transactionRequestParams.value()) break;
         }
 
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
-        transactionOutputs.add(new TransactionOutput(transactionalRequestParams.to(), transactionalRequestParams.value()));
-        transactionOutputs.add(new TransactionOutput(keyPair.get().getPublicKeyAddress(), total - transactionalRequestParams.value()));
-        UTXORequest transactionRequest = new UTXORequest(transactionInputs, transactionOutputs);
-        return Optional.of(transactionRequest);
+        transactionOutputs.add(new TransactionOutput(transactionRequestParams.to(), transactionRequestParams.value()));
+        transactionOutputs.add(new TransactionOutput(keyPair.get().getPublicKeyAddress(), total - transactionRequestParams.value()));
+        return new UTXORequest(transactionInputs, transactionOutputs);
     }
 
     private static long getBalance(Map<String, TransactionOutput> transactionOutputsById) {

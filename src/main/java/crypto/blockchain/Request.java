@@ -1,6 +1,6 @@
 package crypto.blockchain;
 
-public interface Request {
+public interface Request extends BlockDataHashable {
 
 
 }

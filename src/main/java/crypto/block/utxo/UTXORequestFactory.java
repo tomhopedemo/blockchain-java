@@ -1,4 +1,4 @@
-package crypto.blockchain.utxo;
+package crypto.block.utxo;
 
 import crypto.blockchain.*;
 import crypto.blockchain.api.data.TransactionRequestParams;
@@ -7,7 +7,7 @@ import java.util.*;
 
 public class UTXORequestFactory {
 
-    public static UTXORequest createGenesisRequest(String recipientPublicKey, long transactionValue, String id) {
+    public static UTXORequest createGenesisRequest(String recipientPublicKey, long transactionValue) {
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
         transactionOutputs.add(new TransactionOutput(recipientPublicKey, transactionValue));
         return new UTXORequest(new ArrayList<>(), transactionOutputs);

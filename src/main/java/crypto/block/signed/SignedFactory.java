@@ -1,4 +1,4 @@
-package crypto.blockchain.signed;
+package crypto.block.signed;
 
 import crypto.blockchain.*;
 import crypto.cryptography.ECDSA;

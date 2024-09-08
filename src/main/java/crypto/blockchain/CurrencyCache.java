@@ -1,6 +1,6 @@
 package crypto.blockchain;
 
-import crypto.blockchain.currency.CurrencyRequest;
+import crypto.block.currency.CurrencyRequest;
 
 import java.util.LinkedHashSet;
 import java.util.Optional;

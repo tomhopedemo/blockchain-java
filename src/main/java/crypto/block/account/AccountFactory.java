@@ -1,4 +1,4 @@
-package crypto.blockchain.account;
+package crypto.block.account;
 
 import crypto.blockchain.*;
 import crypto.blockchain.Data;

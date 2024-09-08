@@ -1,18 +1,16 @@
 package crypto.blockchain.service;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
-import crypto.blockchain.account.AccountFactory;
+import crypto.block.account.AccountFactory;
 import crypto.blockchain.api.data.TransactionRequestParams;
-import crypto.blockchain.currency.CurrencyRequest;
-import crypto.blockchain.signed.SignedFactory;
-import crypto.blockchain.utxo.UTXORequestFactory;
+import crypto.block.currency.CurrencyRequest;
+import crypto.block.signed.SignedFactory;
+import crypto.block.utxo.UTXORequestFactory;
+
+import java.util.List;
 
 
 public class AuxService {
-
-    static Gson JSON = new GsonBuilder().create();
 
     public void registerKeyPair(String publicKey, String privateKey) {
         Data.addKeyPair(null, new KeyPair(privateKey, publicKey));
@@ -22,7 +20,7 @@ public class AuxService {
         return Data.getChain(id) != null;
     }
 
-    public Request createGenesisRequest(String id, BlockType type, String publicKey, String currency, Object value) throws ChainException {
+    public Request genesisRequest(String id, BlockType type, String publicKey, String currency, Object value) throws ChainException {
         KeyPair keyPair = Data.getKeyPair(id, publicKey);
         if (keyPair == null) return null;
         return switch(type){
@@ -39,35 +37,36 @@ public class AuxService {
                         .build();
                 yield new AccountFactory(id).create(params);
             }
-            case UTXO -> UTXORequestFactory.createGenesisRequest(keyPair.publicKey(), (Long) value, id);
+            case UTXO -> UTXORequestFactory.createGenesisRequest(keyPair.publicKey(), (Long) value);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
     }
 
-    public Request createDataRequest(BlockType type, String id, String key, String value) throws ChainException {
+    public Request simple(String value) {
+        return new DataRequest(value);
+    }
+
+    public Request signed(String id, String key, String value) throws ChainException {
         KeyPair keyPair = Data.getKeyPair(id, key);
         if (keyPair == null) return null;
-        return switch(type){
-            case DATA -> new DataRequest(value);
-            case SIGNED_DATA -> SignedFactory.createSignedDataRequest(keyPair, value);
-            case CURRENCY -> new CurrencyRequest(value, keyPair.publicKey());
-            default -> throw new IllegalStateException("Unexpected value: " + type);
-        };
+        return SignedFactory.createSignedDataRequest(keyPair, value);
     }
 
-    public Request createTransactionRequest(String id, String type, TransactionRequestParams transactionRequestParams) throws ChainException {
-        return switch(BlockType.valueOf(type)){
-            case ACCOUNT -> new AccountFactory(id).create(transactionRequestParams);
-            case UTXO -> UTXORequestFactory.createUTXORequest(id, transactionRequestParams);
-            default -> throw new IllegalStateException("Unexpected value: " + type);
-        };
+    public Request currency(String id, String key, String value) throws ChainException {
+        KeyPair keyPair = Data.getKeyPair(id, key);
+        if (keyPair == null) return null;
+        return new CurrencyRequest(value, keyPair.publicKey());
     }
 
-    public String createKeyPairJson(){
-        return JSON.toJson(createKeyPair());
+    public Request account(String id, TransactionRequestParams transactionRequestParams) throws ChainException {
+        return new AccountFactory(id).create(transactionRequestParams);
     }
 
-    public KeyPair createKeyPair() {
+    public Request utxo(String id, TransactionRequestParams transactionRequestParams) throws ChainException {
+        return UTXORequestFactory.createUTXORequest(id, transactionRequestParams);
+    }
+
+    public KeyPair keypair() {
         return KeyPair.generate();
     }
 
@@ -75,4 +74,9 @@ public class AuxService {
         return ChainValidator.validate(id);
     }
 
+    public String key(String id) {
+        List<String> keys = Data.getKeys(id);
+        if (keys.isEmpty()) return null;
+        return keys.getFirst();
+    }
 }

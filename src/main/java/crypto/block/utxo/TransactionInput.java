@@ -1,4 +1,4 @@
-package crypto.blockchain.utxo;
+package crypto.block.utxo;
 
 import crypto.encoding.Encoder;
 

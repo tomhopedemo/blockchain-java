@@ -1,11 +1,11 @@
 package crypto.blockchain;
 
-import crypto.blockchain.account.AccountFactory;
-import crypto.blockchain.currency.CurrencyFactory;
-import crypto.blockchain.keypair.KeyPairFactory;
-import crypto.blockchain.signed.SignedFactory;
-import crypto.blockchain.simple.SimpleBlockFactory;
-import crypto.blockchain.utxo.UTXOFactory;
+import crypto.block.account.AccountFactory;
+import crypto.block.currency.CurrencyFactory;
+import crypto.block.keypair.KeyPairFactory;
+import crypto.block.signed.SignedFactory;
+import crypto.block.simple.SimpleBlockFactory;
+import crypto.block.utxo.UTXOFactory;
 
 import java.util.List;
 import java.util.Set;

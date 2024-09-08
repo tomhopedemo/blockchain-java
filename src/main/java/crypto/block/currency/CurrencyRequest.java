@@ -1,4 +1,4 @@
-package crypto.blockchain.currency;
+package crypto.block.currency;
 
 import crypto.blockchain.Request;
 

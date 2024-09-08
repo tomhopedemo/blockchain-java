@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
 import static crypto.blockchain.api.Control.CORS;
 
 @RestController @CrossOrigin(origins = CORS)
@@ -30,7 +28,7 @@ public class GenesisAPI {
         if (chain != null) {
             BlockType blockType = BlockType.valueOf(type);
             try {
-                Request request = new AuxService().createGenesisRequest(id, blockType, publicKey, currency, value);
+                Request request = new AuxService().genesisRequest(id, blockType, publicKey, currency, value);
                 chainService.submitRequest(id, blockType, request);
                 return new ResponseEntity<>(HttpStatus.OK);
 

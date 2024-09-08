@@ -1,4 +1,4 @@
-package crypto.blockchain.keypair;
+package crypto.block.keypair;
 
 import crypto.blockchain.*;
 import crypto.cryptography.ECDSA;

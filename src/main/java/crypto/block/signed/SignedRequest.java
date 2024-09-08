@@ -1,4 +1,4 @@
-package crypto.blockchain.signed;
+package crypto.block.signed;
 
 import crypto.blockchain.Request;
 import crypto.encoding.Encoder;

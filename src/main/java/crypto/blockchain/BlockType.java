@@ -1,9 +1,9 @@
 package crypto.blockchain;
 
-import crypto.blockchain.account.AccountRequest;
-import crypto.blockchain.currency.CurrencyRequest;
-import crypto.blockchain.signed.SignedRequest;
-import crypto.blockchain.utxo.UTXORequest;
+import crypto.block.account.AccountRequest;
+import crypto.block.currency.CurrencyRequest;
+import crypto.block.signed.SignedRequest;
+import crypto.block.utxo.UTXORequest;
 
 public enum BlockType {
     DATA(DataRequest.class),

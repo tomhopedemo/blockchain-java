@@ -1,7 +1,6 @@
-package crypto.blockchain.currency;
+package crypto.block.currency;
 
 import crypto.blockchain.*;
-import crypto.cryptography.ECDSA;
 
 import java.util.ArrayList;
 import java.util.List;

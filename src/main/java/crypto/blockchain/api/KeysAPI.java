@@ -17,10 +17,4 @@ public class KeysAPI {
         return new ChainService().getKeysJson(id);
     }
 
-    //option to save key as well
-
-    @GetMapping("/keys/create")
-    String keyPair() {
-        return new AuxService().createKeyPairJson();
-    }
 }

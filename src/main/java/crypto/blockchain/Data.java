@@ -1,7 +1,7 @@
 package crypto.blockchain;
 
-import crypto.blockchain.currency.CurrencyRequest;
-import crypto.blockchain.utxo.UTXOCache;
+import crypto.block.currency.CurrencyRequest;
+import crypto.block.utxo.UTXOCache;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

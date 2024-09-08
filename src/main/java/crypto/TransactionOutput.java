@@ -3,18 +3,10 @@ package crypto;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
 
-public class TransactionOutput {
-    String recipient;
-    String value;
+public record TransactionOutput (String recipient, String value) {
 
     public TransactionOutput(String recipientPublicKey, long value) {
-        this.recipient = recipientPublicKey;
-        this.value = String.valueOf(value);
-    }
-
-    public TransactionOutput(String publicKey, String value) {
-        this.recipient = publicKey;
-        this.value = String.valueOf(value);
+        this(recipientPublicKey, String.valueOf(value));
     }
 
     public long getValue(){

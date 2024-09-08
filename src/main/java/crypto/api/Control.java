@@ -61,17 +61,15 @@ import java.security.Security;
  *  34. create next app rename title to blockchains
  *  35. add text to the account transaction to act as a nonce ( and don't allow a transaction to reoccur w/ same signature)
  *  36. add keypair to 'global' keypair cache
- *  37. global keypair cache details to be merged with specific chain details on get.
- *  38. ability to create own schema for block type
- *  39. transaction output convert to record
+ *  37. global keypair cache details to be merged with specific chain details on get?
+ *  38. ability to create own schema for block type...
  *  40. simulate return types to be updated
- *  41. merge API classes
- *  42. at some point the AUX service needs to start being a separate instance from the mining rig
- *  43. log at 'api-debug' level failures at api
- *  44. switch to considering requests as objects ( which have been imbued with request interface )
- *  47. auxservice create null chain reference on startup?
- *  48. refactor genesis switch
- *  51. review genesis endpoint
+ *  41. at some point the AUX service needs to start being a separate instance from the mining rig
+ *  42. log at 'api-debug' level failures at api
+ *  43. switch to considering requests as objects ( which have been imbued with request interface )
+ *  44. auxservice create null chain reference on startup?
+ *  45. refactor genesis switch
+ *  46. review genesis endpoint
  */
 
 

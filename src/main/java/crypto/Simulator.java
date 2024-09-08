@@ -50,7 +50,7 @@ public class Simulator {
     }
 
     public void signed() throws ChainException {
-        chainService.allowBlockType(SIGNED_DATA);
+        chainService.allowBlockType(SIGNED);
         Keypair keypair = auxService.keypair();
         auxService.registerKeypair(keypair);
         Request request = auxService.signed(keypair.publicKey(), "ABCDE");

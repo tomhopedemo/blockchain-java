@@ -53,7 +53,7 @@ public class AuxAPI {
     public ResponseEntity<?> signed(@RequestParam("id") String id,
                                     @RequestParam("key") String key,
                                     @RequestParam("data") String data) {
-        return create(id, SIGNED_DATA, () -> new AuxService(id).signed(key, data));
+        return create(id, SIGNED, () -> new AuxService(id).signed(key, data));
     }
 
     @GetMapping("/r/data")

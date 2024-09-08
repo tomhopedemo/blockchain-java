@@ -34,7 +34,7 @@ public record Miner (String id) implements Runnable {
                 case CURRENCY -> new CurrencyFactory(id);
                 case DATA -> new DataFactory(id);
                 case KEYPAIR -> new KeypairFactory(id);
-                case SIGNED_DATA -> new SignedFactory(id);
+                case SIGNED -> new SignedFactory(id);
                 case UTXO -> new UTXOFactory(id);
             };
 

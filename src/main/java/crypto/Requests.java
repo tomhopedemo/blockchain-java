@@ -16,7 +16,7 @@ public class Requests {
     static Map<String, List<UTXORequest>> utxoRequests = new HashMap<>();
     static Map<String, List<DataRequest>> dataRequests = new HashMap<>();
     static Map<String, List<Keypair>> keypairRequests = new HashMap<>();
-    static Map<String, List<SignedRequest>> signedDataRequests = new HashMap<>();
+    static Map<String, List<SignedRequest>> signedRequests = new HashMap<>();
     static Map<String, List<CurrencyRequest>> currencyRequests = new HashMap<>();
 
     private static Map getMap(BlockType blockType) {
@@ -25,7 +25,7 @@ public class Requests {
             case CURRENCY -> currencyRequests;
             case DATA -> dataRequests;
             case KEYPAIR -> keypairRequests;
-            case SIGNED_DATA -> signedDataRequests;
+            case SIGNED -> signedRequests;
             case UTXO -> utxoRequests;
         };
     }

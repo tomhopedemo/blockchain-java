@@ -57,7 +57,7 @@ public class ChainAPI {
                 }
                 case DATA -> service.data();
                 case KEYPAIR -> service.keypair();
-                case SIGNED_DATA -> service.signed();
+                case SIGNED -> service.signed();
                 case UTXO -> service.utxo();
             }
             return new ResponseEntity<>(chainService.getChainJson(), OK);

@@ -69,7 +69,6 @@ import java.security.Security;
  *  42. at some point the AUX service needs to start being a separate instance from the mining rig
  *  43. log at 'api-debug' level failures at api
  *  44. switch to considering requests as objects ( which have been imbued with request interface )
- *  45. signedata -> signed
  *  47. auxservice create null chain reference on startup?
  *  48. refactor genesis switch
  *  51. review genesis endpoint

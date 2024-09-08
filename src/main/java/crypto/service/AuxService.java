@@ -44,7 +44,7 @@ public record AuxService(String id) {
     public Request signed(String key, String value) throws ChainException {
         Keypair keypair = Data.getKeypair(id, key);
         if (keypair == null) return null;
-        return SignedFactory.createSignedDataRequest(keypair, value);
+        return SignedFactory.createSignedRequest(keypair, value);
     }
 
     public Request currency(String key, String value) throws ChainException {

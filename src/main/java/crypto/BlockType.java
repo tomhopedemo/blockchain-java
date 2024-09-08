@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public enum BlockType {
     DATA(DataRequest.class),
-    SIGNED_DATA(SignedRequest.class),
+    SIGNED(SignedRequest.class),
     CURRENCY(CurrencyRequest.class),
     KEYPAIR(Keypair.class),
     ACCOUNT(AccountRequest.class),

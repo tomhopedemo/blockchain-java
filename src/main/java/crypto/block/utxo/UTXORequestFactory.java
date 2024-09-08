@@ -6,16 +6,16 @@ import java.util.*;
 
 public class UTXORequestFactory {
 
-    public static UTXORequest createGenesisRequest(String recipientPublicKey, long transactionValue) {
+    public static UTXORequest createGenesisRequest(String recipientPublicKey, String currency, long transactionValue) {
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
-        transactionOutputs.add(new TransactionOutput(recipientPublicKey, transactionValue));
+        transactionOutputs.add(new TransactionOutput(recipientPublicKey, currency, transactionValue));
         return new UTXORequest(new ArrayList<>(), transactionOutputs);
     }
 
-    public static UTXORequest createUTXORequest(String id, String from, String to, String currency, Long value) throws ChainException {
+    public static UTXORequest create(String id, String from, String to, String currency, Long value) throws ChainException {
         Keypair keypair = Data.getKeypair(id, from);
         if (keypair == null) return null;
-        Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(keypair, id);
+        Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(id, currency, keypair);
         long balance = getBalance(unspentTransactionOutputsById);
         if (balance < value) {
             return null;
@@ -33,8 +33,8 @@ public class UTXORequestFactory {
         }
 
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
-        transactionOutputs.add(new TransactionOutput(to, value));
-        transactionOutputs.add(new TransactionOutput(keypair.publicKey(), total - value));
+        transactionOutputs.add(new TransactionOutput(to, currency, value));
+        transactionOutputs.add(new TransactionOutput(keypair.publicKey(), currency, total - value));
         return new UTXORequest(transactionInputs, transactionOutputs);
     }
 
@@ -43,9 +43,9 @@ public class UTXORequestFactory {
                 .map(transactionOutput -> transactionOutput.getValue()).mapToLong(Long::longValue).sum();
     }
 
-    public static Map<String, TransactionOutput> getTransactionOutputsById(Keypair keypair, String id) {
+    public static Map<String, TransactionOutput> getTransactionOutputsById(String id, String currency, Keypair keypair) {
         Map<String, TransactionOutput> transactionOutputsById = new HashMap<>();
-        UTXOCache utxoCache = Data.getUTXOCache(id);
+        UTXOCache utxoCache = Data.getUTXOCache(id, currency);
         if (utxoCache != null) {
             for (Map.Entry<String, TransactionOutput> item : utxoCache.entrySet()) {
                 TransactionOutput transactionOutput = item.getValue();

@@ -22,8 +22,8 @@ public record AccountFactory(String id) implements BlockFactory<AccountRequest> 
         addBlock(id, blockData);
         for (AccountRequest request : blockData.data()) {
             for (TransactionOutput transactionOutput : request.transactionOutputs()) {
-                Data.addAccountBalance(id, transactionOutput.getRecipient(), request.currency(), transactionOutput.getValue());
-                Data.addAccountBalance(id, request.publicKey(), request.currency(), -transactionOutput.getValue());
+                Data.addAccount(id, transactionOutput.getRecipient(), request.currency(), transactionOutput.getValue());
+                Data.addAccount(id, request.publicKey(), request.currency(), -transactionOutput.getValue());
             }
         }
         Requests.remove(id, blockData.data(), BlockType.ACCOUNT);
@@ -54,7 +54,7 @@ public record AccountFactory(String id) implements BlockFactory<AccountRequest> 
             for (TransactionOutput transactionOutput : request.transactionOutputs()) {
                 sum += transactionOutput.getValue();
             }
-            Long balance = Data.getAccountBalance(id, request.currency(), request.publicKey());
+            Long balance = Data.getAccount(id, request.currency(), request.publicKey());
             if (!(balance >= sum)) return false;
         }
         return true;
@@ -63,9 +63,9 @@ public record AccountFactory(String id) implements BlockFactory<AccountRequest> 
     public AccountRequest create(String from, String to, String currency, Long value) throws ChainException {
         Keypair keypair = Data.getKeypair(id, from);
         if (keypair == null) return null;
-        Long balance = Data.getAccountBalance(id, currency, keypair.publicKey());
+        Long balance = Data.getAccount(id, currency, keypair.publicKey());
         if (balance < value) return null;
-        List<TransactionOutput> transactionOutputs = List.of(new TransactionOutput(to, value));
+        List<TransactionOutput> transactionOutputs = List.of(new TransactionOutput(to, currency, value));
         return create(keypair, currency, transactionOutputs);
     }
 

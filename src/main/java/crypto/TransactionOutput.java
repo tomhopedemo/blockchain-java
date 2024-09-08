@@ -3,10 +3,10 @@ package crypto;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
 
-public record TransactionOutput (String recipient, String value) {
+public record TransactionOutput (String recipient, String currency, String value) {
 
-    public TransactionOutput(String recipientPublicKey, long value) {
-        this(recipientPublicKey, String.valueOf(value));
+    public TransactionOutput(String recipientPublicKey, String currency, long value) {
+        this(recipientPublicKey, currency, String.valueOf(value));
     }
 
     public long getValue(){
@@ -18,13 +18,13 @@ public record TransactionOutput (String recipient, String value) {
     }
 
     public String generateTransactionOutputHash(String transactionRequestHash) {
-        String preHash = recipient + transactionRequestHash + value;
+        String preHash = recipient + currency + transactionRequestHash + value;
         byte[] hash = Hashing.hash(preHash);
         return Encoder.encodeToHexadecimal(hash);
     }
 
     public String serialise(){
-        return this.recipient + this.value;
+        return recipient + currency + value;
     }
 
 }

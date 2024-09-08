@@ -34,11 +34,12 @@ public record UTXOFactory(String id) implements BlockFactory<UTXORequest>{
         }
         addBlock(id, requests);
         for (UTXORequest utxoRequest : requests.data()) {
+            String currency = utxoRequest.getTransactionOutputs().getFirst().currency();
             for (TransactionOutput transactionOutput : utxoRequest.getTransactionOutputs()) {
-                Data.addUtxo(id, transactionOutput.generateTransactionOutputHash(utxoRequest.getBlockDataHash()), transactionOutput);
+                Data.addUtxo(id, currency, transactionOutput.generateTransactionOutputHash(utxoRequest.getBlockDataHash()), transactionOutput);
             }
             for (TransactionInput transactionInput : utxoRequest.getTransactionInputs()) {
-                Data.removeUtxo(id, transactionInput.transactionOutputHash());
+                Data.removeUtxo(id, currency, transactionInput.transactionOutputHash());
             }
         }
         Requests.remove(id, requests.data(), UTXO);

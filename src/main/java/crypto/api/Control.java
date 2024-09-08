@@ -55,10 +55,7 @@ import java.security.Security;
  *  28. proof of work where machines are given codes for performing actual work
  *  29. share code for block creation in blockfactory
  *  30. deserialiseRequest to use enum
- *  31. allow currencies for utxo chains too
  *  32. create object the same as currency request with a different name (like an empty wrapper)
- *  33. your wallet undefied types
- *  34. create next app rename title to blockchains
  *  35. add text to the account transaction to act as a nonce ( and don't allow a transaction to reoccur w/ same signature)
  *  36. add keypair to 'global' keypair cache
  *  37. global keypair cache details to be merged with specific chain details on get?
@@ -70,6 +67,10 @@ import java.security.Security;
  *  44. auxservice create null chain reference on startup?
  *  45. refactor genesis switch
  *  46. review genesis endpoint
+ *  47. clean main methods
+ *  48. transactionoutput to have single constructor
+ *  49. generateTransactionOutputHash to use similar hashing mechanism to request
+ *  50. utxo include check that all inputs/outputs have same currency.
  */
 
 

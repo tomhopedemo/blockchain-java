@@ -22,7 +22,7 @@ public record Miner (String id) implements Runnable {
     }
 
     public void runSynch() {
-        Set<BlockType> blockTypes = Data.getBlockTypes(id);
+        Set<BlockType> blockTypes = Data.getTypes(id);
         for (BlockType blockType : blockTypes) {
             List<? extends Request> requests = Requests.get(id, blockType);
             if (requests == null || requests.isEmpty()) {

@@ -32,19 +32,14 @@ public record AuxService(String id) {
                 if (currencyRequest == null) yield null;
                 yield new AccountFactory(id).create(currencyRequest.publicKey(), publicKey, currency, (Long) value);
             }
-            case UTXO -> UTXORequestFactory.createGenesisRequest(keypair.publicKey(), (Long) value);
+            case UTXO -> UTXORequestFactory.createGenesisRequest(keypair.publicKey(), currency, (Long) value);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
     }
 
-    public Request data(String value) {
-        return new DataRequest(value);
-    }
 
-    public Request signed(String key, String value) throws ChainException {
-        Keypair keypair = Data.getKeypair(id, key);
-        if (keypair == null) return null;
-        return SignedFactory.createSignedRequest(keypair, value);
+    public Request account(String from, String to, String currency, Long value) throws ChainException {
+        return new AccountFactory(id).create(from, to, currency, value);
     }
 
     public Request currency(String key, String value) throws ChainException {
@@ -53,16 +48,22 @@ public record AuxService(String id) {
         return new CurrencyRequest(value, keypair.publicKey());
     }
 
-    public Request account(String from, String to, String currency, Long value) throws ChainException {
-        return new AccountFactory(id).create(from, to, currency, value);
-    }
-
-    public Request utxo(String from, String to, String currency, Long value) throws ChainException {
-        return UTXORequestFactory.createUTXORequest(id, from, to, currency, value);
+    public Request data(String value) {
+        return new DataRequest(value);
     }
 
     public Keypair keypair() {
         return Keypair.generate();
+    }
+
+    public Request signed(String key, String value) throws ChainException {
+        Keypair keypair = Data.getKeypair(id, key);
+        if (keypair == null) return null;
+        return SignedFactory.createSignedRequest(keypair, value);
+    }
+
+    public Request utxo(String from, String to, String currency, Long value) throws ChainException {
+        return UTXORequestFactory.create(id, from, to, currency, value);
     }
 
     public boolean validate() {

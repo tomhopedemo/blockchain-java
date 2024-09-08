@@ -23,7 +23,6 @@ public class CurrencyAccountCache {
         return currencyAccountCache.get(currency) != null;
     }
 
-
     public static class AccountCache {
         public ConcurrentHashMap<String, Long> accounts = new ConcurrentHashMap<>();
 

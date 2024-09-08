@@ -21,11 +21,11 @@ public class Requests {
 
     private static Map getMap(BlockType blockType) {
         return switch (blockType){
-            case DATA -> dataRequests;
-            case SIGNED_DATA -> signedDataRequests;
-            case CURRENCY -> currencyRequests;
-            case KEYPAIR -> keypairRequests;
             case ACCOUNT -> accountRequests;
+            case CURRENCY -> currencyRequests;
+            case DATA -> dataRequests;
+            case KEYPAIR -> keypairRequests;
+            case SIGNED_DATA -> signedDataRequests;
             case UTXO -> utxoRequests;
         };
     }

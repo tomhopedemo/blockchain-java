@@ -1,11 +1,11 @@
-package crypto.block.simple;
+package crypto.block.data;
 
 import crypto.blockchain.*;
 import crypto.blockchain.BlockData;
 
 import java.util.List;
 
-public record SimpleBlockFactory(String id) implements BlockFactory<DataRequest>{
+public record DataFactory(String id) implements BlockFactory<DataRequest>{
 
     @Override
     public void mine(BlockData<DataRequest> blockData) {

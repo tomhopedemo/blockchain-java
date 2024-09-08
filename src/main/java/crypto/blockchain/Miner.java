@@ -4,7 +4,7 @@ import crypto.block.account.AccountFactory;
 import crypto.block.currency.CurrencyFactory;
 import crypto.block.keypair.KeypairFactory;
 import crypto.block.signed.SignedFactory;
-import crypto.block.simple.SimpleBlockFactory;
+import crypto.block.data.DataFactory;
 import crypto.block.utxo.UTXOFactory;
 
 import java.util.List;
@@ -30,11 +30,11 @@ public record Miner (String id) implements Runnable {
             }
 
             BlockFactory blockFactory = switch (blockType) {
-                case DATA -> new SimpleBlockFactory(id);
-                case SIGNED_DATA -> new SignedFactory(id);
-                case CURRENCY -> new CurrencyFactory(id);
-                case KEYPAIR -> new KeypairFactory(id);
                 case ACCOUNT -> new AccountFactory(id);
+                case CURRENCY -> new CurrencyFactory(id);
+                case DATA -> new DataFactory(id);
+                case KEYPAIR -> new KeypairFactory(id);
+                case SIGNED_DATA -> new SignedFactory(id);
                 case UTXO -> new UTXOFactory(id);
             };
 

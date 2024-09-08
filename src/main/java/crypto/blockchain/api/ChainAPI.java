@@ -3,7 +3,6 @@ package crypto.blockchain.api;
 import crypto.blockchain.BlockType;
 import crypto.blockchain.Simulator;
 import crypto.blockchain.service.ChainService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,7 +54,7 @@ public class ChainAPI {
                 }
                 case KEYPAIR -> service.keypair();
                 case SIGNED_DATA -> service.signed();
-                case DATA -> service.simple();
+                case DATA -> service.data();
                 case UTXO -> service.utxo();
             }
             return new ResponseEntity<>(chainService.getChainJson(), OK);

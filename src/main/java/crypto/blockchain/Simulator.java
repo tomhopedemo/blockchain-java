@@ -59,7 +59,7 @@ public class Simulator {
         miner.runSynch();
     }
 
-    public void simple()  {
+    public void data()  {
         chainService.allowBlockType(DATA);
         Request request = new DataRequest(randomString(10));
         chainService.submitRequest(request);

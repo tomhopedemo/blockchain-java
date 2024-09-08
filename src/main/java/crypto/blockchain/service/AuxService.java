@@ -37,7 +37,7 @@ public record AuxService(String id) {
         };
     }
 
-    public Request simple(String value) {
+    public Request data(String value) {
         return new DataRequest(value);
     }
 

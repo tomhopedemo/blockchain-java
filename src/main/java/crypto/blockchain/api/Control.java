@@ -1,6 +1,8 @@
 package crypto.blockchain.api;
 
+import crypto.blockchain.Data;
 import crypto.blockchain.MinerPool;
+import crypto.blockchain.service.AuxService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -70,9 +72,8 @@ import java.security.Security;
  *  43. log at 'api-debug' level failures at api
  *  44. switch to considering requests as objects ( which have been imbued with request interface )
  *  45. signedata -> signed
- *  46. simple -> data
- *  47. auxservice create null chain reference on startup.
- *  49. auxservice id param
+ *  47. auxservice create null chain reference on startup?
+ *  48. refactor genesis switch
  */
 
 

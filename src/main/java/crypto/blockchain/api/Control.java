@@ -74,7 +74,8 @@ import java.security.Security;
  *  45. signedata -> signed
  *  47. auxservice create null chain reference on startup?
  *  48. refactor genesis switch
- *  49. update chain endpoints as per auxapi
+ *  50. remove blockchain package
+ *  51. review genesis endpoint
  */
 
 

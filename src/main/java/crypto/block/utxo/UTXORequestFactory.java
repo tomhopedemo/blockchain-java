@@ -1,7 +1,6 @@
 package crypto.block.utxo;
 
 import crypto.blockchain.*;
-import crypto.blockchain.api.data.TransactionRequestParams;
 
 import java.util.*;
 
@@ -13,12 +12,12 @@ public class UTXORequestFactory {
         return new UTXORequest(new ArrayList<>(), transactionOutputs);
     }
 
-    public static UTXORequest createUTXORequest(String id, TransactionRequestParams transactionRequestParams) throws ChainException{
-        Keypair keypair = Data.getKeypair(id, transactionRequestParams.from());
+    public static UTXORequest createUTXORequest(String id, String from, String to, String currency, Long value) throws ChainException{
+        Keypair keypair = Data.getKeypair(id, from);
         if (keypair == null) return null;
         Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(keypair, id);
         long balance = getBalance(unspentTransactionOutputsById);
-        if (balance < transactionRequestParams.value()) {
+        if (balance < value) {
             return null;
         }
 
@@ -30,12 +29,12 @@ public class UTXORequestFactory {
             transactionInputs.add(new TransactionInput(transactionOutputHash, signature));
             TransactionOutput transactionOutput = entry.getValue();
             total += transactionOutput.getValue();
-            if (total >= transactionRequestParams.value()) break;
+            if (total >= value) break;
         }
 
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
-        transactionOutputs.add(new TransactionOutput(transactionRequestParams.to(), transactionRequestParams.value()));
-        transactionOutputs.add(new TransactionOutput(keypair.publicKey(), total - transactionRequestParams.value()));
+        transactionOutputs.add(new TransactionOutput(to, value));
+        transactionOutputs.add(new TransactionOutput(keypair.publicKey(), total - value));
         return new UTXORequest(transactionInputs, transactionOutputs);
     }
 

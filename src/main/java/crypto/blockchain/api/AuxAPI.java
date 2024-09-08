@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import crypto.blockchain.BlockType;
 import crypto.blockchain.ChainException;
 import crypto.blockchain.Request;
-import crypto.blockchain.api.data.TransactionRequestParams;
 import crypto.blockchain.service.AuxService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -32,8 +31,11 @@ public class AuxAPI {
 
     @GetMapping("/r/account")
     public ResponseEntity<?> account(@RequestParam("id") String id,
-                                     @RequestParam("params") TransactionRequestParams params)  {
-        return create(id, ACCOUNT, () -> auxService.account(id, params));
+                                     @RequestParam("from") String from,
+                                     @RequestParam("to") String to,
+                                     @RequestParam("currency") String currency,
+                                     @RequestParam("value") String value)  {
+        return create(id, ACCOUNT, () -> auxService.account(id, from, to, currency, Long.valueOf(value)));
     }
 
     @GetMapping("/r/currency")
@@ -64,8 +66,11 @@ public class AuxAPI {
 
     @GetMapping("/r/utxo")
     public ResponseEntity<?> createUtxo(@RequestParam("id") String id,
-                                        @RequestParam("params") TransactionRequestParams params)  {
-        return create(id, UTXO, () -> auxService.utxo(id, params));
+                                        @RequestParam("from") String from,
+                                        @RequestParam("to") String to,
+                                        @RequestParam("currency") String currency,
+                                        @RequestParam("value") String value)  {
+        return create(id, UTXO, () -> auxService.utxo(id, from, to, currency, Long.valueOf(value)));
     }
 
 

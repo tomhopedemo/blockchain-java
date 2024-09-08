@@ -2,7 +2,6 @@ package crypto.block.account;
 
 import crypto.blockchain.*;
 import crypto.blockchain.Data;
-import crypto.blockchain.api.data.TransactionRequestParams;
 import crypto.blockchain.BlockData;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
@@ -61,13 +60,13 @@ public record AccountFactory(String id) implements BlockFactory<AccountRequest> 
         return true;
     }
 
-    public AccountRequest create(TransactionRequestParams params) throws ChainException {
-        Keypair keypair = Data.getKeypair(id, params.from());
+    public AccountRequest create(String from, String to, String currency, Long value) throws ChainException {
+        Keypair keypair = Data.getKeypair(id, from);
         if (keypair == null) return null;
-        Long balance = Data.getAccountBalance(id, params.currency(), keypair.publicKey());
-        if (balance < params.value()) return null;
-        List<TransactionOutput> transactionOutputs = List.of(new TransactionOutput(params.to(), params.value()));
-        return create(keypair, params.currency(), transactionOutputs);
+        Long balance = Data.getAccountBalance(id, currency, keypair.publicKey());
+        if (balance < value) return null;
+        List<TransactionOutput> transactionOutputs = List.of(new TransactionOutput(to, value));
+        return create(keypair, currency, transactionOutputs);
     }
 
     private AccountRequest create(Keypair keypair, String currency, List<TransactionOutput> transactionOutputs) throws ChainException {

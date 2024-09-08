@@ -2,7 +2,6 @@ package crypto.blockchain.service;
 
 import crypto.blockchain.*;
 import crypto.block.account.AccountFactory;
-import crypto.blockchain.api.data.TransactionRequestParams;
 import crypto.block.currency.CurrencyRequest;
 import crypto.block.signed.SignedFactory;
 import crypto.block.utxo.UTXORequestFactory;
@@ -30,16 +29,8 @@ public class AuxService {
         return switch(type){
             case ACCOUNT -> {
                 CurrencyRequest currencyRequest = Data.getCurrency(id, currency);
-                if (currencyRequest == null){
-                    yield null;
-                }
-                TransactionRequestParams params = new TransactionRequestParams.Builder()
-                        .setCurrency(currency)
-                        .setFrom(currencyRequest.publicKey())
-                        .setTo(publicKey)
-                        .setValue((Long)value)
-                        .build();
-                yield new AccountFactory(id).create(params);
+                if (currencyRequest == null) yield null;
+                yield new AccountFactory(id).create(currencyRequest.publicKey(), publicKey, currency, (Long) value);
             }
             case UTXO -> UTXORequestFactory.createGenesisRequest(keypair.publicKey(), (Long) value);
             default -> throw new IllegalStateException("Unexpected value: " + type);
@@ -62,12 +53,12 @@ public class AuxService {
         return new CurrencyRequest(value, keypair.publicKey());
     }
 
-    public Request account(String id, TransactionRequestParams transactionRequestParams) throws ChainException {
-        return new AccountFactory(id).create(transactionRequestParams);
+    public Request account(String id, String from, String to, String currency, Long value) throws ChainException {
+        return new AccountFactory(id).create(from, to, currency, value);
     }
 
-    public Request utxo(String id, TransactionRequestParams transactionRequestParams) throws ChainException {
-        return UTXORequestFactory.createUTXORequest(id, transactionRequestParams);
+    public Request utxo(String id, String from, String to, String currency, Long value) throws ChainException {
+        return UTXORequestFactory.createUTXORequest(id, from, to, currency, value);
     }
 
     public Keypair keypair() {

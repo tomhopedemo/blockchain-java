@@ -72,10 +72,7 @@ import java.security.Security;
  *  45. signedata -> signed
  *  46. simple -> data
  *  47. auxservice create null chain reference on startup.
- *  48 transactionrequestparams -> individual params
- *  51. simulate reuse static fields for services
- *  52. for simulate currency, we'll need to also simulate the public key - this will be passed in.
- *  53. simulate methods in separate class and simulate api call in shared api class
+ *  49. auxservice id param
  */
 
 

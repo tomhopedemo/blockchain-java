@@ -1,7 +1,6 @@
 package crypto.blockchain;
 
 import crypto.block.currency.CurrencyRequest;
-import crypto.blockchain.api.data.TransactionRequestParams;
 import crypto.blockchain.service.AuxService;
 import crypto.blockchain.service.ChainService;
 
@@ -28,8 +27,7 @@ public class Simulator {
         miner.runSynch();
 
         Keypair to = auxService.keypair();
-        TransactionRequestParams params = new TransactionRequestParams.Builder().setCurrency(CURRENCY).setFrom(genesisKeypair.publicKey()).setTo(to.publicKey()).setValue(5L).build();
-        Request request = auxService.account(id, params);
+        Request request = auxService.account(id, genesisKeypair.publicKey(), to.publicKey(), CURRENCY, 5L);
         chainService.submitRequest(request);
         miner.runSynch();
     }
@@ -80,8 +78,7 @@ public class Simulator {
         miner.runSynch();
 
         Keypair toKeypair = auxService.keypair();
-        TransactionRequestParams params = new TransactionRequestParams.Builder().setCurrency(CURRENCY).setFrom(keypair.publicKey()).setTo(toKeypair.publicKey()).setValue(5L).build();
-        Request request = auxService.utxo(id, params);
+        Request request = auxService.utxo(id, keypair.publicKey(), toKeypair.publicKey(), CURRENCY, 5L);
         chainService.submitRequest(request);
         miner.runSynch();
     }

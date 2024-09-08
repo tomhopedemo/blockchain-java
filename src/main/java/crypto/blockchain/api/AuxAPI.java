@@ -72,6 +72,13 @@ public class AuxAPI {
         return create(id, UTXO, () -> new AuxService(id).utxo(from, to, currency, Long.valueOf(value)));
     }
 
+
+    @GetMapping("/validate")
+    public ResponseEntity<?> get(@RequestParam("id") String id) {
+        boolean validate = new AuxService(id).validate();
+        return new ResponseEntity<>(validate, OK);
+    }
+
     public interface CreateRequest {
         Request create() throws ChainException;
     }

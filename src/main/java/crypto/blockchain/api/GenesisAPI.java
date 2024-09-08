@@ -23,13 +23,13 @@ public class GenesisAPI {
                    @RequestParam("currency") String currency,
                    @RequestParam("type") String type,
                    @RequestParam("value") Long value) {
-        ChainService chainService = new ChainService();
-        Blockchain chain = chainService.getChain(id);
+        ChainService chainService = new ChainService(id);
+        Blockchain chain = chainService.getChain();
         if (chain != null) {
             BlockType blockType = BlockType.valueOf(type);
             try {
                 Request request = new AuxService().genesisRequest(id, blockType, publicKey, currency, value);
-                chainService.submitRequest(id, request);
+                chainService.submitRequest(request);
                 return new ResponseEntity<>(HttpStatus.OK);
 
             } catch (ChainException ignored){

@@ -23,13 +23,13 @@ public class SubmitAPI {
     public ResponseEntity<?> submit(@RequestParam("id") String id,
                           @RequestParam("type") String type,
                           @RequestParam("requestJson") String requestJson){
-        ChainService chainService = new ChainService();
-        if (chainService.hasChain(id)) {
+        ChainService chainService = new ChainService(id);
+        if (chainService.hasChain()) {
             BlockType blockType = BlockType.valueOf(type);
             Request request = JSON.fromJson(requestJson, blockType.getRequestClass());
-            chainService.submitRequest(id, request);
-            chainService.requestMiner(id);
-            return new ResponseEntity<>(chainService.getChainJson(id), OK);
+            chainService.submitRequest(request);
+            chainService.requestMiner();
+            return new ResponseEntity<>(chainService.getChainJson(), OK);
         } else {
             return new ResponseEntity<>(INTERNAL_SERVER_ERROR);
         }

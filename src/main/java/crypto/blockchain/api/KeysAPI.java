@@ -14,7 +14,7 @@ public class KeysAPI {
 
     @GetMapping("/keys/get")
     String get(@RequestParam("id") String id) {
-        return new ChainService().getKeysJson(id);
+        return new ChainService(id).getKeysJson();
     }
 
 }

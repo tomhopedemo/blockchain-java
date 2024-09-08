@@ -19,28 +19,28 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController @CrossOrigin(origins = CORS)
 public class ChainAPI {
 
-    ChainService chainService = new ChainService();
     static ResponseEntity<Object> ERROR = new ResponseEntity<>(INTERNAL_SERVER_ERROR);
 
     @GetMapping("/chain/create")
     public ResponseEntity<?> create(@RequestParam("id") String id) {
-        ChainService chainService = new ChainService();
-        if (chainService.hasChain(id)) return ERROR;
-        chainService.createChain(id);
-        String chainJson = chainService.getChainJson(id);
+        ChainService chainService = new ChainService(id);
+        if (chainService.hasChain()) return ERROR;
+        chainService.createChain();
+        String chainJson = chainService.getChainJson();
         return new ResponseEntity<>(chainJson, OK);
     }
 
     @GetMapping("/chain/get")
     public String get(@RequestParam("id") String id) {
-        return new ChainService().getChainJson(id);
+        return new ChainService(id).getChainJson();
     }
 
     @GetMapping("/simulate")
     public ResponseEntity<?> simulate(@RequestParam("type") String type) {
         String id = UUID.randomUUID().toString();
-        chainService.createChain(id);
-        chainService.disableAutoMining(id);
+        ChainService chainService = new ChainService(id);
+        chainService.createChain();
+        chainService.disableAutoMining();
         Simulator service = new Simulator(id);
         try {
             switch (BlockType.valueOf(type)) {
@@ -58,7 +58,7 @@ public class ChainAPI {
                 case DATA -> service.simple();
                 case UTXO -> service.utxo();
             }
-            return new ResponseEntity<>(chainService.getChainJson(id), OK);
+            return new ResponseEntity<>(chainService.getChainJson(), OK);
         } catch (Exception e){
             e.printStackTrace();
             return ERROR;

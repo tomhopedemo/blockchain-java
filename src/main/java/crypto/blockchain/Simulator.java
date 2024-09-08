@@ -10,77 +10,79 @@ import java.util.Random;
 import static crypto.blockchain.BlockType.*;
 import static crypto.blockchain.BlockType.UTXO;
 
-public record Simulator(String id) {
+public class Simulator {
+    public Simulator(String id) {this.id = id;}
 
-    private static final ChainService chainService = new ChainService();
-    private static final AuxService auxService = new AuxService();
+    private String id;
+    private final ChainService chainService = new ChainService(id) ;
+    private final AuxService auxService = new AuxService();
     public static final String CURRENCY = "CBX";
 
     public void account() throws ChainException {
-        chainService.allowBlockType(id, ACCOUNT);
+        chainService.allowBlockType(ACCOUNT);
         KeyPair genesisKeypair = auxService.keypair();
         auxService.registerKeyPair(genesisKeypair.publicKey(), genesisKeypair.privateKey());
         Request genesisRequest = auxService.genesisRequest(id, ACCOUNT, genesisKeypair.publicKey(), CURRENCY, 100L);
-        chainService.submitRequest(id, genesisRequest);
+        chainService.submitRequest(genesisRequest);
         Miner miner = new Miner(id);
         miner.runSynch();
 
         KeyPair to = auxService.keypair();
         TransactionRequestParams params = new TransactionRequestParams.Builder().setCurrency(CURRENCY).setFrom(genesisKeypair.publicKey()).setTo(to.publicKey()).setValue(5L).build();
         Request request = auxService.account(id, params);
-        chainService.submitRequest(id, request);
+        chainService.submitRequest(request);
         miner.runSynch();
     }
 
     public void currency() {
-        chainService.allowBlockType(id, BlockType.CURRENCY);
+        chainService.allowBlockType(BlockType.CURRENCY);
         String key = auxService.key(id);
         CurrencyRequest request = new CurrencyRequest(CURRENCY, key);
-        chainService.submitRequest(id, request);
+        chainService.submitRequest(request);
         Miner miner = new Miner(id);
         miner.runSynch();
     }
 
     public void keypair() {
-        chainService.allowBlockType(id, KEYPAIR);
+        chainService.allowBlockType(KEYPAIR);
         KeyPair keyPair = auxService.keypair();
-        chainService.submitRequest(id, keyPair);
+        chainService.submitRequest(keyPair);
         Miner miner = new Miner(id);
         miner.runSynch();
     }
 
     public void signed() throws ChainException {
-        chainService.allowBlockType(id, SIGNED_DATA);
+        chainService.allowBlockType(SIGNED_DATA);
         KeyPair keyPair = auxService.keypair();
         auxService.registerKeyPair(keyPair.publicKey(), keyPair.privateKey());
         Request request = auxService.signed(id, keyPair.publicKey(), "ABCDE");
-        chainService.submitRequest(id, request);
+        chainService.submitRequest(request);
         Miner miner = new Miner(id);
         miner.runSynch();
     }
 
     public void simple()  {
-        chainService.allowBlockType(id, DATA);
+        chainService.allowBlockType(DATA);
         Request request = new DataRequest(randomString(10));
-        chainService.submitRequest(id, request);
+        chainService.submitRequest(request);
         Miner miner = new Miner(id);
         miner.runSynch();
     }
 
     public void utxo() throws ChainException {
-        chainService.allowBlockType(id, UTXO);
+        chainService.allowBlockType(UTXO);
         KeyPair keyPair = auxService.keypair();
         auxService.registerKeyPair(keyPair.publicKey(), keyPair.privateKey());
 
         Request genesisRequest = auxService.genesisRequest(id, UTXO, keyPair.publicKey(), CURRENCY, 100L);
-        chainService.submitRequest(id, genesisRequest);
+        chainService.submitRequest(genesisRequest);
         Miner miner = new Miner(id);
         miner.runSynch();
 
         KeyPair toKeyPair = auxService.keypair();
         TransactionRequestParams params = new TransactionRequestParams.Builder().setCurrency(CURRENCY).setFrom(keyPair.publicKey()).setTo(toKeyPair.publicKey()).setValue(5L).build();
         Request request = auxService.utxo(id, params);
-        chainService.submitRequest(id, request);
+        chainService.submitRequest(request);
         miner.runSynch();
     }
 

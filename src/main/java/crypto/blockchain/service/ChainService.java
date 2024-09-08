@@ -4,44 +4,44 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import crypto.blockchain.*;
 
-public class ChainService {
+public record ChainService(String id) {
 
     static Gson JSON = new GsonBuilder().create();
 
-    public void createChain(String id) {
+    public void createChain() {
         Blockchain chain = new Blockchain(id);
         Data.addChain(chain);
     }
 
-    public boolean hasChain(String id) {
+    public boolean hasChain() {
         return Data.hasChain(id);
     }
 
-    public void allowBlockType(String id, BlockType type) {
+    public void allowBlockType(BlockType type) {
         Data.addType(id, type);
     }
 
-    public Blockchain getChain(String id){
+    public Blockchain getChain(){
         return Data.getChain(id);
     }
 
-    public String getChainJson(String id){
-        return JSON.toJson(getChain(id));
+    public String getChainJson(){
+        return JSON.toJson(getChain());
     }
 
-    public String getKeysJson(String id) {
+    public String getKeysJson() {
         return JSON.toJson(Data.getKeys(id));
     }
 
-    public void submitRequest(String id, Request request) {
+    public void submitRequest(Request request) {
         Requests.add(id, request);
     }
 
-    public void requestMiner(String id) {
+    public void requestMiner() {
         MinerPool.requestMiner(id);
     }
 
-    public void disableAutoMining(String id) {
+    public void disableAutoMining() {
         MinerPool.disable(id);
     }
 }

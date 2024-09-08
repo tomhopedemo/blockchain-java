@@ -20,14 +20,14 @@ public class Simulator {
 
     public void account() throws ChainException {
         chainService.allowBlockType(ACCOUNT);
-        KeyPair genesisKeypair = auxService.keypair();
-        auxService.registerKeyPair(genesisKeypair.publicKey(), genesisKeypair.privateKey());
+        Keypair genesisKeypair = auxService.keypair();
+        auxService.registerKeypair(genesisKeypair);
         Request genesisRequest = auxService.genesisRequest(id, ACCOUNT, genesisKeypair.publicKey(), CURRENCY, 100L);
         chainService.submitRequest(genesisRequest);
         Miner miner = new Miner(id);
         miner.runSynch();
 
-        KeyPair to = auxService.keypair();
+        Keypair to = auxService.keypair();
         TransactionRequestParams params = new TransactionRequestParams.Builder().setCurrency(CURRENCY).setFrom(genesisKeypair.publicKey()).setTo(to.publicKey()).setValue(5L).build();
         Request request = auxService.account(id, params);
         chainService.submitRequest(request);
@@ -45,17 +45,17 @@ public class Simulator {
 
     public void keypair() {
         chainService.allowBlockType(KEYPAIR);
-        KeyPair keyPair = auxService.keypair();
-        chainService.submitRequest(keyPair);
+        Keypair keypair = auxService.keypair();
+        chainService.submitRequest(keypair);
         Miner miner = new Miner(id);
         miner.runSynch();
     }
 
     public void signed() throws ChainException {
         chainService.allowBlockType(SIGNED_DATA);
-        KeyPair keyPair = auxService.keypair();
-        auxService.registerKeyPair(keyPair.publicKey(), keyPair.privateKey());
-        Request request = auxService.signed(id, keyPair.publicKey(), "ABCDE");
+        Keypair keypair = auxService.keypair();
+        auxService.registerKeypair(keypair);
+        Request request = auxService.signed(id, keypair.publicKey(), "ABCDE");
         chainService.submitRequest(request);
         Miner miner = new Miner(id);
         miner.runSynch();
@@ -71,16 +71,16 @@ public class Simulator {
 
     public void utxo() throws ChainException {
         chainService.allowBlockType(UTXO);
-        KeyPair keyPair = auxService.keypair();
-        auxService.registerKeyPair(keyPair.publicKey(), keyPair.privateKey());
+        Keypair keypair = auxService.keypair();
+        auxService.registerKeypair(keypair);
 
-        Request genesisRequest = auxService.genesisRequest(id, UTXO, keyPair.publicKey(), CURRENCY, 100L);
+        Request genesisRequest = auxService.genesisRequest(id, UTXO, keypair.publicKey(), CURRENCY, 100L);
         chainService.submitRequest(genesisRequest);
         Miner miner = new Miner(id);
         miner.runSynch();
 
-        KeyPair toKeyPair = auxService.keypair();
-        TransactionRequestParams params = new TransactionRequestParams.Builder().setCurrency(CURRENCY).setFrom(keyPair.publicKey()).setTo(toKeyPair.publicKey()).setValue(5L).build();
+        Keypair toKeypair = auxService.keypair();
+        TransactionRequestParams params = new TransactionRequestParams.Builder().setCurrency(CURRENCY).setFrom(keypair.publicKey()).setTo(toKeypair.publicKey()).setValue(5L).build();
         Request request = auxService.utxo(id, params);
         chainService.submitRequest(request);
         miner.runSynch();

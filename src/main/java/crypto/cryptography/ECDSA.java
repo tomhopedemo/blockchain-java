@@ -1,5 +1,6 @@
 package crypto.cryptography;
 
+import crypto.blockchain.Keypair;
 import crypto.encoding.Encoder;
 
 import javax.crypto.Cipher;
@@ -40,11 +41,11 @@ public class ECDSA {
         return cipher.doFinal(encrypted);
     }
 
-    public static boolean checkKeyPair(String publicKey, String privateKey) {
+    public static boolean checkKeypair(Keypair keypair) {
         byte[] signatureInput = "anyString".getBytes(StandardCharsets.UTF_8);
         try {
-            byte[] signature = calculateECDSASignature(Encoder.decodeToPrivateKey(privateKey), signatureInput);
-            return verifyECDSASignature(Encoder.decodeToPublicKey(publicKey), signatureInput, signature);
+            byte[] signature = calculateECDSASignature(Encoder.decodeToPrivateKey(keypair.privateKey()), signatureInput);
+            return verifyECDSASignature(Encoder.decodeToPublicKey(keypair.publicKey()), signatureInput, signature);
         } catch (Exception e){
             return false;
         }

@@ -62,17 +62,17 @@ public record AccountFactory(String id) implements BlockFactory<AccountRequest> 
     }
 
     public AccountRequest create(TransactionRequestParams params) throws ChainException {
-        KeyPair keyPair = Data.getKeyPair(id, params.from());
-        if (keyPair == null) return null;
-        Long balance = Data.getAccountBalance(id, params.currency(), keyPair.publicKey());
+        Keypair keypair = Data.getKeypair(id, params.from());
+        if (keypair == null) return null;
+        Long balance = Data.getAccountBalance(id, params.currency(), keypair.publicKey());
         if (balance < params.value()) return null;
         List<TransactionOutput> transactionOutputs = List.of(new TransactionOutput(params.to(), params.value()));
-        return create(keyPair, params.currency(), transactionOutputs);
+        return create(keypair, params.currency(), transactionOutputs);
     }
 
-    private AccountRequest create(KeyPair keyPair, String currency, List<TransactionOutput> transactionOutputs) throws ChainException {
-        String hash = AccountRequest.generateHash(keyPair.publicKey(), currency, transactionOutputs);
-        byte[] signature = Signing.sign(keyPair, hash);
-        return new AccountRequest(keyPair.publicKey(), currency, transactionOutputs, Encoder.encodeToHexadecimal(signature));
+    private AccountRequest create(Keypair keypair, String currency, List<TransactionOutput> transactionOutputs) throws ChainException {
+        String hash = AccountRequest.generateHash(keypair.publicKey(), currency, transactionOutputs);
+        byte[] signature = Signing.sign(keypair, hash);
+        return new AccountRequest(keypair.publicKey(), currency, transactionOutputs, Encoder.encodeToHexadecimal(signature));
     }
 }

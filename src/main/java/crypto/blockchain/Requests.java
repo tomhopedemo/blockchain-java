@@ -15,7 +15,7 @@ public class Requests {
     static Map<String, List<AccountRequest>> accountRequests = new HashMap<>();
     static Map<String, List<UTXORequest>> utxoRequests = new HashMap<>();
     static Map<String, List<DataRequest>> dataRequests = new HashMap<>();
-    static Map<String, List<KeyPair>> keyPairRequests = new HashMap<>();
+    static Map<String, List<Keypair>> keypairRequests = new HashMap<>();
     static Map<String, List<SignedRequest>> signedDataRequests = new HashMap<>();
     static Map<String, List<CurrencyRequest>> currencyRequests = new HashMap<>();
 
@@ -24,7 +24,7 @@ public class Requests {
             case DATA -> dataRequests;
             case SIGNED_DATA -> signedDataRequests;
             case CURRENCY -> currencyRequests;
-            case KEYPAIR -> keyPairRequests;
+            case KEYPAIR -> keypairRequests;
             case ACCOUNT -> accountRequests;
             case UTXO -> utxoRequests;
         };

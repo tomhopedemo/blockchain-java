@@ -76,8 +76,6 @@ import java.security.Security;
  *  51. simulate reuse static fields for services
  *  52. for simulate currency, we'll need to also simulate the public key - this will be passed in.
  *  53. simulate methods in separate class and simulate api call in shared api class
- *  54. register key pair to operate on KeyPair object
- *  55. the chain service should have id in constructor
  */
 
 

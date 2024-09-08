@@ -27,7 +27,7 @@ public class AuxAPI {
     @GetMapping("/reg/keypair")
     public void addKey(@RequestParam("public") String publicKey,
                        @RequestParam("private") String privateKey){
-        new AuxService().registerKeyPair(publicKey, privateKey);
+        new AuxService().registerKeypair(publicKey, privateKey);
     }
 
     @GetMapping("/r/account")

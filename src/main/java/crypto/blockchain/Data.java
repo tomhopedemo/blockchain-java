@@ -14,14 +14,14 @@ public class Data {
     static Map<String, UTXOCache> utxoCaches;
     static Map<String, CurrencyCache> currencyCache;
 
-    static Map<String, KeyPairCache> keyPairCaches; //the key pair from the currency cache can be used also.
+    static Map<String, KeypairCache> keypairCaches; //the key pair from the currency cache can be used also.
 
     static {
         allowedBlocktypes = new ConcurrentHashMap<>();
         chains = new ConcurrentHashMap<>();
         currencyAccountCaches = new ConcurrentHashMap<>();
         utxoCaches = new ConcurrentHashMap<>();
-        keyPairCaches = new ConcurrentHashMap<>();
+        keypairCaches = new ConcurrentHashMap<>();
         currencyCache = new ConcurrentHashMap<>();
     }
 
@@ -38,8 +38,8 @@ public class Data {
         return chains.containsKey(id);
     }
 
-    public static void addKeyPair(String id, KeyPair keyPair) {
-        keyPairCaches.computeIfAbsent(id, _ ->  new KeyPairCache()).addKeyPair(keyPair);
+    public static void addKeypair(String id, Keypair keypair) {
+        keypairCaches.computeIfAbsent(id, _ ->  new KeypairCache()).addKeypair(keypair);
     }
 
     public static void addUtxo(String id, String transactionOutputHash, TransactionOutput transactionOutput) {
@@ -75,11 +75,11 @@ public class Data {
     }
 
     public static List<String> getKeys(String id) {
-        return keyPairCaches.get(id).getKeyPairs().stream().map(w -> w.publicKey()).toList();
+        return keypairCaches.get(id).getKeypairs().stream().map(w -> w.publicKey()).toList();
     }
 
-    public static KeyPair getKeyPair(String id, String publicKey) {
-        return keyPairCaches.get(id).getKeyPair(publicKey);
+    public static Keypair getKeypair(String id, String publicKey) {
+        return keypairCaches.get(id).getKeypair(publicKey);
     }
 
     public static Long getAccountBalance(String id, String currency, String publicKey){
@@ -109,7 +109,7 @@ public class Data {
     }
 
     public static boolean hasKey(String id, String publicKey) {
-        return getKeyPair(id, publicKey) != null;
+        return getKeypair(id, publicKey) != null;
     }
 
     public static void addCurrency(String id, CurrencyRequest currency) {

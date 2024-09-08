@@ -6,26 +6,26 @@ import crypto.cryptography.ECDSA;
 import java.util.ArrayList;
 import java.util.List;
 
-public record KeyPairFactory(String id) implements BlockFactory<KeyPair> {
+public record KeypairFactory(String id) implements BlockFactory<Keypair> {
 
     @Override
-    public void mine(BlockData<KeyPair> blockData) {
-        for (KeyPair request : blockData.data()) {
-            if (!ECDSA.checkKeyPair(request.publicKey(), request.privateKey())) return;
+    public void mine(BlockData<Keypair> blockData) {
+        for (Keypair request : blockData.data()) {
+            if (!ECDSA.checkKeypair(request)) return;
             if (Data.hasKey(id, request.publicKey())) return;
         }
         addBlock(id, blockData);
-        blockData.data().forEach(request -> Data.addKeyPair(id, request));
+        blockData.data().forEach(request -> Data.addKeypair(id, request));
         Requests.remove(id, blockData.data(), BlockType.KEYPAIR);
     }
 
     @Override
-    public BlockData<KeyPair> prepare(List<KeyPair> requests) {
+    public BlockData<Keypair> prepare(List<Keypair> requests) {
         return new BlockData<>(new ArrayList<>(requests));
     }
 
     @Override
-    public boolean verify(KeyPair request) {
+    public boolean verify(Keypair request) {
         return true;
     }
 }

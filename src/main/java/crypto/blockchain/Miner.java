@@ -2,7 +2,7 @@ package crypto.blockchain;
 
 import crypto.block.account.AccountFactory;
 import crypto.block.currency.CurrencyFactory;
-import crypto.block.keypair.KeyPairFactory;
+import crypto.block.keypair.KeypairFactory;
 import crypto.block.signed.SignedFactory;
 import crypto.block.simple.SimpleBlockFactory;
 import crypto.block.utxo.UTXOFactory;
@@ -33,7 +33,7 @@ public record Miner (String id) implements Runnable {
                 case DATA -> new SimpleBlockFactory(id);
                 case SIGNED_DATA -> new SignedFactory(id);
                 case CURRENCY -> new CurrencyFactory(id);
-                case KEYPAIR -> new KeyPairFactory(id);
+                case KEYPAIR -> new KeypairFactory(id);
                 case ACCOUNT -> new AccountFactory(id);
                 case UTXO -> new UTXOFactory(id);
             };

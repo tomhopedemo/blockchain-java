@@ -37,10 +37,10 @@ public record SignedFactory(String id) implements BlockFactory<SignedRequest>{
         }
     }
 
-    public static SignedRequest createSignedDataRequest(KeyPair keyPair, String value) throws ChainException {
-        String hash = SignedRequest.generateHash(keyPair.publicKey(), value);
-        byte[] signature = Signing.sign(keyPair, hash);
-        return new SignedRequest(keyPair.publicKey(), value, Encoder.encodeToHexadecimal(signature));
+    public static SignedRequest createSignedDataRequest(Keypair keypair, String value) throws ChainException {
+        String hash = SignedRequest.generateHash(keypair.publicKey(), value);
+        byte[] signature = Signing.sign(keypair, hash);
+        return new SignedRequest(keypair.publicKey(), value, Encoder.encodeToHexadecimal(signature));
     }
 
 }

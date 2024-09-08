@@ -12,7 +12,7 @@ public enum BlockType {
     DATA(DataRequest.class),
     SIGNED_DATA(SignedRequest.class),
     CURRENCY(CurrencyRequest.class),
-    KEYPAIR(KeyPair.class),
+    KEYPAIR(Keypair.class),
     ACCOUNT(AccountRequest.class),
     UTXO(UTXORequest.class);
 

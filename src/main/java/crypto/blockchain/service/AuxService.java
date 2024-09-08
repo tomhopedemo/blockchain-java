@@ -12,8 +12,12 @@ import java.util.List;
 
 public class AuxService {
 
-    public void registerKeyPair(String publicKey, String privateKey) {
-        Data.addKeyPair(null, new KeyPair(privateKey, publicKey));
+    public void registerKeypair(Keypair keypair) {
+        Data.addKeypair(null, keypair);
+    }
+
+    public void registerKeypair(String publicKey, String privateKey) {
+        registerKeypair(new Keypair(privateKey, publicKey));
     }
 
     public boolean exists(String id){
@@ -21,8 +25,8 @@ public class AuxService {
     }
 
     public Request genesisRequest(String id, BlockType type, String publicKey, String currency, Object value) throws ChainException {
-        KeyPair keyPair = Data.getKeyPair(id, publicKey);
-        if (keyPair == null) return null;
+        Keypair keypair = Data.getKeypair(id, publicKey);
+        if (keypair == null) return null;
         return switch(type){
             case ACCOUNT -> {
                 CurrencyRequest currencyRequest = Data.getCurrency(id, currency);
@@ -37,7 +41,7 @@ public class AuxService {
                         .build();
                 yield new AccountFactory(id).create(params);
             }
-            case UTXO -> UTXORequestFactory.createGenesisRequest(keyPair.publicKey(), (Long) value);
+            case UTXO -> UTXORequestFactory.createGenesisRequest(keypair.publicKey(), (Long) value);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
     }
@@ -47,15 +51,15 @@ public class AuxService {
     }
 
     public Request signed(String id, String key, String value) throws ChainException {
-        KeyPair keyPair = Data.getKeyPair(id, key);
-        if (keyPair == null) return null;
-        return SignedFactory.createSignedDataRequest(keyPair, value);
+        Keypair keypair = Data.getKeypair(id, key);
+        if (keypair == null) return null;
+        return SignedFactory.createSignedDataRequest(keypair, value);
     }
 
     public Request currency(String id, String key, String value) throws ChainException {
-        KeyPair keyPair = Data.getKeyPair(id, key);
-        if (keyPair == null) return null;
-        return new CurrencyRequest(value, keyPair.publicKey());
+        Keypair keypair = Data.getKeypair(id, key);
+        if (keypair == null) return null;
+        return new CurrencyRequest(value, keypair.publicKey());
     }
 
     public Request account(String id, TransactionRequestParams transactionRequestParams) throws ChainException {
@@ -66,8 +70,8 @@ public class AuxService {
         return UTXORequestFactory.createUTXORequest(id, transactionRequestParams);
     }
 
-    public KeyPair keypair() {
-        return KeyPair.generate();
+    public Keypair keypair() {
+        return Keypair.generate();
     }
 
     public boolean validate(String id) {

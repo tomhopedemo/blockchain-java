@@ -1,6 +1,6 @@
 package crypto.block.currency;
 
-import crypto.blockchain.*;
+import crypto.*;
 
 import java.util.ArrayList;
 import java.util.List;

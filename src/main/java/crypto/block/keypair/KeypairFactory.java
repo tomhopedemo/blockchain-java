@@ -1,6 +1,6 @@
 package crypto.block.keypair;
 
-import crypto.blockchain.*;
+import crypto.*;
 import crypto.cryptography.ECDSA;
 
 import java.util.ArrayList;

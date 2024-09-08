@@ -1,7 +1,7 @@
 package crypto.block.data;
 
-import crypto.blockchain.*;
-import crypto.blockchain.BlockData;
+import crypto.*;
+import crypto.BlockData;
 
 import java.util.List;
 

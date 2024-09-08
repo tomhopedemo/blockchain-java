@@ -1,6 +1,6 @@
 package crypto.block.currency;
 
-import crypto.blockchain.Request;
+import crypto.Request;
 
 
 public record CurrencyRequest(String currency, String publicKey) implements Request {

@@ -1,6 +1,6 @@
 package crypto.block.utxo;
 
-import crypto.blockchain.*;
+import crypto.*;
 
 import java.util.*;
 
@@ -12,7 +12,7 @@ public class UTXORequestFactory {
         return new UTXORequest(new ArrayList<>(), transactionOutputs);
     }
 
-    public static UTXORequest createUTXORequest(String id, String from, String to, String currency, Long value) throws ChainException{
+    public static UTXORequest createUTXORequest(String id, String from, String to, String currency, Long value) throws ChainException {
         Keypair keypair = Data.getKeypair(id, from);
         if (keypair == null) return null;
         Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(keypair, id);

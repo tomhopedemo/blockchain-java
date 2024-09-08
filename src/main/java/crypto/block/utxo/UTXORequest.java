@@ -1,7 +1,7 @@
 package crypto.block.utxo;
 
-import crypto.blockchain.Request;
-import crypto.blockchain.TransactionOutput;
+import crypto.Request;
+import crypto.TransactionOutput;
 
 import java.util.List;
 

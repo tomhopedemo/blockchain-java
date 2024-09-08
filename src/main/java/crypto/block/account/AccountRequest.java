@@ -1,6 +1,7 @@
 package crypto.block.account;
 
-import crypto.blockchain.*;
+import crypto.Request;
+import crypto.TransactionOutput;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
 

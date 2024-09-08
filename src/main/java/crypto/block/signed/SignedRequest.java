@@ -1,6 +1,6 @@
 package crypto.block.signed;
 
-import crypto.blockchain.Request;
+import crypto.Request;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
 

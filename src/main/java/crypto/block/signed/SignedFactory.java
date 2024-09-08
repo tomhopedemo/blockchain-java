@@ -1,6 +1,6 @@
 package crypto.block.signed;
 
-import crypto.blockchain.*;
+import crypto.*;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;

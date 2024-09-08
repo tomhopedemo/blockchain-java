@@ -1,6 +1,7 @@
 package crypto.block.utxo;
 
-import crypto.blockchain.TransactionOutput;
+
+import crypto.TransactionOutput;
 
 import java.util.HashMap;
 import java.util.Map;

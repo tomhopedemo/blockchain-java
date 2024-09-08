@@ -1,8 +1,8 @@
 package crypto.block.account;
 
-import crypto.blockchain.*;
-import crypto.blockchain.Data;
-import crypto.blockchain.BlockData;
+import crypto.*;
+import crypto.Data;
+import crypto.BlockData;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 import org.bouncycastle.util.encoders.Hex;

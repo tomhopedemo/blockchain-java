@@ -27,7 +27,7 @@ public class SubmitAPI {
         if (chainService.hasChain(id)) {
             BlockType blockType = BlockType.valueOf(type);
             Request request = JSON.fromJson(requestJson, blockType.getRequestClass());
-            chainService.submitRequest(id, blockType, request);
+            chainService.submitRequest(id, request);
             chainService.requestMiner(id);
             return new ResponseEntity<>(chainService.getChainJson(id), OK);
         } else {

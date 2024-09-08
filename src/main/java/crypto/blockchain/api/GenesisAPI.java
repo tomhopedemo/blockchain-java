@@ -29,7 +29,7 @@ public class GenesisAPI {
             BlockType blockType = BlockType.valueOf(type);
             try {
                 Request request = new AuxService().genesisRequest(id, blockType, publicKey, currency, value);
-                chainService.submitRequest(id, blockType, request);
+                chainService.submitRequest(id, request);
                 return new ResponseEntity<>(HttpStatus.OK);
 
             } catch (ChainException ignored){

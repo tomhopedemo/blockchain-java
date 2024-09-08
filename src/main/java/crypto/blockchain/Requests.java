@@ -30,7 +30,8 @@ public class Requests {
         };
     }
 
-    public static void add(String id, BlockType blockType, Request request) {
+    public static void add(String id, Request request) {
+        BlockType blockType = BlockType.getType(request.getClass());
         Map requests = getMap(blockType);
         ((List) requests.computeIfAbsent(id, _ -> new ArrayList<>())).add(request);
     }

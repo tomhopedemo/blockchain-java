@@ -21,14 +21,14 @@ public record Simulator(String id) {
         KeyPair genesisKeypair = auxService.keypair();
         auxService.registerKeyPair(genesisKeypair.publicKey(), genesisKeypair.privateKey());
         Request genesisRequest = auxService.genesisRequest(id, ACCOUNT, genesisKeypair.publicKey(), CURRENCY, 100L);
-        chainService.submitRequest(id, ACCOUNT, genesisRequest);
+        chainService.submitRequest(id, genesisRequest);
         Miner miner = new Miner(id);
         miner.runSynch();
 
         KeyPair to = auxService.keypair();
         TransactionRequestParams params = new TransactionRequestParams.Builder().setCurrency(CURRENCY).setFrom(genesisKeypair.publicKey()).setTo(to.publicKey()).setValue(5L).build();
         Request request = auxService.account(id, params);
-        chainService.submitRequest(id, ACCOUNT, request);
+        chainService.submitRequest(id, request);
         miner.runSynch();
     }
 
@@ -36,7 +36,7 @@ public record Simulator(String id) {
         chainService.allowBlockType(id, BlockType.CURRENCY);
         String key = auxService.key(id);
         CurrencyRequest request = new CurrencyRequest(CURRENCY, key);
-        chainService.submitRequest(id, BlockType.CURRENCY, request);
+        chainService.submitRequest(id, request);
         Miner miner = new Miner(id);
         miner.runSynch();
     }
@@ -44,7 +44,7 @@ public record Simulator(String id) {
     public void keypair() {
         chainService.allowBlockType(id, KEYPAIR);
         KeyPair keyPair = auxService.keypair();
-        chainService.submitRequest(id, KEYPAIR, keyPair);
+        chainService.submitRequest(id, keyPair);
         Miner miner = new Miner(id);
         miner.runSynch();
     }
@@ -54,7 +54,7 @@ public record Simulator(String id) {
         KeyPair keyPair = auxService.keypair();
         auxService.registerKeyPair(keyPair.publicKey(), keyPair.privateKey());
         Request request = auxService.signed(id, keyPair.publicKey(), "ABCDE");
-        chainService.submitRequest(id, BlockType.SIGNED_DATA, request);
+        chainService.submitRequest(id, request);
         Miner miner = new Miner(id);
         miner.runSynch();
     }
@@ -62,7 +62,7 @@ public record Simulator(String id) {
     public void simple()  {
         chainService.allowBlockType(id, DATA);
         Request request = new DataRequest(randomString(10));
-        chainService.submitRequest(id, DATA, request);
+        chainService.submitRequest(id, request);
         Miner miner = new Miner(id);
         miner.runSynch();
     }
@@ -73,14 +73,14 @@ public record Simulator(String id) {
         auxService.registerKeyPair(keyPair.publicKey(), keyPair.privateKey());
 
         Request genesisRequest = auxService.genesisRequest(id, UTXO, keyPair.publicKey(), CURRENCY, 100L);
-        chainService.submitRequest(id, UTXO, genesisRequest);
+        chainService.submitRequest(id, genesisRequest);
         Miner miner = new Miner(id);
         miner.runSynch();
 
         KeyPair toKeyPair = auxService.keypair();
         TransactionRequestParams params = new TransactionRequestParams.Builder().setCurrency(CURRENCY).setFrom(keyPair.publicKey()).setTo(toKeyPair.publicKey()).setValue(5L).build();
         Request request = auxService.utxo(id, params);
-        chainService.submitRequest(id, UTXO, request);
+        chainService.submitRequest(id, request);
         miner.runSynch();
     }
 

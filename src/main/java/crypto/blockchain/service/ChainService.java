@@ -33,8 +33,8 @@ public class ChainService {
         return JSON.toJson(Data.getKeys(id));
     }
 
-    public void submitRequest(String id, BlockType type, Request request) {
-        Requests.add(id, type, request);
+    public void submitRequest(String id, Request request) {
+        Requests.add(id, request);
     }
 
     public void requestMiner(String id) {

@@ -13,7 +13,7 @@ public class ValidationAPI {
 
     @GetMapping("/validation")
     public boolean get(@RequestParam("id") String id) {
-        return new AuxService().validate(id);
+        return new AuxService(id).validate();
     }
 
 }

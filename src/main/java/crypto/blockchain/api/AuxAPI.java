@@ -21,12 +21,11 @@ import static org.springframework.http.HttpStatus.OK;
 public class AuxAPI {
     static Gson JSON = new GsonBuilder().create();
     static ResponseEntity<Object> ERROR = new ResponseEntity<>(INTERNAL_SERVER_ERROR);
-    AuxService auxService = new AuxService();
 
     @GetMapping("/reg/keypair")
     public void addKey(@RequestParam("public") String publicKey,
                        @RequestParam("private") String privateKey){
-        new AuxService().registerKeypair(publicKey, privateKey);
+        new AuxService(null).registerKeypair(publicKey, privateKey);
     }
 
     @GetMapping("/r/account")
@@ -35,32 +34,32 @@ public class AuxAPI {
                                      @RequestParam("to") String to,
                                      @RequestParam("currency") String currency,
                                      @RequestParam("value") String value)  {
-        return create(id, ACCOUNT, () -> auxService.account(id, from, to, currency, Long.valueOf(value)));
+        return create(id, ACCOUNT, () -> new AuxService(id).account(from, to, currency, Long.valueOf(value)));
     }
 
     @GetMapping("/r/currency")
     public ResponseEntity<?> currency(@RequestParam("id") String id,
                                       @RequestParam("key") String key,
                                       @RequestParam("value") String value) {
-        return create(id, CURRENCY, () -> auxService.currency(id, key, value));
+        return create(id, CURRENCY, () -> new AuxService(id).currency(key, value));
     }
 
     @GetMapping("/r/keypair")
     public ResponseEntity<?> keypair() {
-        return create(null, CURRENCY, () -> auxService.keypair());
+        return create(null, KEYPAIR, () -> new AuxService(null).keypair());
     }
 
     @GetMapping("/r/signed")
     public ResponseEntity<?> signed(@RequestParam("id") String id,
                                     @RequestParam("key") String key,
                                     @RequestParam("data") String data) {
-        return create(id, CURRENCY, () -> auxService.signed(id, key, data));
+        return create(id, SIGNED_DATA, () -> new AuxService(id).signed(key, data));
     }
 
     @GetMapping("/r/simple")
     public ResponseEntity<?> simple(@RequestParam("id") String id,
                                     @RequestParam("data") String data) {
-        return create(id, CURRENCY, () -> auxService.simple(data));
+        return create(id, DATA, () -> new AuxService(id).simple(data));
     }
 
 
@@ -70,17 +69,16 @@ public class AuxAPI {
                                         @RequestParam("to") String to,
                                         @RequestParam("currency") String currency,
                                         @RequestParam("value") String value)  {
-        return create(id, UTXO, () -> auxService.utxo(id, from, to, currency, Long.valueOf(value)));
+        return create(id, UTXO, () -> new AuxService(id).utxo(from, to, currency, Long.valueOf(value)));
     }
-
 
     public interface CreateRequest {
         Request create() throws ChainException;
     }
 
     public static ResponseEntity<?> create(String id, BlockType type, CreateRequest create) {
-        AuxService auxService = new AuxService();
-        if (!auxService.exists(id)) return ERROR;
+        AuxService auxService = new AuxService(id);
+        if (!auxService.exists()) return ERROR;
         try {
             Request request = create.create();
             if (request == null) return ERROR;

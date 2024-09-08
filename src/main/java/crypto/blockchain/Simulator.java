@@ -14,27 +14,27 @@ public class Simulator {
 
     private String id;
     private final ChainService chainService = new ChainService(id) ;
-    private final AuxService auxService = new AuxService();
+    private final AuxService auxService = new AuxService(id);
     public static final String CURRENCY = "CBX";
 
     public void account() throws ChainException {
         chainService.allowBlockType(ACCOUNT);
         Keypair genesisKeypair = auxService.keypair();
         auxService.registerKeypair(genesisKeypair);
-        Request genesisRequest = auxService.genesisRequest(id, ACCOUNT, genesisKeypair.publicKey(), CURRENCY, 100L);
+        Request genesisRequest = auxService.genesisRequest(ACCOUNT, genesisKeypair.publicKey(), CURRENCY, 100L);
         chainService.submitRequest(genesisRequest);
         Miner miner = new Miner(id);
         miner.runSynch();
 
         Keypair to = auxService.keypair();
-        Request request = auxService.account(id, genesisKeypair.publicKey(), to.publicKey(), CURRENCY, 5L);
+        Request request = auxService.account(genesisKeypair.publicKey(), to.publicKey(), CURRENCY, 5L);
         chainService.submitRequest(request);
         miner.runSynch();
     }
 
     public void currency() {
         chainService.allowBlockType(BlockType.CURRENCY);
-        String key = auxService.key(id);
+        String key = auxService.key();
         CurrencyRequest request = new CurrencyRequest(CURRENCY, key);
         chainService.submitRequest(request);
         Miner miner = new Miner(id);
@@ -53,7 +53,7 @@ public class Simulator {
         chainService.allowBlockType(SIGNED_DATA);
         Keypair keypair = auxService.keypair();
         auxService.registerKeypair(keypair);
-        Request request = auxService.signed(id, keypair.publicKey(), "ABCDE");
+        Request request = auxService.signed(keypair.publicKey(), "ABCDE");
         chainService.submitRequest(request);
         Miner miner = new Miner(id);
         miner.runSynch();
@@ -72,13 +72,13 @@ public class Simulator {
         Keypair keypair = auxService.keypair();
         auxService.registerKeypair(keypair);
 
-        Request genesisRequest = auxService.genesisRequest(id, UTXO, keypair.publicKey(), CURRENCY, 100L);
+        Request genesisRequest = auxService.genesisRequest(UTXO, keypair.publicKey(), CURRENCY, 100L);
         chainService.submitRequest(genesisRequest);
         Miner miner = new Miner(id);
         miner.runSynch();
 
         Keypair toKeypair = auxService.keypair();
-        Request request = auxService.utxo(id, keypair.publicKey(), toKeypair.publicKey(), CURRENCY, 5L);
+        Request request = auxService.utxo(keypair.publicKey(), toKeypair.publicKey(), CURRENCY, 5L);
         chainService.submitRequest(request);
         miner.runSynch();
     }

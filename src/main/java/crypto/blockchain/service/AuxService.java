@@ -9,7 +9,7 @@ import crypto.block.utxo.UTXORequestFactory;
 import java.util.List;
 
 
-public class AuxService {
+public record AuxService(String id) {
 
     public void registerKeypair(Keypair keypair) {
         Data.addKeypair(null, keypair);
@@ -19,11 +19,11 @@ public class AuxService {
         registerKeypair(new Keypair(privateKey, publicKey));
     }
 
-    public boolean exists(String id){
+    public boolean exists(){
         return Data.getChain(id) != null;
     }
 
-    public Request genesisRequest(String id, BlockType type, String publicKey, String currency, Object value) throws ChainException {
+    public Request genesisRequest(BlockType type, String publicKey, String currency, Object value) throws ChainException {
         Keypair keypair = Data.getKeypair(id, publicKey);
         if (keypair == null) return null;
         return switch(type){
@@ -41,23 +41,23 @@ public class AuxService {
         return new DataRequest(value);
     }
 
-    public Request signed(String id, String key, String value) throws ChainException {
+    public Request signed(String key, String value) throws ChainException {
         Keypair keypair = Data.getKeypair(id, key);
         if (keypair == null) return null;
         return SignedFactory.createSignedDataRequest(keypair, value);
     }
 
-    public Request currency(String id, String key, String value) throws ChainException {
+    public Request currency(String key, String value) throws ChainException {
         Keypair keypair = Data.getKeypair(id, key);
         if (keypair == null) return null;
         return new CurrencyRequest(value, keypair.publicKey());
     }
 
-    public Request account(String id, String from, String to, String currency, Long value) throws ChainException {
+    public Request account(String from, String to, String currency, Long value) throws ChainException {
         return new AccountFactory(id).create(from, to, currency, value);
     }
 
-    public Request utxo(String id, String from, String to, String currency, Long value) throws ChainException {
+    public Request utxo(String from, String to, String currency, Long value) throws ChainException {
         return UTXORequestFactory.createUTXORequest(id, from, to, currency, value);
     }
 
@@ -65,11 +65,11 @@ public class AuxService {
         return Keypair.generate();
     }
 
-    public boolean validate(String id) {
+    public boolean validate() {
         return ChainValidator.validate(id);
     }
 
-    public String key(String id) {
+    public String key() {
         List<String> keys = Data.getKeys(id);
         if (keys.isEmpty()) return null;
         return keys.getFirst();

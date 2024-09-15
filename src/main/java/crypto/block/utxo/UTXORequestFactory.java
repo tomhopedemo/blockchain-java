@@ -6,7 +6,7 @@ import java.util.*;
 
 public class UTXORequestFactory {
 
-    public static UTXORequest createGenesisRequest(String recipientPublicKey, String currency, long transactionValue) {
+    public static UTXORequest genesis(String recipientPublicKey, String currency, long transactionValue) {
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
         transactionOutputs.add(new TransactionOutput(recipientPublicKey, currency, transactionValue));
         return new UTXORequest(new ArrayList<>(), transactionOutputs);

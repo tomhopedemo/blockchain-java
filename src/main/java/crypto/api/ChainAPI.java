@@ -47,17 +47,28 @@ public class ChainAPI {
         try {
             switch (BlockType.valueOf(type)) {
                 case ACCOUNT -> {
-                    service.keypair();
-                    service.currency();
-                    service.account();
+                    Keypair keypair = service.keypair();
+                    service.currency(keypair);
+                    service.account(keypair);
                 }
                 case CURRENCY -> {
-                    service.keypair();
-                    service.currency();
+                    Keypair keypair = service.keypair();
+                    service.currency(keypair);
                 }
                 case DATA -> service.data();
+                case DIFFICULTY -> {
+                    Keypair keypair = service.keypair();
+                    String currency = service.currency(keypair);
+                    service.difficulty(currency, keypair);
+                }
                 case KEYPAIR -> service.keypair();
                 case SIGNED -> service.signed();
+                case STAKE -> {
+                    Keypair keypair = service.keypair();
+                    service.currency(keypair);
+                    Keypair accountKeypair = service.account(keypair);
+                    service.stake(accountKeypair);
+                }
                 case UTXO -> service.utxo();
             }
             return new ResponseEntity<>(chainService.getChainJson(), OK);
@@ -89,13 +100,8 @@ public class ChainAPI {
         ChainService chainService = new ChainService(id);
         Blockchain chain = chainService.getChain();
         if (chain == null) return ERROR;
-        try {
-            Request request = new AuxService(id).genesisRequest(BlockType.valueOf(type), publicKey, currency, value);
-            chainService.submitRequest(request);
-            return new ResponseEntity<>(OK);
-        } catch (ChainException e){
-            e.printStackTrace();
-            return ERROR;
-        }
+        Request request = new AuxService(id).utxoGenesis(publicKey, currency, value);
+        chainService.submitRequest(request);
+        return new ResponseEntity<>(OK);
     }
 }

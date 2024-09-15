@@ -11,7 +11,7 @@ public record Keypair(String privateKey, String publicKey) implements Request {
         this(Encoder.encodeToString(privateKey), Encoder.encodeToString(publicKey));
     }
 
-    public static Keypair generate() {
+    public static Keypair create() {
         KeyPair keyPair = ECDSA.generateKeyPair();
         return new Keypair(keyPair.getPrivate(), keyPair.getPublic());
     }

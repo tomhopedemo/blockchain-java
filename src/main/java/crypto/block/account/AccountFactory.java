@@ -61,10 +61,12 @@ public record AccountFactory(String id) implements BlockFactory<AccountRequest> 
     }
 
     public AccountRequest create(String from, String to, String currency, Long value) throws ChainException {
-        Keypair keypair = Data.getKeypair(id, from);
+        Keypair keypair = AuxData.getKeypair(from);
         if (keypair == null) return null;
-        Long balance = Data.getAccount(id, currency, keypair.publicKey());
-        if (balance < value) return null;
+        if (!Data.getCurrency(id, currency).publicKey().equals(keypair.publicKey())){
+            Long balance = Data.getAccount(id, currency, keypair.publicKey());
+            if (balance < value) return null;
+        }
         List<TransactionOutput> transactionOutputs = List.of(new TransactionOutput(to, currency, value));
         return create(keypair, currency, transactionOutputs);
     }

@@ -3,7 +3,9 @@ package crypto.service;
 import crypto.*;
 import crypto.block.account.AccountFactory;
 import crypto.block.currency.CurrencyRequest;
+import crypto.block.data.DataRequest;
 import crypto.block.signed.SignedFactory;
+import crypto.block.stake.StakeFactory;
 import crypto.block.utxo.UTXORequestFactory;
 
 import java.util.List;
@@ -12,7 +14,7 @@ import java.util.List;
 public record AuxService(String id) {
 
     public void registerKeypair(Keypair keypair) {
-        Data.addKeypair(null, keypair);
+        AuxData.addKeypair(keypair);
     }
 
     public void registerKeypair(String publicKey, String privateKey) {
@@ -23,20 +25,11 @@ public record AuxService(String id) {
         return Data.getChain(id) != null;
     }
 
-    public Request genesisRequest(BlockType type, String publicKey, String currency, Object value) throws ChainException {
+    public Request utxoGenesis(String publicKey, String currency, Object value) {
         Keypair keypair = Data.getKeypair(id, publicKey);
         if (keypair == null) return null;
-        return switch(type){
-            case ACCOUNT -> {
-                CurrencyRequest currencyRequest = Data.getCurrency(id, currency);
-                if (currencyRequest == null) yield null;
-                yield new AccountFactory(id).create(currencyRequest.publicKey(), publicKey, currency, (Long) value);
-            }
-            case UTXO -> UTXORequestFactory.createGenesisRequest(keypair.publicKey(), currency, (Long) value);
-            default -> throw new IllegalStateException("Unexpected value: " + type);
-        };
+        return UTXORequestFactory.genesis(keypair.publicKey(), currency, (Long) value);
     }
-
 
     public Request account(String from, String to, String currency, Long value) throws ChainException {
         return new AccountFactory(id).create(from, to, currency, value);
@@ -53,13 +46,17 @@ public record AuxService(String id) {
     }
 
     public Keypair keypair() {
-        return Keypair.generate();
+        return Keypair.create();
     }
 
     public Request signed(String key, String value) throws ChainException {
         Keypair keypair = Data.getKeypair(id, key);
         if (keypair == null) return null;
-        return SignedFactory.createSignedRequest(keypair, value);
+        return SignedFactory.create(keypair, value);
+    }
+
+    public Request stake(Keypair keypair, String currency) throws ChainException {
+        return new StakeFactory(id).create(keypair, currency);
     }
 
     public Request utxo(String from, String to, String currency, Long value) throws ChainException {

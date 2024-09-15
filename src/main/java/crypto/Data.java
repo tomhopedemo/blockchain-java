@@ -1,7 +1,9 @@
 package crypto;
 
 import crypto.block.currency.CurrencyRequest;
+import crypto.block.difficulty.DifficultyRequest;
 import crypto.block.utxo.UTXOCache;
+import crypto.caches.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,15 +14,17 @@ public class Data {
     static Map<String, Set<BlockType>> allowedBlocktypes;
 
     static Map<String, CurrencyAccountCache> currencyAccountCaches;
-    static Map<String, CurrencyCache> currencyCache;
+    static Map<String, CurrencyCache> currencyCaches;
     static Map<String, KeypairCache> keypairCaches;
     static Map<String, CurrencyUtxoCache> currencyUtxoCaches;
+    static Map<String, CurrencyStakeCache> currencyStakeCaches;
+    static Map<String, DifficultyCache> difficultyCaches;
 
     static {
         chains = new ConcurrentHashMap<>();
         allowedBlocktypes = new ConcurrentHashMap<>();
         currencyAccountCaches = new ConcurrentHashMap<>();
-        currencyCache = new ConcurrentHashMap<>();
+        currencyCaches = new ConcurrentHashMap<>();
         keypairCaches = new ConcurrentHashMap<>();
         currencyUtxoCaches = new ConcurrentHashMap<>();
     }
@@ -54,9 +58,7 @@ public class Data {
 
     public static Long getAccount(String id, String currency, String publicKey){
         CurrencyAccountCache currencyAccountCache = Data.currencyAccountCaches.get(id);
-        if (currencyAccountCache == null){
-            return 0L;
-        }
+        if (currencyAccountCache == null) return 0L;
         return currencyAccountCache.getBalance(publicKey, currency);
     }
 
@@ -67,8 +69,12 @@ public class Data {
     }
 
     //currency
+    public static void addCurrency(String id, CurrencyRequest currency) {
+        currencyCaches.computeIfAbsent(id, _ -> new CurrencyCache()).add(currency);
+    }
+
     public static CurrencyRequest getCurrency(String id, String currency) {
-        CurrencyCache currencies = currencyCache.get(id);
+        CurrencyCache currencies = currencyCaches.get(id);
         if (currencies == null) return null;
         Optional<CurrencyRequest> currencyRequest = currencies.get(currency);
         return currencyRequest.isPresent() ? currencyRequest.get() : null;
@@ -78,43 +84,50 @@ public class Data {
         return getCurrency(id, currency) != null;
     }
 
-    public static void addCurrency(String id, CurrencyRequest currency) {
-        currencyCache.computeIfAbsent(id, _ -> new CurrencyCache()).add(currency);
+    //Difficulty
+    public static void addDifficulty(String id, DifficultyRequest request) {
+        difficultyCaches.computeIfAbsent(id, _ -> new DifficultyCache()).add(request);
     }
-
 
     //keypair
     public static void addKeypair(String id, Keypair keypair) {
         keypairCaches.computeIfAbsent(id, _ ->  new KeypairCache()).addKeypair(keypair);
     }
 
-    public static List<String> getKeys(String id) {
-        return keypairCaches.get(id).getKeypairs().stream().map(w -> w.publicKey()).toList();
+    public static Keypair getKeypair(String id, String publicKey) {
+        KeypairCache cache = keypairCaches.get(id);
+        if (cache == null) return null;
+        return cache.getKeypair(publicKey);
     }
 
-    public static Keypair getKeypair(String id, String publicKey) {
-        return keypairCaches.get(id).getKeypair(publicKey);
+    public static List<String> getKeys(String id) {
+        return keypairCaches.get(id).getKeypairs().stream().map(w -> w.publicKey()).toList();
     }
 
     public static boolean hasKey(String id, String publicKey) {
         return getKeypair(id, publicKey) != null;
     }
 
+    //Stake
+    public static void addStake(String id, String currency, String publicKey, long value, int expiry) {
+        currencyStakeCaches.computeIfAbsent(id, _ -> new CurrencyStakeCache()).add(publicKey, currency, value, expiry);
+    }
+
     //UTXO
-    public static void addUtxo(String id, String currency, String transactionOutputHash, TransactionOutput transactionOutput) {
-        currencyUtxoCaches.computeIfAbsent(id, _ ->  new CurrencyUtxoCache()).put(currency, transactionOutputHash, transactionOutput);
+    public static void addUtxo(String id, String currency, String utxoHash, TransactionOutput transactionOutput) {
+        currencyUtxoCaches.computeIfAbsent(id, _ ->  new CurrencyUtxoCache()).put(currency, utxoHash, transactionOutput);
     }
 
-    public static void removeUtxo(String id, String currency, String utxoOutputHash) {
-        currencyUtxoCaches.get(id).get(currency).remove(utxoOutputHash);
+    public static void removeUtxo(String id, String currency, String utxoHash) {
+        currencyUtxoCaches.get(id).get(currency).remove(utxoHash);
     }
 
-    public static TransactionOutput getUtxo(String id, String transactionOutputHash) {
-        return currencyUtxoCaches.get(id).find(transactionOutputHash);
+    public static TransactionOutput getUtxo(String id, String utxoHash) {
+        return currencyUtxoCaches.get(id).find(utxoHash);
     }
 
-    public static boolean hasUtxo(String id, String utxoOutputHash) {
-        return currencyUtxoCaches.get(id).find(utxoOutputHash) != null;
+    public static boolean hasUtxo(String id, String utxoHash) {
+        return currencyUtxoCaches.get(id).find(utxoHash) != null;
     }
 
     public static UTXOCache getUTXOCache(String id, String currency){

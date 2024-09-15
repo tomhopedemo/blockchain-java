@@ -37,7 +37,7 @@ public record SignedFactory(String id) implements BlockFactory<SignedRequest>{
         }
     }
 
-    public static SignedRequest createSignedRequest(Keypair keypair, String value) throws ChainException {
+    public static SignedRequest create(Keypair keypair, String value) throws ChainException {
         String hash = SignedRequest.generateHash(keypair.publicKey(), value);
         byte[] signature = Signing.sign(keypair, hash);
         return new SignedRequest(keypair.publicKey(), value, Encoder.encodeToHexadecimal(signature));

@@ -1,4 +1,6 @@
-package crypto;
+package crypto.block.data;
+
+import crypto.Request;
 
 public record DataRequest (String data) implements Request {
 

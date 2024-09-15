@@ -1,14 +1,6 @@
 package crypto;
 
-import crypto.block.account.AccountFactory;
-import crypto.block.currency.CurrencyFactory;
-import crypto.block.keypair.KeypairFactory;
-import crypto.block.signed.SignedFactory;
-import crypto.block.data.DataFactory;
-import crypto.block.utxo.UTXOFactory;
-
 import java.util.List;
-import java.util.Set;
 
 public record Miner (String id) implements Runnable {
 
@@ -21,27 +13,16 @@ public record Miner (String id) implements Runnable {
         }
     }
 
-    public void runSynch() {
-        Set<BlockType> blockTypes = Data.getTypes(id);
-        for (BlockType blockType : blockTypes) {
+    public void runSynch()  {
+        for (BlockType blockType : Data.getTypes(id)) {
             List<? extends Request> requests = Requests.get(id, blockType);
-            if (requests == null || requests.isEmpty()) {
-                continue;
-            }
-
-            BlockFactory blockFactory = switch (blockType) {
-                case ACCOUNT -> new AccountFactory(id);
-                case CURRENCY -> new CurrencyFactory(id);
-                case DATA -> new DataFactory(id);
-                case KEYPAIR -> new KeypairFactory(id);
-                case SIGNED -> new SignedFactory(id);
-                case UTXO -> new UTXOFactory(id);
-            };
-
-            BlockData blockDataHashable = blockFactory.prepare(requests);
-            if (blockDataHashable != null) {
+            if (requests == null || requests.isEmpty()) continue;
+            try {
+                BlockFactory blockFactory = blockType.getFactoryClass().getDeclaredConstructor(String.class).newInstance(id);
+                BlockData blockDataHashable = blockFactory.prepare(requests);
+                if (blockDataHashable == null) continue;
                 blockFactory.mine(blockDataHashable);
-            }
+            } catch (Exception ignored) {}
         }
     }
 }

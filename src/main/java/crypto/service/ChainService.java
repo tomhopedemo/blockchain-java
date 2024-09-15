@@ -29,10 +29,6 @@ public record ChainService(String id) {
         return JSON.toJson(getChain());
     }
 
-    public String getKeysJson() {
-        return JSON.toJson(Data.getKeys(id));
-    }
-
     public void submitRequest(Request request) {
         Requests.add(id, request);
     }

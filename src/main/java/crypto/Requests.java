@@ -3,6 +3,7 @@ package crypto;
 import crypto.block.account.AccountRequest;
 import crypto.block.currency.CurrencyRequest;
 import crypto.block.signed.SignedRequest;
+import crypto.block.stake.StakeRequest;
 import crypto.block.utxo.UTXORequest;
 
 import java.util.ArrayList;
@@ -12,22 +13,8 @@ import java.util.Map;
 
 public class Requests {
 
-    static Map<String, List<AccountRequest>> accountRequests = new HashMap<>();
-    static Map<String, List<UTXORequest>> utxoRequests = new HashMap<>();
-    static Map<String, List<DataRequest>> dataRequests = new HashMap<>();
-    static Map<String, List<Keypair>> keypairRequests = new HashMap<>();
-    static Map<String, List<SignedRequest>> signedRequests = new HashMap<>();
-    static Map<String, List<CurrencyRequest>> currencyRequests = new HashMap<>();
-
     private static Map getMap(BlockType blockType) {
-        return switch (blockType){
-            case ACCOUNT -> accountRequests;
-            case CURRENCY -> currencyRequests;
-            case DATA -> dataRequests;
-            case KEYPAIR -> keypairRequests;
-            case SIGNED -> signedRequests;
-            case UTXO -> utxoRequests;
-        };
+        return blockType.getRequestMap();
     }
 
     public static void add(String id, Request request) {

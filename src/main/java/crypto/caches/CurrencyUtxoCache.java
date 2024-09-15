@@ -1,5 +1,6 @@
-package crypto;
+package crypto.caches;
 
+import crypto.TransactionOutput;
 import crypto.block.utxo.UTXOCache;
 
 import java.util.Map;

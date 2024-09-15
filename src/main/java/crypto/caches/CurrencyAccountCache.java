@@ -1,4 +1,4 @@
-package crypto;
+package crypto.caches;
 
 import java.util.concurrent.ConcurrentHashMap;
 

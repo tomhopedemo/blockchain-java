@@ -1,11 +1,11 @@
 package crypto.service;
 
 import crypto.*;
-import crypto.block.account.AccountFactory;
+import crypto.block.account.AccountRequest;
 import crypto.block.currency.CurrencyRequest;
 import crypto.block.data.DataRequest;
-import crypto.block.signed.SignedFactory;
-import crypto.block.stake.StakeFactory;
+import crypto.block.signed.SignedRequest;
+import crypto.block.stake.StakeRequest;
 import crypto.block.utxo.UTXORequestFactory;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public record AuxService(String id) {
     }
 
     public Request account(String from, String to, String currency, Long value) throws ChainException {
-        return new AccountFactory(id).create(from, to, currency, value);
+        return AccountRequest.create(id, from, to, currency, value);
     }
 
     public Request currency(String key, String value) throws ChainException {
@@ -52,11 +52,11 @@ public record AuxService(String id) {
     public Request signed(String key, String value) throws ChainException {
         Keypair keypair = Data.getKeypair(id, key);
         if (keypair == null) return null;
-        return SignedFactory.create(keypair, value);
+        return SignedRequest.create(keypair, value);
     }
 
     public Request stake(Keypair keypair, String currency) throws ChainException {
-        return new StakeFactory(id).create(keypair, currency);
+        return StakeRequest.create(keypair, currency);
     }
 
     public Request utxo(String from, String to, String currency, Long value) throws ChainException {

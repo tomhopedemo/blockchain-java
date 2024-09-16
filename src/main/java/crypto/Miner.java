@@ -18,10 +18,9 @@ public record Miner (String id) implements Runnable {
             List<? extends Request> requests = Requests.get(id, blockType);
             if (requests == null || requests.isEmpty()) continue;
             try {
-                BlockFactory blockFactory = blockType.getFactoryClass().getDeclaredConstructor(String.class).newInstance(id);
-                BlockData blockDataHashable = blockFactory.prepare(requests);
+                BlockData blockDataHashable = requests.getFirst().prepare(id, requests);
                 if (blockDataHashable == null) continue;
-                blockFactory.mine(blockDataHashable);
+                requests.getFirst().mine(id, blockDataHashable);
             } catch (Exception ignored) {}
         }
     }

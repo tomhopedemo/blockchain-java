@@ -1,41 +1,31 @@
 package crypto;
 
-import crypto.block.account.AccountFactory;
 import crypto.block.account.AccountRequest;
-import crypto.block.currency.CurrencyFactory;
 import crypto.block.currency.CurrencyRequest;
-import crypto.block.data.DataFactory;
 import crypto.block.data.DataRequest;
-import crypto.block.difficulty.DifficultyFactory;
 import crypto.block.difficulty.DifficultyRequest;
-import crypto.block.keypair.KeypairFactory;
-import crypto.block.signed.SignedFactory;
 import crypto.block.signed.SignedRequest;
-import crypto.block.stake.StakeFactory;
 import crypto.block.stake.StakeRequest;
-import crypto.block.utxo.UTXOFactory;
 import crypto.block.utxo.UTXORequest;
 
 import java.util.*;
 
 public enum BlockType {
 
-    ACCOUNT(AccountRequest.class, AccountFactory.class),
-    CURRENCY(CurrencyRequest.class, CurrencyFactory.class),
-    DATA(DataRequest.class, DataFactory.class),
-    DIFFICULTY(DifficultyRequest.class, DifficultyFactory.class),
-    KEYPAIR(Keypair.class, KeypairFactory.class),
-    SIGNED(SignedRequest.class, SignedFactory.class),
-    STAKE(StakeRequest.class, StakeFactory.class),
-    UTXO(UTXORequest.class, UTXOFactory.class);
+    ACCOUNT(AccountRequest.class),
+    CURRENCY(CurrencyRequest.class),
+    DATA(DataRequest.class),
+    DIFFICULTY(DifficultyRequest.class),
+    KEYPAIR(Keypair.class),
+    SIGNED(SignedRequest.class),
+    STAKE(StakeRequest.class),
+    UTXO(UTXORequest.class);
 
     private final Class<? extends Request> requestClass;
-    private final Class<? extends BlockFactory> factoryClass;
     private final Map<String, List<? extends Request>> requestMap;
 
-    BlockType(Class<? extends Request> requestClass, Class<? extends BlockFactory> factoryClass) {
+    BlockType(Class<? extends Request> requestClass) {
         this.requestClass = requestClass;
-        this.factoryClass = factoryClass;
         this.requestMap = new HashMap<>();
     }
 
@@ -46,9 +36,6 @@ public enum BlockType {
 
     public Class<? extends Request> getRequestClass() {
         return requestClass;
-    }
-    public Class<? extends BlockFactory> getFactoryClass() {
-        return factoryClass;
     }
 
     public Map<String, List<? extends Request>> getRequestMap(){

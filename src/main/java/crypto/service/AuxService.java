@@ -1,11 +1,7 @@
 package crypto.service;
 
 import crypto.*;
-import crypto.block.account.AccountRequest;
-import crypto.block.currency.CurrencyRequest;
-import crypto.block.data.DataRequest;
-import crypto.block.signed.SignedRequest;
-import crypto.block.stake.StakeRequest;
+import crypto.block.*;
 import crypto.block.utxo.UTXORequestFactory;
 
 import java.util.List;
@@ -22,27 +18,27 @@ public record AuxService(String id) {
     }
 
     public boolean exists(){
-        return Data.getChain(id) != null;
+        return Caches.getChain(id) != null;
     }
 
     public Request utxoGenesis(String publicKey, String currency, Object value) {
-        Keypair keypair = Data.getKeypair(id, publicKey);
+        Keypair keypair = Caches.getKeypair(id, publicKey);
         if (keypair == null) return null;
         return UTXORequestFactory.genesis(keypair.publicKey(), currency, (Long) value);
     }
 
     public Request account(String from, String to, String currency, Long value) throws ChainException {
-        return AccountRequest.create(id, from, to, currency, value);
+        return Account.create(id, from, to, currency, value);
     }
 
     public Request currency(String key, String value) throws ChainException {
-        Keypair keypair = Data.getKeypair(id, key);
+        Keypair keypair = Caches.getKeypair(id, key);
         if (keypair == null) return null;
-        return new CurrencyRequest(value, keypair.publicKey());
+        return new Currency(value, keypair.publicKey());
     }
 
     public Request data(String value) {
-        return new DataRequest(value);
+        return new Data(value);
     }
 
     public Keypair keypair() {
@@ -50,13 +46,13 @@ public record AuxService(String id) {
     }
 
     public Request signed(String key, String value) throws ChainException {
-        Keypair keypair = Data.getKeypair(id, key);
+        Keypair keypair = Caches.getKeypair(id, key);
         if (keypair == null) return null;
-        return SignedRequest.create(keypair, value);
+        return Signed.create(keypair, value);
     }
 
     public Request stake(Keypair keypair, String currency) throws ChainException {
-        return StakeRequest.create(keypair, currency);
+        return Stake.create(keypair, currency);
     }
 
     public Request utxo(String from, String to, String currency, Long value) throws ChainException {
@@ -68,7 +64,7 @@ public record AuxService(String id) {
     }
 
     public String key() {
-        List<String> keys = Data.getKeys(id);
+        List<String> keys = Caches.getKeys(id);
         if (keys.isEmpty()) return null;
         return keys.getFirst();
     }

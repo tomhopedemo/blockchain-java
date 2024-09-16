@@ -3,7 +3,7 @@ package crypto;
 public class ChainValidator {
 
     public static boolean validate(String id) {
-        Blockchain chain = Data.getChain(id);
+        Blockchain chain = Caches.getChain(id);
         for (int i = 0; i < chain.blocks.size(); i++) {
             Block block = chain.get(i);
             if (i > 0 && !block.getPreviousBlockHashId().equals(chain.get(i - 1).getBlockHashId())){

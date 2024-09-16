@@ -15,7 +15,7 @@ import java.util.Set;
 import static crypto.BlockType.UTXO;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class UTXORequest implements Request<UTXORequest> {
+public class UTXO implements Request<crypto.block.utxo.UTXO> {
 
     public List<TransactionInput> transactionInputs;
     public List<TransactionOutput> transactionOutputs;
@@ -26,7 +26,7 @@ public class UTXORequest implements Request<UTXORequest> {
                 String.join("", getTransactionOutputs().stream().map(transactionOutput -> transactionOutput.serialise()).toList());
     }
 
-    public UTXORequest(List<TransactionInput> transactionInputs, List<TransactionOutput> transactionOutputs) {
+    public UTXO(List<TransactionInput> transactionInputs, List<TransactionOutput> transactionOutputs) {
         this.transactionInputs = transactionInputs;
         this.transactionOutputs = transactionOutputs;
     }
@@ -42,44 +42,44 @@ public class UTXORequest implements Request<UTXORequest> {
 
 
     @Override
-    public void mine(String id, BlockData<UTXORequest> requests) {
-        if (Data.getChain(id).getMostRecentHash() != null) {
-            for (UTXORequest transactionRequest : requests.data()) {
+    public void mine(String id, BlockData<crypto.block.utxo.UTXO> requests) {
+        if (Caches.getChain(id).getMostRecentHash() != null) {
+            for (crypto.block.utxo.UTXO transactionRequest : requests.data()) {
                 if (!verify(id, transactionRequest)) return;
                 if (!checkInputSumEqualToOutputSum(transactionRequest, id)) return;
             }
         }
 
         Set<String> inputs = new HashSet<>();
-        for (UTXORequest utxoRequest : requests.data()) {
+        for (crypto.block.utxo.UTXO utxoRequest : requests.data()) {
             for (TransactionInput transactionInput : utxoRequest.getTransactionInputs()) {
                 if (inputs.contains(transactionInput.transactionOutputHash())) return;
                 inputs.add(transactionInput.transactionOutputHash());
             }
         }
         addBlock(id, requests);
-        for (UTXORequest utxoRequest : requests.data()) {
+        for (crypto.block.utxo.UTXO utxoRequest : requests.data()) {
             String currency = utxoRequest.getTransactionOutputs().getFirst().currency();
             for (TransactionOutput transactionOutput : utxoRequest.getTransactionOutputs()) {
-                Data.addUtxo(id, currency, transactionOutput.generateTransactionOutputHash(utxoRequest.getBlockDataHash()), transactionOutput);
+                Caches.addUtxo(id, currency, transactionOutput.generateTransactionOutputHash(utxoRequest.getBlockDataHash()), transactionOutput);
             }
             for (TransactionInput transactionInput : utxoRequest.getTransactionInputs()) {
-                Data.removeUtxo(id, currency, transactionInput.transactionOutputHash());
+                Caches.removeUtxo(id, currency, transactionInput.transactionOutputHash());
             }
         }
         Requests.remove(id, requests.data(), UTXO);
     }
 
     @Override
-    public BlockData<UTXORequest> prepare(String id, List<UTXORequest> requests) {
+    public BlockData<crypto.block.utxo.UTXO> prepare(String id, List<crypto.block.utxo.UTXO> requests) {
         Set<String> inputsReferenced = new HashSet<>();
-        List<UTXORequest> included = new ArrayList<>();
-        Blockchain chain = Data.getChain(id);
+        List<crypto.block.utxo.UTXO> included = new ArrayList<>();
+        Blockchain chain = Caches.getChain(id);
         if (chain.getMostRecentHash() == null){
             requests = requests.stream().filter(r -> r.transactionInputs.isEmpty()).toList();
         }
 
-        for (UTXORequest request : requests) {
+        for (crypto.block.utxo.UTXO request : requests) {
             boolean shouldInclude;
             if (chain.getMostRecentHash() == null){
                 shouldInclude = includeGenesisRequest(request);
@@ -96,10 +96,10 @@ public class UTXORequest implements Request<UTXORequest> {
     }
 
     @Override
-    public boolean verify(String id, UTXORequest request) {
+    public boolean verify(String id, crypto.block.utxo.UTXO request) {
         for (TransactionInput transactionInput : request.getTransactionInputs()) {
             String transactionOutputHash = transactionInput.transactionOutputHash();
-            TransactionOutput transactionOutput = Data.getUtxo(id, transactionOutputHash);
+            TransactionOutput transactionOutput = Caches.getUtxo(id, transactionOutputHash);
             if (transactionOutput == null) return false;
             try {
                 PublicKey publicKey = Encoder.decodeToPublicKey(transactionOutput.getRecipient());
@@ -112,11 +112,11 @@ public class UTXORequest implements Request<UTXORequest> {
         return true;
     }
 
-    private boolean includeGenesisRequest(UTXORequest request) {
+    private boolean includeGenesisRequest(crypto.block.utxo.UTXO request) {
         return true; //can add restrictions later
     }
 
-    private boolean includeUtxoRequest(String id, UTXORequest request, Set<String> inputsReferenced) {
+    private boolean includeUtxoRequest(String id, crypto.block.utxo.UTXO request, Set<String> inputsReferenced) {
         if (!verify(id, request)) {
             return false;
         }
@@ -131,7 +131,7 @@ public class UTXORequest implements Request<UTXORequest> {
             } else if (inputsReferenced.contains(transactionOutputHash)){
                 return false;
                 //check if input is available
-            } else if (!Data.hasUtxo(id, transactionOutputHash)) {
+            } else if (!Caches.hasUtxo(id, transactionOutputHash)) {
                 return false;
             } else {
                 transactionInputsToAdd.add(transactionOutputHash);
@@ -141,11 +141,11 @@ public class UTXORequest implements Request<UTXORequest> {
         return true;
     }
 
-    private static boolean checkInputSumEqualToOutputSum(UTXORequest request, String id) {
+    private static boolean checkInputSumEqualToOutputSum(crypto.block.utxo.UTXO request, String id) {
         long sumOfInputs = 0L;
         long sumOfOutputs = 0L;
         for (TransactionInput transactionInput : request.getTransactionInputs()) {
-            TransactionOutput transactionOutput = Data.getUtxo(id, transactionInput.transactionOutputHash());
+            TransactionOutput transactionOutput = Caches.getUtxo(id, transactionInput.transactionOutputHash());
             long transactionOutputValue = transactionOutput.getValue();
             sumOfInputs += transactionOutputValue;
         }
@@ -158,10 +158,10 @@ public class UTXORequest implements Request<UTXORequest> {
         return sumOfInputs == sumOfOutputs;
     }
 
-    private boolean isInputSumEqualToOutputSum(String id, UTXORequest request) {
+    private boolean isInputSumEqualToOutputSum(String id, crypto.block.utxo.UTXO request) {
         long sum = 0L;
         for (TransactionInput transactionInput : request.getTransactionInputs()) {
-            TransactionOutput transactionOutput = Data.getUtxo(id, transactionInput.transactionOutputHash());
+            TransactionOutput transactionOutput = Caches.getUtxo(id, transactionInput.transactionOutputHash());
             sum += transactionOutput.getValue();
         }
         for (TransactionOutput transactionOutput : request.getTransactionOutputs()) {

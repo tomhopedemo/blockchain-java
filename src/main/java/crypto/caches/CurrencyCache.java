@@ -1,6 +1,6 @@
 package crypto.caches;
 
-import crypto.block.currency.CurrencyRequest;
+import crypto.block.Currency;
 
 import java.util.LinkedHashSet;
 import java.util.Optional;
@@ -8,16 +8,16 @@ import java.util.Set;
 
 public class CurrencyCache {
 
-    private final Set<CurrencyRequest> currencies = new LinkedHashSet<>();
+    private final Set<Currency> currencies = new LinkedHashSet<>();
 
-    public void add(CurrencyRequest currencyData){
-        Optional<CurrencyRequest> found = get(currencyData.currency());
+    public void add(Currency currencyData){
+        Optional<Currency> found = get(currencyData.currency());
         if (found.isEmpty()){
             currencies.add(currencyData);
         }
     }
 
-    public Optional<CurrencyRequest> get(String currency) {
+    public Optional<Currency> get(String currency) {
         return currencies.stream().filter(c -> currency.equals(c.currency())).findFirst();
     }
 

@@ -1,10 +1,10 @@
-package crypto.block.data;
+package crypto.block;
 
 import crypto.*;
 
 import java.util.List;
 
-public record DataRequest (String data) implements Request<DataRequest> {
+public record Data(String data) implements Request<Data> {
 
     @Override
     public String getPreHash() {
@@ -13,18 +13,18 @@ public record DataRequest (String data) implements Request<DataRequest> {
 
 
     @Override
-    public void mine(String id, BlockData<DataRequest> blockData) {
+    public void mine(String id, BlockData<Data> blockData) {
         addBlock(id, blockData);
         Requests.remove(id, blockData.data(), BlockType.DATA);
     }
 
     @Override
-    public BlockData<DataRequest> prepare(String id, List<DataRequest> requests) {
+    public BlockData<Data> prepare(String id, List<Data> requests) {
         return requests.isEmpty() ? null : new BlockData<>(List.of(requests.getFirst()));
     }
 
     @Override
-    public boolean verify(String id, DataRequest request) {
+    public boolean verify(String id, Data request) {
         return true;
     }
 

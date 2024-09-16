@@ -1,14 +1,15 @@
 package crypto;
 
-import crypto.block.currency.CurrencyRequest;
-import crypto.block.difficulty.DifficultyRequest;
+import crypto.block.Currency;
+import crypto.block.Difficulty;
+import crypto.block.Keypair;
 import crypto.block.utxo.UTXOCache;
 import crypto.caches.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Data {
+public class Caches {
 
     static Map<String, Blockchain> chains;
     static Map<String, Set<BlockType>> allowedBlocktypes;
@@ -57,7 +58,7 @@ public class Data {
     }
 
     public static Long getAccount(String id, String currency, String publicKey){
-        CurrencyAccountCache currencyAccountCache = Data.currencyAccountCaches.get(id);
+        CurrencyAccountCache currencyAccountCache = Caches.currencyAccountCaches.get(id);
         if (currencyAccountCache == null) return 0L;
         return currencyAccountCache.getBalance(publicKey, currency);
     }
@@ -69,14 +70,14 @@ public class Data {
     }
 
     //currency
-    public static void addCurrency(String id, CurrencyRequest currency) {
+    public static void addCurrency(String id, Currency currency) {
         currencyCaches.computeIfAbsent(id, _ -> new CurrencyCache()).add(currency);
     }
 
-    public static CurrencyRequest getCurrency(String id, String currency) {
+    public static Currency getCurrency(String id, String currency) {
         CurrencyCache currencies = currencyCaches.get(id);
         if (currencies == null) return null;
-        Optional<CurrencyRequest> currencyRequest = currencies.get(currency);
+        Optional<Currency> currencyRequest = currencies.get(currency);
         return currencyRequest.isPresent() ? currencyRequest.get() : null;
     }
 
@@ -85,7 +86,7 @@ public class Data {
     }
 
     //Difficulty
-    public static void addDifficulty(String id, DifficultyRequest request) {
+    public static void addDifficulty(String id, Difficulty request) {
         difficultyCaches.computeIfAbsent(id, _ -> new DifficultyCache()).add(request);
     }
 
@@ -108,7 +109,7 @@ public class Data {
         return getKeypair(id, publicKey) != null;
     }
 
-    //Stake
+    //StakeCacheItem
     public static void addStake(String id, String currency, String publicKey, long value, int expiry) {
         currencyStakeCaches.computeIfAbsent(id, _ -> new CurrencyStakeCache()).add(publicKey, currency, value, expiry);
     }

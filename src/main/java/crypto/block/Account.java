@@ -1,4 +1,4 @@
-package crypto.block.account;
+package crypto.block;
 
 import crypto.*;
 import crypto.cryptography.ECDSA;
@@ -13,7 +13,7 @@ import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public record AccountRequest(String publicKey, String currency, List<TransactionOutput> transactionOutputs, String signature) implements Request<AccountRequest> {
+public record Account(String publicKey, String currency, List<TransactionOutput> transactionOutputs, String signature) implements Request<Account> {
 
     @Override
     public String getPreHash() {
@@ -28,14 +28,14 @@ public record AccountRequest(String publicKey, String currency, List<Transaction
     }
 
     @Override
-    public void mine(String id, BlockData<AccountRequest> blockData) {
+    public void mine(String id, BlockData<Account> blockData) {
         if (!verify(id, blockData)) return;
         if (blockData.data().size() != blockData.data().stream().map(r -> r.publicKey()).distinct().toList().size()) return;
         addBlock(id, blockData);
-        for (AccountRequest request : blockData.data()) {
+        for (Account request : blockData.data()) {
             for (TransactionOutput transactionOutput : request.transactionOutputs()) {
-                Data.addAccount(id, transactionOutput.getRecipient(), request.currency(), transactionOutput.getValue());
-                Data.addAccount(id, request.publicKey(), request.currency(), -transactionOutput.getValue());
+                Caches.addAccount(id, transactionOutput.getRecipient(), request.currency(), transactionOutput.getValue());
+                Caches.addAccount(id, request.publicKey(), request.currency(), -transactionOutput.getValue());
             }
         }
         Requests.remove(id, blockData.data(), BlockType.ACCOUNT);
@@ -43,9 +43,9 @@ public record AccountRequest(String publicKey, String currency, List<Transaction
 
 
     @Override
-    public BlockData<AccountRequest> prepare(String id, List<AccountRequest> requests) {
-        List<AccountRequest> selected = new ArrayList<>();
-        for (AccountRequest request : requests) {
+    public BlockData<Account> prepare(String id, List<Account> requests) {
+        List<Account> selected = new ArrayList<>();
+        for (Account request : requests) {
             if (!verify(id, request)) continue;
             selected.add(request);
         }
@@ -53,41 +53,41 @@ public record AccountRequest(String publicKey, String currency, List<Transaction
     }
 
     @Override
-    public boolean verify(String id, AccountRequest request) {
+    public boolean verify(String id, Account request) {
         try {
             PublicKey publicKey = Encoder.decodeToPublicKey(request.publicKey());
-            String hash = AccountRequest.generateHash(request.publicKey(), request.currency(), request.transactionOutputs());
+            String hash = Account.generateHash(request.publicKey(), request.currency(), request.transactionOutputs());
             if (!ECDSA.verifyECDSASignature(publicKey, hash.getBytes(UTF_8), Hex.decode(request.signature()))) return false;
         } catch (GeneralSecurityException e){
             return false;
         }
 
-        if (Data.hasAccountCache(id, request.currency())) {
+        if (Caches.hasAccountCache(id, request.currency())) {
             long sum = 0L;
             for (TransactionOutput transactionOutput : request.transactionOutputs()) {
                 sum += transactionOutput.getValue();
             }
-            Long balance = Data.getAccount(id, request.currency(), request.publicKey());
+            Long balance = Caches.getAccount(id, request.currency(), request.publicKey());
             if (!(balance >= sum)) return false;
         }
         return true;
     }
 
-    public static AccountRequest create(String id, String from, String to, String currency, Long value) throws ChainException {
+    public static Account create(String id, String from, String to, String currency, Long value) throws ChainException {
         Keypair keypair = AuxData.getKeypair(from);
         if (keypair == null) return null;
-        if (!Data.getCurrency(id, currency).publicKey().equals(keypair.publicKey())){
-            Long balance = Data.getAccount(id, currency, keypair.publicKey());
+        if (!Caches.getCurrency(id, currency).publicKey().equals(keypair.publicKey())){
+            Long balance = Caches.getAccount(id, currency, keypair.publicKey());
             if (balance < value) return null;
         }
         List<TransactionOutput> transactionOutputs = List.of(new TransactionOutput(to, currency, value));
         return create(keypair, currency, transactionOutputs);
     }
 
-    private static AccountRequest create(Keypair keypair, String currency, List<TransactionOutput> transactionOutputs) throws ChainException {
-        String hash = AccountRequest.generateHash(keypair.publicKey(), currency, transactionOutputs);
+    private static Account create(Keypair keypair, String currency, List<TransactionOutput> transactionOutputs) throws ChainException {
+        String hash = Account.generateHash(keypair.publicKey(), currency, transactionOutputs);
         byte[] signature = Signing.sign(keypair, hash);
-        return new AccountRequest(keypair.publicKey(), currency, transactionOutputs, Encoder.encodeToHexadecimal(signature));
+        return new Account(keypair.publicKey(), currency, transactionOutputs, Encoder.encodeToHexadecimal(signature));
     }
 
 

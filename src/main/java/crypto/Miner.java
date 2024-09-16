@@ -14,7 +14,7 @@ public record Miner (String id) implements Runnable {
     }
 
     public void runSynch()  {
-        for (BlockType blockType : Data.getTypes(id)) {
+        for (BlockType blockType : Caches.getTypes(id)) {
             List<? extends Request> requests = Requests.get(id, blockType);
             if (requests == null || requests.isEmpty()) continue;
             try {

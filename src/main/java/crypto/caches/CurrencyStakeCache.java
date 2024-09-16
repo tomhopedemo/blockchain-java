@@ -1,6 +1,6 @@
 package crypto.caches;
 
-import crypto.Stake;
+import crypto.StakeCacheItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,14 +20,14 @@ public class CurrencyStakeCache {
     }
 
     public static class StakeCache {
-        public List<Stake> stakes = new ArrayList<>();
+        public List<StakeCacheItem> stakes = new ArrayList<>();
 
         public void add(String publicKey, Long value, int expiry){
-            stakes.add(new Stake(publicKey, value, expiry));
+            stakes.add(new StakeCacheItem(publicKey, value, expiry));
         }
 
-        public Stake get(String publicKey) {
-            Optional<Stake> first = stakes.stream().filter(s -> publicKey.equals(s.publicKey())).findFirst();
+        public StakeCacheItem get(String publicKey) {
+            Optional<StakeCacheItem> first = stakes.stream().filter(s -> publicKey.equals(s.publicKey())).findFirst();
             return first.isPresent() ? first.get() : null;
         }
     }

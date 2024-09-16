@@ -1,11 +1,11 @@
 package crypto;
 
-import crypto.block.currency.CurrencyRequest;
-import crypto.block.data.DataRequest;
-import crypto.block.difficulty.DifficultyRequest;
+import crypto.block.Currency;
+import crypto.block.Data;
+import crypto.block.Difficulty;
+import crypto.block.Keypair;
 import crypto.service.AuxService;
 import crypto.service.ChainService;
-import org.apache.commons.lang3.builder.Diff;
 
 import java.util.Random;
 
@@ -51,7 +51,7 @@ public class Simulator {
 
     public String currency(Keypair keypair) {
         chainService.allowBlockType(BlockType.CURRENCY);
-        CurrencyRequest request = new CurrencyRequest(CURRENCY, keypair.publicKey());
+        Currency request = new Currency(CURRENCY, keypair.publicKey());
         chainService.submitRequest(request);
         Miner miner = new Miner(id);
         miner.runSynch();
@@ -61,7 +61,7 @@ public class Simulator {
 
     public void difficulty(String currency, Keypair keypair) {
         chainService.allowBlockType(DIFFICULTY);
-        DifficultyRequest request = new DifficultyRequest(1, currency, keypair.publicKey());
+        Difficulty request = new Difficulty(1, currency, keypair.publicKey());
         chainService.submitRequest(request);
         Miner miner = new Miner(id);
         miner.runSynch();
@@ -88,7 +88,7 @@ public class Simulator {
 
     public void data()  {
         chainService.allowBlockType(DATA);
-        Request request = new DataRequest(randomString(10));
+        Request request = new Data(randomString(10));
         chainService.submitRequest(request);
         Miner miner = new Miner(id);
         miner.runSynch();

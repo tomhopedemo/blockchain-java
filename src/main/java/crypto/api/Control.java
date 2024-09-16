@@ -28,7 +28,7 @@ import java.security.Security;
  *  24. separator character in pre-hash for all hashing;
  *  25. consider moving hashing methods to a separate file
  *  26. simulate and genesis to actually create required blocks for specific currency
- *  27. in Data switch back to not creating objects on get
+ *  27. in Caches switch back to not creating objects on get
  *  28. proof of work where machines are given codes for performing actual work
  *  29. share code for block creation in blockfactory
  *  30. deserialiseRequest to use enum

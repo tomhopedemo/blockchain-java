@@ -1,4 +1,4 @@
-package crypto.block.stake;
+package crypto.block;
 
 import crypto.*;
 import crypto.encoding.Encoder;
@@ -7,7 +7,7 @@ import crypto.hashing.Hashing;
 import java.util.ArrayList;
 import java.util.List;
 
-public record StakeRequest(String publicKey, String currency, long value, int index, String signature) implements Request<StakeRequest> {
+public record Stake(String publicKey, String currency, long value, int index, String signature) implements Request<Stake> {
 
     @Override
     public String getPreHash() {
@@ -24,21 +24,21 @@ public record StakeRequest(String publicKey, String currency, long value, int in
     static int SIZE = 3;
 
     @Override
-    public void mine(String id, BlockData<StakeRequest> blockData) {
+    public void mine(String id, BlockData<Stake> blockData) {
         if (!verify(id, blockData)) return;
         if (blockData.data().size() != blockData.data().stream().map(r -> r.publicKey()).distinct().toList().size()) return;
         addBlock(id, blockData);
-        int size = Data.getChain(id).blocks.size();
-        for (StakeRequest request : blockData.data()) {
-            Data.addStake(id, request.currency(), request.publicKey(), request.value(), size + BLOCK_EXPIRY);
+        int size = Caches.getChain(id).blocks.size();
+        for (Stake request : blockData.data()) {
+            Caches.addStake(id, request.currency(), request.publicKey(), request.value(), size + BLOCK_EXPIRY);
         }
         Requests.remove(id, blockData.data(), BlockType.STAKE);
     }
 
     @Override
-    public BlockData<StakeRequest> prepare(String id, List<StakeRequest> requests) {
-        List<StakeRequest> selected = new ArrayList<>();
-        for (StakeRequest request : requests) {
+    public BlockData<Stake> prepare(String id, List<Stake> requests) {
+        List<Stake> selected = new ArrayList<>();
+        for (Stake request : requests) {
             if (!verify(id, request)) continue;
             selected.add(request);
         }
@@ -46,14 +46,14 @@ public record StakeRequest(String publicKey, String currency, long value, int in
     }
 
     @Override
-    public boolean verify(String id, StakeRequest request) {
+    public boolean verify(String id, Stake request) {
         return true;
     }
 
     public static Request create(Keypair keypair, String currency) throws ChainException {
-        String hash = StakeRequest.generateHash(keypair.publicKey(), currency, SIZE, BLOCK_EXPIRY);
+        String hash = Stake.generateHash(keypair.publicKey(), currency, SIZE, BLOCK_EXPIRY);
         byte[] signature = Signing.sign(keypair, hash);
-        return new StakeRequest(keypair.publicKey(), currency, SIZE, BLOCK_EXPIRY,  Encoder.encodeToHexadecimal(signature));
+        return new Stake(keypair.publicKey(), currency, SIZE, BLOCK_EXPIRY,  Encoder.encodeToHexadecimal(signature));
     }
 
 }

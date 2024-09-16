@@ -1,5 +1,6 @@
 package crypto;
 
+import crypto.block.Keypair;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 

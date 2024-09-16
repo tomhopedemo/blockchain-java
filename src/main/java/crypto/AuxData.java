@@ -1,5 +1,7 @@
 package crypto;
 
+import crypto.block.Keypair;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

@@ -24,7 +24,7 @@ public interface Request<R extends Request> extends BlockDataHashable {
     }
 
     default void addBlock(String id, BlockData<R> blockData) {
-        Blockchain chain = Data.getChain(id);
+        Blockchain chain = Caches.getChain(id);
         Block block = new Block(blockData, chain.getMostRecentHash());
         BlockMiner.mineBlockHash(block, "0".repeat(1));
         chain.add(block);

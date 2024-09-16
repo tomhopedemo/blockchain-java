@@ -1,19 +1,20 @@
 package crypto.block.utxo;
 
 import crypto.*;
+import crypto.block.Keypair;
 
 import java.util.*;
 
 public class UTXORequestFactory {
 
-    public static UTXORequest genesis(String recipientPublicKey, String currency, long transactionValue) {
+    public static UTXO genesis(String recipientPublicKey, String currency, long transactionValue) {
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
         transactionOutputs.add(new TransactionOutput(recipientPublicKey, currency, transactionValue));
-        return new UTXORequest(new ArrayList<>(), transactionOutputs);
+        return new UTXO(new ArrayList<>(), transactionOutputs);
     }
 
-    public static UTXORequest create(String id, String from, String to, String currency, Long value) throws ChainException {
-        Keypair keypair = Data.getKeypair(id, from);
+    public static UTXO create(String id, String from, String to, String currency, Long value) throws ChainException {
+        Keypair keypair = Caches.getKeypair(id, from);
         if (keypair == null) return null;
         Map<String, TransactionOutput> unspentTransactionOutputsById = getTransactionOutputsById(id, currency, keypair);
         long balance = getBalance(unspentTransactionOutputsById);
@@ -35,7 +36,7 @@ public class UTXORequestFactory {
         List<TransactionOutput> transactionOutputs = new ArrayList<>();
         transactionOutputs.add(new TransactionOutput(to, currency, value));
         transactionOutputs.add(new TransactionOutput(keypair.publicKey(), currency, total - value));
-        return new UTXORequest(transactionInputs, transactionOutputs);
+        return new UTXO(transactionInputs, transactionOutputs);
     }
 
     private static long getBalance(Map<String, TransactionOutput> transactionOutputsById) {
@@ -45,7 +46,7 @@ public class UTXORequestFactory {
 
     public static Map<String, TransactionOutput> getTransactionOutputsById(String id, String currency, Keypair keypair) {
         Map<String, TransactionOutput> transactionOutputsById = new HashMap<>();
-        UTXOCache utxoCache = Data.getUTXOCache(id, currency);
+        UTXOCache utxoCache = Caches.getUTXOCache(id, currency);
         if (utxoCache != null) {
             for (Map.Entry<String, TransactionOutput> item : utxoCache.entrySet()) {
                 TransactionOutput transactionOutput = item.getValue();

@@ -1,25 +1,20 @@
 package crypto;
 
-import crypto.block.account.AccountRequest;
-import crypto.block.currency.CurrencyRequest;
-import crypto.block.data.DataRequest;
-import crypto.block.difficulty.DifficultyRequest;
-import crypto.block.signed.SignedRequest;
-import crypto.block.stake.StakeRequest;
-import crypto.block.utxo.UTXORequest;
+import crypto.block.*;
+import crypto.block.Currency;
 
 import java.util.*;
 
 public enum BlockType {
 
-    ACCOUNT(AccountRequest.class),
-    CURRENCY(CurrencyRequest.class),
-    DATA(DataRequest.class),
-    DIFFICULTY(DifficultyRequest.class),
+    ACCOUNT(Account.class),
+    CURRENCY(Currency.class),
+    DATA(Data.class),
+    DIFFICULTY(Difficulty.class),
     KEYPAIR(Keypair.class),
-    SIGNED(SignedRequest.class),
-    STAKE(StakeRequest.class),
-    UTXO(UTXORequest.class);
+    SIGNED(Signed.class),
+    STAKE(Stake.class),
+    UTXO(crypto.block.utxo.UTXO.class);
 
     private final Class<? extends Request> requestClass;
     private final Map<String, List<? extends Request>> requestMap;

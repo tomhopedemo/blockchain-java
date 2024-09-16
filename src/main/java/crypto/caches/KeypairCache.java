@@ -1,6 +1,6 @@
 package crypto.caches;
 
-import crypto.Keypair;
+import crypto.block.Keypair;
 
 import java.util.ArrayList;
 import java.util.List;

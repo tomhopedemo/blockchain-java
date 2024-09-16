@@ -1,6 +1,6 @@
 package crypto.cryptography;
 
-import crypto.Keypair;
+import crypto.block.Keypair;
 import crypto.encoding.Encoder;
 
 import javax.crypto.Cipher;

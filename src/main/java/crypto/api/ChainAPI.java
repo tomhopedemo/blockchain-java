@@ -3,6 +3,7 @@ package crypto.api;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import crypto.*;
+import crypto.block.Keypair;
 import crypto.service.AuxService;
 import crypto.service.ChainService;
 import org.springframework.http.ResponseEntity;

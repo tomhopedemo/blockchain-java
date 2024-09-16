@@ -1,6 +1,6 @@
-package crypto;
+package crypto.block;
 
-import crypto.block.difficulty.DifficultyRequest;
+import crypto.*;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 
@@ -28,10 +28,10 @@ public record Keypair(String privateKey, String publicKey) implements Request<Ke
     public void mine(String id, BlockData<Keypair> blockData) {
         for (Keypair request : blockData.data()) {
             if (!ECDSA.checkKeypair(request)) return;
-            if (Data.hasKey(id, request.publicKey())) return;
+            if (Caches.hasKey(id, request.publicKey())) return;
         }
         addBlock(id, blockData);
-        blockData.data().forEach(request -> Data.addKeypair(id, request));
+        blockData.data().forEach(request -> Caches.addKeypair(id, request));
         Requests.remove(id, blockData.data(), BlockType.KEYPAIR);
     }
 

@@ -10,19 +10,19 @@ public record ChainService(String id) {
 
     public void createChain() {
         Blockchain chain = new Blockchain(id);
-        Data.addChain(chain);
+        Caches.addChain(chain);
     }
 
     public boolean hasChain() {
-        return Data.hasChain(id);
+        return Caches.hasChain(id);
     }
 
     public void allowBlockType(BlockType type) {
-        Data.addType(id, type);
+        Caches.addType(id, type);
     }
 
     public Blockchain getChain(){
-        return Data.getChain(id);
+        return Caches.getChain(id);
     }
 
     public String getChainJson(){

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public record Currency(String currency, String publicKey) implements Request<Currency> {
+public record Currency(String currency, String publicKey) implements SimpleRequest<Currency> {
 
     @Override
     public String getPreHash() {
@@ -23,16 +23,6 @@ public record Currency(String currency, String publicKey) implements Request<Cur
         addBlock(id, blockData);
         blockData.data().forEach(request -> Caches.addCurrency(id, request));
         Requests.remove(id, blockData.data(), BlockType.CURRENCY);
-    }
-
-    @Override
-    public BlockData<Currency> prepare(String id, List<Currency> requests) {
-        return new BlockData<>(new ArrayList<>(requests));
-    }
-
-    @Override
-    public boolean verify(String id, Currency request) {
-        return true;
     }
 
 }

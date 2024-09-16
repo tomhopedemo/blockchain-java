@@ -14,6 +14,8 @@ public class Caches {
     static Map<String, Blockchain> chains;
     static Map<String, Set<BlockType>> allowedBlocktypes;
 
+    static Map<String, Boolean> publishedMap;
+
     static Map<String, CurrencyAccountCache> currencyAccountCaches;
     static Map<String, CurrencyCache> currencyCaches;
     static Map<String, KeypairCache> keypairCaches;
@@ -24,6 +26,7 @@ public class Caches {
     static {
         chains = new ConcurrentHashMap<>();
         allowedBlocktypes = new ConcurrentHashMap<>();
+        publishedMap = new ConcurrentHashMap<>();
         currencyAccountCaches = new ConcurrentHashMap<>();
         currencyCaches = new ConcurrentHashMap<>();
         keypairCaches = new ConcurrentHashMap<>();
@@ -135,4 +138,11 @@ public class Caches {
         return currencyUtxoCaches.get(id).get(currency);
     }
 
+    public static boolean isPublished(String id) {
+        return publishedMap.get(id);
+    }
+
+    public static void publish(String id) {
+        publishedMap.put(id, true);
+    }
 }

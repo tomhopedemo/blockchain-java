@@ -2,22 +2,11 @@ package crypto.block;
 
 import crypto.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public record Difficulty(Integer difficulty, String currency, String publicKey) implements Request<Difficulty> {
+public record Difficulty(Integer difficulty, String currency, String publicKey) implements SimpleRequest<Difficulty> {
 
     @Override
     public String getPreHash() {
         return publicKey + "~" + currency + "~" + difficulty;
-    }
-
-    public BlockData<Difficulty> prepare(String id, List<Difficulty> requests){
-        return new BlockData<>(new ArrayList<>(requests));
-    }
-
-    public boolean verify(String id, Difficulty request){
-        return true;
     }
 
     @Override

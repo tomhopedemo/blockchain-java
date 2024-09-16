@@ -12,6 +12,7 @@ public enum BlockType {
     DATA(Data.class),
     DIFFICULTY(Difficulty.class),
     KEYPAIR(Keypair.class),
+    PUBLISH(Publish.class),
     SIGNED(Signed.class),
     STAKE(Stake.class),
     UTXO(crypto.block.utxo.UTXO.class);

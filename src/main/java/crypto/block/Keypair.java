@@ -8,7 +8,7 @@ import java.security.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public record Keypair(String privateKey, String publicKey) implements Request<Keypair> {
+public record Keypair(String privateKey, String publicKey) implements SimpleRequest<Keypair> {
 
     private Keypair(PrivateKey privateKey, PublicKey publicKey) {
         this(Encoder.encodeToString(privateKey), Encoder.encodeToString(publicKey));
@@ -33,15 +33,6 @@ public record Keypair(String privateKey, String publicKey) implements Request<Ke
         addBlock(id, blockData);
         blockData.data().forEach(request -> Caches.addKeypair(id, request));
         Requests.remove(id, blockData.data(), BlockType.KEYPAIR);
-    }
-
-    public BlockData<Keypair> prepare(String id, List<Keypair> requests){
-        return new BlockData<>(new ArrayList<>(requests));
-    }
-
-    @Override
-    public boolean verify(String id, Keypair request) {
-        return true;
     }
 
 }

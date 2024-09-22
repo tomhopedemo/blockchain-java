@@ -1,11 +1,11 @@
 package crypto;
 
 import crypto.block.*;
-import crypto.hashing.Hashing;
 import crypto.service.AuxService;
 import crypto.service.ChainService;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Random;
 
 public class Simulator {
@@ -90,6 +90,16 @@ public class Simulator {
         miner.runSynch();
     }
 
+    public void referendum() throws ChainException {
+        Keypair keypair = auxService.keypair();
+        chainService.allowBlockType(Difficulty.class);
+        List<String> options = List.of("Yes", "No", "Abstain");
+        Keypair referendumKeypair = auxService.keypair();
+        Referendum request = Referendum.create(id, keypair, referendumKeypair.publicKey(), "What is the capital of Peru?", options, false);
+        chainService.submitRequest(request);
+        Miner miner = new Miner(id);
+        miner.runSynch();
+    }
 
     public Keypair create() throws ChainException {
         chainService.allowBlockType(Create.class);
@@ -153,4 +163,6 @@ public class Simulator {
         }
         return sb.toString();
     }
+
+
 }

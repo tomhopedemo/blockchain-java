@@ -84,6 +84,11 @@ import java.security.Security;
  *  all types to be signed now generalism
  *  introduce nonces at the data level ( e.g. for branch/merge)
  *  hashtype to be passed in later on in certain cases (e.g. in Aux).
+ *  publish is a trigger to let the system know to make available.
+ *  referendum to be modified to have a question field, let the name to be generated, and renamed to id. potentially rename referendum to question
+ *  referendum to have a 'population'
+ *  population block - which represents a group, which can be subscribed to. alternatively populatin which is created and the owner adds to.
+ *  generic cache
  */
 
 

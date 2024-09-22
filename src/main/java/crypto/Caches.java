@@ -20,6 +20,7 @@ public class Caches {
     static Map<String, CurrencyAccountCache> currencyAccountCaches;
     static Map<String, BranchCache> branchCaches;
     static Map<String, CurrencyCache> currencyCaches;
+    static Map<String, ReferendumCache> referendumCaches;
     static Map<String, KeypairCache> keypairCaches;
     static Map<String, CurrencyUtxoCache> currencyUtxoCaches;
     static Map<String, CurrencyStakeCache> currencyStakeCaches;
@@ -172,5 +173,9 @@ public class Caches {
         BranchCache branchCache = branchCaches.get(id);
         if (branchCache == null) return;
         branchCache.remove(branchKey);
+    }
+
+    public static void addReferendum(String id, Referendum request) {
+        referendumCaches.computeIfAbsent(id, _ -> new ReferendumCache()).add(request);
     }
 }

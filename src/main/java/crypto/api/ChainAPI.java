@@ -76,18 +76,11 @@ public class ChainAPI {
                     simulator.merge(keypair, branch.branchKey());
                 }
                 case "publish" -> {
-                    //should the chain begin with an ownership token - which when we publish the other half of
-                    //lets you know that it's ready.
-                    //alternatively we can publish with the same key but not let it known that the
-                    //so we would need to publish the ownership key with the keypair.
-                    //so keypair is required for currency. however, in order to publish you
-                    //also need to use a keypair.
-                    //is there anything that we can't do if not published? - the chain won't get picked up
-                    //and likely wont' be operated on. also publish is a trigger to let the system know to make available.
-                    //so you can begin constructing on aux, and then publish it. (or try to) - there may be id issues. (should blockchain ids be keys also?)
-
                     Keypair keypair = simulator.create();
                     simulator.publish(keypair);
+                }
+                case "referendum" -> {
+                    simulator.referendum();
                 }
                 case "stake" -> {
                     Keypair keypair = simulator.keypair();

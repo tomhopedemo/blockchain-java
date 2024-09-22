@@ -2,6 +2,7 @@ package crypto;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import crypto.hashing.Hashing;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,8 +30,9 @@ public interface Request<R extends Request> extends BlockDataHashable {
 
     default void addBlock(String id, BlockData<R> blockData) {
         Blockchain chain = Caches.getChain(id);
-        Block block = new Block(blockData, chain.getMostRecentHash());
-        BlockMiner.mineBlockHash(block, "0".repeat(1));
+        Hashing.Type hashType = Caches.getHashType(id);
+        Block block = new Block(blockData, chain.getMostRecentHash(), hashType);
+        BlockMiner.mineBlockHash(block, "0".repeat(1), hashType);
         chain.add(block);
         try {
             writeBlock(id, chain.blocks.size() - 1, block);
@@ -46,16 +48,8 @@ public interface Request<R extends Request> extends BlockDataHashable {
         Files.write(Path.of(dir + index + "-" + block.getBlockHashId()), JSON.toJson(block).getBytes());
     }
 
-
-
-    default Map<String, List<? extends Request>> getRequestMap(){
-        return requestMaps.get(this.getClass());
-    }
-
     static Map<String, List<? extends Request>> getRequestMap(Class<? extends Request> clazz){
         return requestMaps.get(clazz);
     }
-
-
 
 }

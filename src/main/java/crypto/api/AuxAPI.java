@@ -48,20 +48,13 @@ public class AuxAPI {
         return create(null, Keypair.class, () -> new AuxService(null).keypair());
     }
 
-    @GetMapping("/r/signed")
-    public ResponseEntity<?> signed(@RequestParam("id") String id,
-                                    @RequestParam("key") String key,
-                                    @RequestParam("data") String data) {
-        return create(id, Signed.class, () -> new AuxService(id).signed(key, data));
-    }
-
     @GetMapping("/r/data")
     public ResponseEntity<?> data(@RequestParam("id") String id,
-                                  @RequestParam("data") byte[] data,
-                                  @RequestParam("format") String format) {
-        return create(id, Data.class, () -> new AuxService(id).data(data, format));
+                                    @RequestParam("key") String key,
+                                    @RequestParam("data") byte[] data,
+                                    @RequestParam("format") String format) {
+        return create(id, Data.class, () -> new AuxService(id).data(key, data, format));
     }
-
 
     @GetMapping("/r/utxo")
     public ResponseEntity<?> createUtxo(@RequestParam("id") String id,

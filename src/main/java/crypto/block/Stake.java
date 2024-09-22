@@ -3,6 +3,7 @@ package crypto.block;
 import crypto.*;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
+import crypto.signing.Signing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +15,9 @@ public record Stake(String publicKey, String currency, long value, int index, St
         return signature;
     }
 
-    public static String generateHash(String publicKey, String currency, long value, int index) {
+    public static String generateHash(String publicKey, String currency, long value, int index, Hashing.Type hashType) {
         String preHash = publicKey + "~" + currency + "~" + value + "~" + index;
-        byte[] hash = Hashing.hash(preHash);
+        byte[] hash = Hashing.hash(preHash, hashType);
         return Encoder.encodeToHexadecimal(hash);
     }
 
@@ -50,8 +51,8 @@ public record Stake(String publicKey, String currency, long value, int index, St
         return true;
     }
 
-    public static Request create(Keypair keypair, String currency) throws ChainException {
-        String hash = Stake.generateHash(keypair.publicKey(), currency, SIZE, BLOCK_EXPIRY);
+    public static Request create(String id, Keypair keypair, String currency) throws ChainException {
+        String hash = Stake.generateHash(keypair.publicKey(), currency, SIZE, BLOCK_EXPIRY, Caches.getHashType(id));
         byte[] signature = Signing.sign(keypair, hash);
         return new Stake(keypair.publicKey(), currency, SIZE, BLOCK_EXPIRY,  Encoder.encodeToHexadecimal(signature));
     }

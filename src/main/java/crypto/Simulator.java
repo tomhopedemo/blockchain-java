@@ -1,9 +1,11 @@
 package crypto;
 
 import crypto.block.*;
+import crypto.hashing.Hashing;
 import crypto.service.AuxService;
 import crypto.service.ChainService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 public class Simulator {
@@ -34,6 +36,13 @@ public class Simulator {
         return to;
     }
 
+    public void branch(Keypair keypair) throws ChainException {
+        chainService.allowBlockType(Branch.class);
+        Request request = auxService.branch(keypair); //the branch/sidechain may want to have it's own public key tied up in this request.
+        chainService.submitRequest(request);
+        Miner miner = new Miner(id);
+        miner.runSynch();
+    }
 
     public void stake(Keypair keypair) throws ChainException {
         chainService.allowBlockType(Stake.class);
@@ -43,9 +52,18 @@ public class Simulator {
         miner.runSynch();
     }
 
+    public void hash(Keypair keypair) throws ChainException {
+        chainService.allowBlockType(Hash.class);
+        Request request = auxService.hash(keypair, "SHA_256");
+        chainService.submitRequest(request);
+        Miner miner = new Miner(id);
+        miner.runSynch();
+    }
+
+
     public String currency(Keypair keypair) throws ChainException {
         chainService.allowBlockType(Currency.class);
-        Currency request = Currency.create(keypair, CURRENCY);
+        Currency request = Currency.create(id, keypair, CURRENCY);
         chainService.submitRequest(request);
         Miner miner = new Miner(id);
         miner.runSynch();
@@ -70,19 +88,11 @@ public class Simulator {
         return keypair;
     }
 
-    public void signed() throws ChainException {
-        chainService.allowBlockType(Signed.class);
+    public void data() throws ChainException {
+        chainService.allowBlockType(Data.class);
         Keypair keypair = auxService.keypair();
         auxService.registerKeypair(keypair);
-        Request request = auxService.signed(keypair.publicKey(), "ABCDE");
-        chainService.submitRequest(request);
-        Miner miner = new Miner(id);
-        miner.runSynch();
-    }
-
-    public void data()  {
-        chainService.allowBlockType(Data.class);
-        Request request = new Data(randomString(10), "myformat");
+        Request request = auxService.data(keypair.publicKey(), "ABCDE".getBytes(StandardCharsets.UTF_8), "UTF_8");
         chainService.submitRequest(request);
         Miner miner = new Miner(id);
         miner.runSynch();

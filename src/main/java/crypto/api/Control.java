@@ -6,10 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.security.Security;
 /**
- *  option to choose hashing mechanism (is this for block or internal hashes?) - probably all - this would need to be the very first block
- *  hash. and could change as you go along - ownership probably. maybe change hash type. so start with one.
- *  for account genesis indication either an explicit flag (requires extra data on object)?, or based on being the first block (doesn't work with our type or future extensions to type system), or same as utxo (would have no signature - there could be a public private key) - quite like the idea as an option, but maybe not default as rewquires more data why do we need a signature, is it okay for the signature to be empty? how can we indicate it's supposed to be genesis? - i think a public private key is a really good idea. so we'll need to include this somehow.
- *  keypair block (public key, private key) - we have currency
  *  big one: data associated with transaction to be encrypted via public key
  *  should accounttransactinorequest or accounttransactionrequests contiain knowledge of the coin - i think the next step is for the holder to contain info on coin. - public private key pair indicating that the coin is public for everyone.
  *  separator character in pre-hash for all hashing;
@@ -51,7 +47,7 @@ import java.security.Security;
   * all rules/code added to chain at start.
  *  read and use latest difficulty.
  *  add staking to the BlockFactory
- *  review required use of nonce in Block hash (the index position should be usable, and perhaps automatically)
+ *  review required use of nonce as field in Block hash (the index position should be usable for nonce, and perhaps automatically)
  *  ownership (of chain) block - single public key- referenced by e.g. switch ( generalizable to multiple owners? )
  *  simulate publish
  *  pull prehash method in request to a different shared place, identify what is common with their construction and get fields reflexively in order.
@@ -79,6 +75,12 @@ import java.security.Security;
  *  fiat off ramps/on ramps
  *  generalize caches
  *  modify calculateHash in Block to an index based approach
+ *  review whether blockdatahashable/blockdata can be merged
+ *  make project private
+ *  requests remove (switch around parameters)
+ *  change public key to key (except for keypair/and encryption protocols)
+ *  execute before 'block'
+ *  time/date onramp/integration
  */
 
 

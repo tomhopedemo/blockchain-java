@@ -7,9 +7,9 @@ public interface BlockDataHashable {
 
     String getPreHash() ;
 
-    default String getBlockDataHash() {
+    default String getBlockDataHash(Hashing.Type hashType) {
         String preHash = getPreHash();
-        byte[] hash = Hashing.hash(preHash);
+        byte[] hash = Hashing.hash(preHash, hashType);
         return Encoder.encodeToHexadecimal(hash);
     }
 

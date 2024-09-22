@@ -3,6 +3,7 @@ package crypto.block;
 import crypto.*;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
+import crypto.signing.Signing;
 
 public record Currency(String currency, String key, String signature) implements SimpleRequest<Currency> {
 
@@ -20,15 +21,15 @@ public record Currency(String currency, String key, String signature) implements
     @Override
     public String getPreHash() {return signature;}
 
-    public static Currency create(Keypair keypair, String currency) throws ChainException {
-        String hash = generateHash(keypair.publicKey(), currency);
+    public static Currency create(String id, Keypair keypair, String currency) throws ChainException {
+        String hash = generateHash(keypair.publicKey(), currency, Caches.getHashType(id));
         byte[] signature = Signing.sign(keypair, hash);
         return new Currency(currency, keypair.publicKey(), Encoder.encodeToHexadecimal(signature));
     }
 
-    public static String generateHash(String key, String currency) {
+    public static String generateHash(String key, String currency, Hashing.Type hashType) {
         String preHash = key + "~" + currency;
-        byte[] hash = Hashing.hash(preHash);
+        byte[] hash = Hashing.hash(preHash, hashType);
         return Encoder.encodeToHexadecimal(hash);
     }
 

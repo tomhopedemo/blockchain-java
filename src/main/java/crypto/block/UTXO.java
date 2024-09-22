@@ -4,6 +4,8 @@ import crypto.*;
 import crypto.caches.UTXOCache;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
+import crypto.hashing.Hashing;
+import crypto.signing.Signing;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.security.GeneralSecurityException;
@@ -50,10 +52,11 @@ public record UTXO(List<TransactionInput> transactionInputs,  List<TransactionOu
             }
         }
         addBlock(id, requests);
+        Hashing.Type hashType = Caches.getHashType(id);
         for (UTXO utxoRequest : requests.data()) {
             String currency = utxoRequest.getTransactionOutputs().getFirst().currency();
             for (TransactionOutput transactionOutput : utxoRequest.getTransactionOutputs()) {
-                Caches.addUtxo(id, currency, transactionOutput.generateTransactionOutputHash(utxoRequest.getBlockDataHash()), transactionOutput);
+                Caches.addUtxo(id, currency, transactionOutput.generateTransactionOutputHash(utxoRequest.getBlockDataHash(hashType), hashType), transactionOutput);
             }
             for (TransactionInput transactionInput : utxoRequest.getTransactionInputs()) {
                 Caches.removeUtxo(id, currency, transactionInput.transactionOutputHash());

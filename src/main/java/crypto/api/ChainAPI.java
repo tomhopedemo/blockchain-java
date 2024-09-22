@@ -39,6 +39,7 @@ public class ChainAPI {
     }
 
     @GetMapping("/c/simulate")
+    //i guess there is no reason why we can't pull the types from the directory
     public ResponseEntity<?> simulate(@RequestParam("type") String type) {
         String id = UUID.randomUUID().toString();
         ChainService chainService = new ChainService(id);
@@ -47,10 +48,9 @@ public class ChainAPI {
         Simulator service = new Simulator(id);
         try {
             switch (type) {
-                case "transaction" -> {
+                case "branch" -> {
                     Keypair keypair = service.keypair();
-                    service.currency(keypair);
-                    service.account(keypair);
+                    service.branch(keypair);
                 }
                 case "currency" -> {
                     Keypair keypair = service.keypair();
@@ -62,13 +62,21 @@ public class ChainAPI {
                     String currency = service.currency(keypair);
                     service.difficulty(currency, keypair);
                 }
+                case "hash" -> {
+                    Keypair keypair = service.keypair();
+                    service.hash(keypair);
+                }
                 case "keypair" -> service.keypair();
-                case "signed" -> service.signed();
                 case "stake" -> {
                     Keypair keypair = service.keypair();
                     service.currency(keypair);
                     Keypair accountKeypair = service.account(keypair);
                     service.stake(accountKeypair);
+                }
+                case "transaction" -> {
+                    Keypair keypair = service.keypair();
+                    service.currency(keypair);
+                    service.account(keypair);
                 }
                 case "utxo" -> service.utxo();
             }

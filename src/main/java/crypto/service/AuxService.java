@@ -2,6 +2,7 @@ package crypto.service;
 
 import crypto.*;
 import crypto.block.*;
+import crypto.hashing.Hashing;
 
 import java.util.List;
 
@@ -32,25 +33,29 @@ public record AuxService(String id) {
     public Request currency(String key, String value) throws ChainException {
         Keypair keypair = Caches.getKeypair(id, key);
         if (keypair == null) return null;
-        return Currency.create(keypair, value);
-    }
-
-    public Request data(byte[] value, String dataFormat) {
-        return new Data(value, dataFormat);
+        return Currency.create(id, keypair, value);
     }
 
     public Keypair keypair() {
         return Keypair.create();
     }
 
-    public Request signed(String key, String value) throws ChainException {
+    public Request data(String key, byte[] data, String format) throws ChainException {
         Keypair keypair = Caches.getKeypair(id, key);
         if (keypair == null) return null;
-        return Signed.create(keypair, value);
+        return Data.create(id, keypair, data, format);
+    }
+
+    public Request branch(Keypair keypair) throws ChainException {
+        return Branch.create(id, keypair);
     }
 
     public Request stake(Keypair keypair, String currency) throws ChainException {
-        return Stake.create(keypair, currency);
+        return Stake.create(id, keypair, currency);
+    }
+
+    public Request hash(Keypair keypair, String hashType) throws ChainException {
+        return Hash.create(id, keypair, Hashing.Type.valueOf(hashType));
     }
 
     public Request utxo(String from, String to, String currency, Long value) throws ChainException {

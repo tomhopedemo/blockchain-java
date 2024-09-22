@@ -4,6 +4,7 @@ import crypto.*;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
+import crypto.signing.Signing;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.security.GeneralSecurityException;
@@ -43,7 +44,7 @@ public record Transaction(String publicKey, String currency, List<TransactionOut
     public boolean verify(String id, Transaction request) {
         try {
             PublicKey publicKey = Encoder.decodeToPublicKey(request.publicKey());
-            String hash = generateHash(request.publicKey(), request.currency(), request.transactionOutputs());
+            String hash = generateHash(request.publicKey(), request.currency(), request.transactionOutputs(), Caches.getHashType(id));
             if (!ECDSA.verifyECDSASignature(publicKey, hash.getBytes(UTF_8), Hex.decode(request.signature()))) return false;
         } catch (GeneralSecurityException e){
             return false;
@@ -73,19 +74,19 @@ public record Transaction(String publicKey, String currency, List<TransactionOut
             if (balance < value) return null;
         }
         List<TransactionOutput> transactionOutputs = List.of(new TransactionOutput(to, currency, value));
-        return create(keypair, currency, transactionOutputs);
+        return create(id, keypair, currency, transactionOutputs);
     }
 
-    private static Transaction create(Keypair keypair, String currency, List<TransactionOutput> transactionOutputs) throws ChainException {
-        String hash = generateHash(keypair.publicKey(), currency, transactionOutputs);
+    private static Transaction create(String id, Keypair keypair, String currency, List<TransactionOutput> transactionOutputs) throws ChainException {
+        String hash = generateHash(keypair.publicKey(), currency, transactionOutputs, Caches.getHashType(id));
         byte[] signature = Signing.sign(keypair, hash);
         return new Transaction(keypair.publicKey(), currency, transactionOutputs, Encoder.encodeToHexadecimal(signature));
     }
 
-    public static String generateHash(String publicKey, String currency, List<TransactionOutput> transactionOutputs) {
+    public static String generateHash(String publicKey, String currency, List<TransactionOutput> transactionOutputs, Hashing.Type hashType) {
         String preHash = publicKey + "~" + currency + "~" +
                 String.join("@", transactionOutputs.stream().map(transactionOutput -> transactionOutput.serialise()).toList());
-        byte[] hash = Hashing.hash(preHash);
+        byte[] hash = Hashing.hash(preHash, hashType);
         return Encoder.encodeToHexadecimal(hash);
     }
 

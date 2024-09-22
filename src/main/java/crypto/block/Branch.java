@@ -3,6 +3,7 @@ package crypto.block;
 import crypto.*;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
+import crypto.signing.Signing;
 
 
 //alternatively - we create the branch and then allow the currencies to be registered on branch.
@@ -45,6 +46,13 @@ import crypto.hashing.Hashing;
 //there would not be operations directly from one branch to the other
 //rather we would rely on an intermediary to connect the two toegether.
 
+//how do we know which hashing mechanism to use for generating requests now -
+//when the hashing mechanism needs to be changed, will there be a lot of notice,
+//are there restrictions on how it is changed to prevent issues with creating requests
+//maybe we can say that once the chain is 'published' the hashing mechanism is fixed.
+
+//however i think it's better to allow it to be modified - it would be changed by the owner
+//
 
 public record Branch(String key, String signature) implements SimpleRequest<Branch> {
 
@@ -60,16 +68,16 @@ public record Branch(String key, String signature) implements SimpleRequest<Bran
         return signature;
     }
 
-    public static Branch create(Keypair keypair, String currency) throws ChainException {
-        String hash = generateHash(keypair.publicKey(), currency);
+    public static Branch create(String id, Keypair keypair) throws ChainException {
+        String hash = generateHash(keypair.publicKey(), Caches.getHashType(id));
+        //will need to sign with precise more information than this/a nonce
         byte[] signature = Signing.sign(keypair, hash);
-
         return new Branch(keypair.publicKey(), Encoder.encodeToHexadecimal(signature));
     }
 
-    public static String generateHash(String key, String currency) {
-        String preHash = key + "~" + currency;
-        byte[] hash = Hashing.hash(preHash);
+    public static String generateHash(String key, Hashing.Type hashType) {
+        String preHash = key;
+        byte[] hash = Hashing.hash(preHash, hashType);
         return Encoder.encodeToHexadecimal(hash);
     }
 }

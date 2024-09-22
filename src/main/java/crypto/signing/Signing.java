@@ -1,5 +1,6 @@
-package crypto;
+package crypto.signing;
 
+import crypto.ChainException;
 import crypto.block.Keypair;
 import crypto.cryptography.ECDSA;
 import crypto.encoding.Encoder;

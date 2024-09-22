@@ -1,11 +1,10 @@
 package crypto;
 
-import crypto.block.Branch;
+import crypto.block.*;
 import crypto.block.Currency;
-import crypto.block.Difficulty;
-import crypto.block.Keypair;
 import crypto.caches.UTXOCache;
 import crypto.caches.*;
+import crypto.hashing.Hashing;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,6 +23,7 @@ public class Caches {
     static Map<String, CurrencyUtxoCache> currencyUtxoCaches;
     static Map<String, CurrencyStakeCache> currencyStakeCaches;
     static Map<String, DifficultyCache> difficultyCaches;
+    static Map<String, Hashing.Type> protocolCache;
 
     static {
         chains = new ConcurrentHashMap<>();
@@ -152,6 +152,15 @@ public class Caches {
 
     public static void publish(String id) {
         publishedCache.put(id, true);
+    }
+
+    public static void setHashType(String id, Hashing.Type hashType) {
+        protocolCache.put(id, hashType);
+    }
+
+    public static Hashing.Type getHashType(String id) {
+        Hashing.Type type = protocolCache.get(id);
+        return type == null ? Hashing.Type.SHA3_256 : type;
     }
 
 }

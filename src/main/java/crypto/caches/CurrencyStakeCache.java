@@ -1,7 +1,5 @@
 package crypto.caches;
 
-import crypto.StakeCacheItem;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

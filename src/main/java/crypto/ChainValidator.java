@@ -10,7 +10,7 @@ public class ChainValidator {
                 return false;
             }
 
-            String blockHash  = block.calculateHash();
+            String blockHash  = block.calculateHash(Caches.getHashType(id));
             if (!blockHash.equals(block.getBlockHashId())){
                 return false;
             }

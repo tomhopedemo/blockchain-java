@@ -17,9 +17,10 @@ public record TransactionOutput (String recipient, String currency, String value
         return recipient;
     }
 
-    public String generateTransactionOutputHash(String transactionRequestHash) {
+    public String generateTransactionOutputHash(String transactionRequestHash, Hashing.Type hashtype) {
         String preHash = recipient + currency + transactionRequestHash + value;
-        byte[] hash = Hashing.hash(preHash);
+
+        byte[] hash = Hashing.hash(preHash, hashtype);
         return Encoder.encodeToHexadecimal(hash);
     }
 

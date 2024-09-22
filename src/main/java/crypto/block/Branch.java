@@ -54,7 +54,7 @@ import crypto.signing.Signing;
 //however i think it's better to allow it to be modified - it would be changed by the owner
 //
 
-public record Branch(String key, String signature) implements SimpleRequest<Branch> {
+public record Branch(String key, String branchKey, String signature) implements SimpleRequest<Branch> {
 
     @Override
     public void mine(String id, BlockData<Branch> blockData) {
@@ -68,15 +68,14 @@ public record Branch(String key, String signature) implements SimpleRequest<Bran
         return signature;
     }
 
-    public static Branch create(String id, Keypair keypair) throws ChainException {
-        String hash = generateHash(keypair.publicKey(), Caches.getHashType(id));
-        //will need to sign with precise more information than this/a nonce
+    public static Branch create(String id, Keypair keypair, String branchId) throws ChainException {
+        String hash = generateHash(keypair.publicKey(), branchId, Caches.getHashType(id));
         byte[] signature = Signing.sign(keypair, hash);
-        return new Branch(keypair.publicKey(), Encoder.encodeToHexadecimal(signature));
+        return new Branch(keypair.publicKey(), branchId, Encoder.encodeToHexadecimal(signature));
     }
 
-    public static String generateHash(String key, Hashing.Type hashType) {
-        String preHash = key;
+    public static String generateHash(String key, String branchId, Hashing.Type hashType) {
+        String preHash = key + "~" + branchId + "~" + Branch.class.getName();
         byte[] hash = Hashing.hash(preHash, hashType);
         return Encoder.encodeToHexadecimal(hash);
     }

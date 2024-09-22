@@ -81,6 +81,9 @@ import java.security.Security;
  *  change public key to key (except for keypair/and encryption protocols)
  *  execute before 'block'
  *  time/date onramp/integration
+ *  all types to be signed now generalism
+ *  introduce nonces at the data level ( e.g. for branch/merge)
+ *  hashtype to be passed in later on in certain cases (e.g. in Aux).
  */
 
 

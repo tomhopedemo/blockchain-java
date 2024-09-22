@@ -46,9 +46,14 @@ public record AuxService(String id) {
         return Data.create(id, keypair, data, format);
     }
 
-    public Request branch(Keypair keypair) throws ChainException {
-        return Branch.create(id, keypair);
+    public Request branch(Keypair keypair, String branchKey) throws ChainException {
+        return Branch.create(id, keypair, branchKey);
     }
+
+    public Request merge(Keypair keypair, String branchKey) throws ChainException {
+        return Merge.create(id, keypair, branchKey);
+    }
+
 
     public Request stake(Keypair keypair, String currency) throws ChainException {
         return Stake.create(id, keypair, currency);

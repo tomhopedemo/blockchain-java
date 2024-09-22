@@ -163,4 +163,9 @@ public class Caches {
         return type == null ? Hashing.Type.SHA3_256 : type;
     }
 
+    public static void removeBranch(String id, String branchKey) {
+        BranchCache branchCache = branchCaches.get(id);
+        if (branchCache == null) return;
+        branchCache.remove(branchKey);
+    }
 }

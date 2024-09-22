@@ -36,9 +36,20 @@ public class Simulator {
         return to;
     }
 
-    public void branch(Keypair keypair) throws ChainException {
+    public Branch branch(Keypair keypair) throws ChainException {
         chainService.allowBlockType(Branch.class);
-        Request request = auxService.branch(keypair); //the branch/sidechain may want to have it's own public key tied up in this request.
+        Keypair branchKeypair = auxService.keypair();
+        Branch request = (Branch) auxService.branch(keypair, branchKeypair.publicKey()); //the branch/sidechain may want to have it's own public key tied up in this request.
+        chainService.submitRequest(request);
+        Miner miner = new Miner(id);
+        miner.runSynch();
+        return request;
+    }
+
+
+    public void merge(Keypair keypair, String branchKey) throws ChainException {
+        chainService.allowBlockType(Merge.class);
+        Request request = auxService.merge(keypair, branchKey); //the branch/sidechain may want to have it's own public key tied up in this request.
         chainService.submitRequest(request);
         Miner miner = new Miner(id);
         miner.runSynch();

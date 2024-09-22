@@ -67,6 +67,12 @@ public class ChainAPI {
                     service.hash(keypair);
                 }
                 case "keypair" -> service.keypair();
+                case "merge" -> {
+                    Keypair keypair = service.keypair();
+
+                    Branch branch = service.branch(keypair);
+                    service.merge(keypair, branch.branchKey());
+                }
                 case "stake" -> {
                     Keypair keypair = service.keypair();
                     service.currency(keypair);

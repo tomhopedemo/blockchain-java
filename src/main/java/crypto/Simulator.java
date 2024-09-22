@@ -111,6 +111,17 @@ public class Simulator {
         return keypair;
     }
 
+
+    public void stock() throws ChainException {
+        chainService.allowBlockType(Stock.class);
+        Keypair keypair = auxService.keypair();
+        Keypair stockKeypair = auxService.keypair(); //can be a uuid instead of a public key.
+        Stock stock = auxService.stock(keypair, stockKeypair.publicKey(), 1);
+        chainService.submitRequest(stock);
+        Miner miner = new Miner(id);
+        miner.runSynch();
+    }
+
     public void publish(Keypair keypair) throws ChainException {
         chainService.allowBlockType(Publish.class);
         Request request = auxService.publish(keypair);

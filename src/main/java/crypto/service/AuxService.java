@@ -84,4 +84,8 @@ public record AuxService(String id) {
     public Request publish(Keypair keypair) throws ChainException {
         return Publish.create(id, keypair);
     }
+
+    public Stock stock(Keypair keypair, String stockKey, long update) throws ChainException {
+        return Stock.create(id, keypair, stockKey, update);
+    }
 }

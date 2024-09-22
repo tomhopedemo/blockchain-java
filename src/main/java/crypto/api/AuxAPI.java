@@ -28,7 +28,7 @@ public class AuxAPI {
     }
 
     @GetMapping("/r/account")
-    public ResponseEntity<?> account(@RequestParam("id") String id,
+    public ResponseEntity<?> account(@RequestParam("stockKey") String id,
                                      @RequestParam("from") String from,
                                      @RequestParam("to") String to,
                                      @RequestParam("currency") String currency,
@@ -37,7 +37,7 @@ public class AuxAPI {
     }
 
     @GetMapping("/r/currency")
-    public ResponseEntity<?> currency(@RequestParam("id") String id,
+    public ResponseEntity<?> currency(@RequestParam("stockKey") String id,
                                       @RequestParam("key") String key,
                                       @RequestParam("value") String value) {
         return create(id, Currency.class, () -> new AuxService(id).currency(key, value));
@@ -49,7 +49,7 @@ public class AuxAPI {
     }
 
     @GetMapping("/r/data")
-    public ResponseEntity<?> data(@RequestParam("id") String id,
+    public ResponseEntity<?> data(@RequestParam("stockKey") String id,
                                     @RequestParam("key") String key,
                                     @RequestParam("data") byte[] data,
                                     @RequestParam("format") String format) {
@@ -57,7 +57,7 @@ public class AuxAPI {
     }
 
     @GetMapping("/r/utxo")
-    public ResponseEntity<?> createUtxo(@RequestParam("id") String id,
+    public ResponseEntity<?> createUtxo(@RequestParam("stockKey") String id,
                                         @RequestParam("from") String from,
                                         @RequestParam("to") String to,
                                         @RequestParam("currency") String currency,
@@ -67,7 +67,7 @@ public class AuxAPI {
 
 
     @GetMapping("/validate")
-    public ResponseEntity<?> get(@RequestParam("id") String id) {
+    public ResponseEntity<?> get(@RequestParam("stockKey") String id) {
         boolean validate = new AuxService(id).validate();
         return new ResponseEntity<>(validate, OK);
     }

@@ -25,7 +25,7 @@ public class ChainAPI {
     static ResponseEntity<Object> ERROR = new ResponseEntity<>(INTERNAL_SERVER_ERROR);
 
     @GetMapping("/c/new")
-    public ResponseEntity<?> create(@RequestParam("id") String id) {
+    public ResponseEntity<?> create(@RequestParam("stockKey") String id) {
         ChainService chainService = new ChainService(id);
         if (chainService.hasChain()) return ERROR;
         chainService.createChain();
@@ -34,7 +34,7 @@ public class ChainAPI {
     }
 
     @GetMapping("/c/get")
-    public String get(@RequestParam("id") String id) {
+    public String get(@RequestParam("stockKey") String id) {
         return new ChainService(id).getChainJson();
     }
 
@@ -88,6 +88,9 @@ public class ChainAPI {
                     Keypair accountKeypair = simulator.account(keypair);
                     simulator.stake(accountKeypair);
                 }
+                case "stock" -> {
+                    simulator.stock();
+                }
                 case "transaction" -> {
                     Keypair keypair = simulator.keypair();
                     simulator.currency(keypair);
@@ -103,7 +106,7 @@ public class ChainAPI {
     }
 
     @GetMapping("/c/add")
-    public ResponseEntity<?> submit(@RequestParam("id") String id,
+    public ResponseEntity<?> submit(@RequestParam("stockKey") String id,
                                     @RequestParam("type") String type,
                                     @RequestParam("requestJson") String requestJson){
         ChainService chainService = new ChainService(id);
@@ -121,7 +124,7 @@ public class ChainAPI {
     }
 
     @GetMapping("/c/genesis")
-    public ResponseEntity<?> genesis(@RequestParam("id") String id,
+    public ResponseEntity<?> genesis(@RequestParam("stockKey") String id,
                                      @RequestParam("type") String type,
                                      @RequestParam("key") String publicKey,
                                      @RequestParam("currency") String currency,

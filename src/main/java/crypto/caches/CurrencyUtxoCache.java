@@ -1,7 +1,6 @@
 package crypto.caches;
 
 import crypto.TransactionOutput;
-import crypto.block.utxo.UTXOCache;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

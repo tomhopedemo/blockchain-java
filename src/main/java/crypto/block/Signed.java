@@ -31,7 +31,7 @@ public record Signed(String publicKey, String value, String signature) implement
     public void mine(String id, BlockData<Signed> blockData) {
         if (!verify(id, blockData)) return;
         addBlock(id, blockData);
-        Requests.remove(id, blockData.data(), BlockType.SIGNED);
+        Requests.remove(id, blockData.data(), this.getClass());
     }
 
     @Override

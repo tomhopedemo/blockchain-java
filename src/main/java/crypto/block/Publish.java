@@ -2,6 +2,8 @@ package crypto.block;
 
 import crypto.*;
 
+//this could be generalized to a flag mechanism. //also will require signature.
+//cleaner mechansim for blocks with a single instance.
 public record Publish(String publicKey) implements SimpleRequest<Publish> {
 
     @Override
@@ -12,7 +14,7 @@ public record Publish(String publicKey) implements SimpleRequest<Publish> {
         if (!verify(id, first)) return;
         addBlock(id, blockData);
         Caches.publish(id);
-        Requests.remove(id, blockData.data(), BlockType.PUBLISH);
+        Requests.remove(id, blockData.data(), this.getClass());
     }
 
     @Override

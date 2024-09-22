@@ -6,22 +6,21 @@ import java.util.Map;
 
 public class Requests {
 
-    private static Map getMap(BlockType blockType) {
-        return blockType.getRequestMap();
+    private static Map getMap(Class<? extends Request> type) {
+        return Request.getRequestMap(type);
     }
 
     public static void add(String id, Request request) {
-        BlockType blockType = BlockType.getType(request.getClass());
-        Map requests = getMap(blockType);
+        Map requests = getMap(request.getClass());
         ((List) requests.computeIfAbsent(id, _ -> new ArrayList<>())).add(request);
     }
 
-    public static List<? extends Request> get(String id, BlockType blockType) {
-        return (List) getMap(blockType).get(id);
+    public static List<? extends Request> get(String id, Class<? extends Request> type) {
+        return (List) getMap(type).get(id);
     }
 
-    public static void remove(String id, List<? extends Request> requests, BlockType blockType) {
-        List<? extends Request> found = get(id, blockType);
+    public static void remove(String id, List<? extends Request> requests, Class<? extends Request> type) {
+        List<? extends Request> found = get(id, type);
         if (found != null) found.removeAll(requests);
     }
 

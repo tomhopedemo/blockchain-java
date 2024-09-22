@@ -1,16 +1,10 @@
 package crypto;
 
-import crypto.block.Currency;
-import crypto.block.Data;
-import crypto.block.Difficulty;
-import crypto.block.Keypair;
+import crypto.block.*;
 import crypto.service.AuxService;
 import crypto.service.ChainService;
 
 import java.util.Random;
-
-import static crypto.BlockType.*;
-import static crypto.BlockType.UTXO;
 
 public class Simulator {
     private final String id;
@@ -26,7 +20,7 @@ public class Simulator {
     }
 
     public Keypair account(Keypair keypair) throws ChainException {
-        chainService.allowBlockType(ACCOUNT);
+        chainService.allowBlockType(Transaction.class);
         auxService.registerKeypair(keypair);
         Request genesisRequest = auxService.account(keypair.publicKey(), keypair.publicKey(), CURRENCY, 100L);
         chainService.submitRequest(genesisRequest);
@@ -42,16 +36,16 @@ public class Simulator {
 
 
     public void stake(Keypair keypair) throws ChainException {
-        chainService.allowBlockType(STAKE);
+        chainService.allowBlockType(Stake.class);
         Request request = auxService.stake(keypair, CURRENCY);
         chainService.submitRequest(request);
         Miner miner = new Miner(id);
         miner.runSynch();
     }
 
-    public String currency(Keypair keypair) {
-        chainService.allowBlockType(BlockType.CURRENCY);
-        Currency request = new Currency(CURRENCY, keypair.publicKey());
+    public String currency(Keypair keypair) throws ChainException {
+        chainService.allowBlockType(Currency.class);
+        Currency request = Currency.create(keypair, CURRENCY);
         chainService.submitRequest(request);
         Miner miner = new Miner(id);
         miner.runSynch();
@@ -60,7 +54,7 @@ public class Simulator {
 
 
     public void difficulty(String currency, Keypair keypair) {
-        chainService.allowBlockType(DIFFICULTY);
+        chainService.allowBlockType(Difficulty.class);
         Difficulty request = new Difficulty(1, currency, keypair.publicKey());
         chainService.submitRequest(request);
         Miner miner = new Miner(id);
@@ -68,7 +62,7 @@ public class Simulator {
     }
 
     public Keypair keypair() {
-        chainService.allowBlockType(KEYPAIR);
+        chainService.allowBlockType(Keypair.class);
         Keypair keypair = auxService.keypair();
         chainService.submitRequest(keypair);
         Miner miner = new Miner(id);
@@ -77,7 +71,7 @@ public class Simulator {
     }
 
     public void signed() throws ChainException {
-        chainService.allowBlockType(SIGNED);
+        chainService.allowBlockType(Signed.class);
         Keypair keypair = auxService.keypair();
         auxService.registerKeypair(keypair);
         Request request = auxService.signed(keypair.publicKey(), "ABCDE");
@@ -87,15 +81,15 @@ public class Simulator {
     }
 
     public void data()  {
-        chainService.allowBlockType(DATA);
-        Request request = new Data(randomString(10));
+        chainService.allowBlockType(Data.class);
+        Request request = new Data(randomString(10), "myformat");
         chainService.submitRequest(request);
         Miner miner = new Miner(id);
         miner.runSynch();
     }
 
     public void utxo() throws ChainException {
-        chainService.allowBlockType(UTXO);
+        chainService.allowBlockType(UTXO.class);
         Keypair keypair = auxService.keypair();
         auxService.registerKeypair(keypair);
 

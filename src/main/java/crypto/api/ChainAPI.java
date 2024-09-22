@@ -3,7 +3,7 @@ package crypto.api;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import crypto.*;
-import crypto.block.Keypair;
+import crypto.block.*;
 import crypto.service.AuxService;
 import crypto.service.ChainService;
 import org.springframework.http.ResponseEntity;
@@ -46,31 +46,31 @@ public class ChainAPI {
         chainService.disableAutoMining();
         Simulator service = new Simulator(id);
         try {
-            switch (BlockType.valueOf(type)) {
-                case ACCOUNT -> {
+            switch (type) {
+                case "transaction" -> {
                     Keypair keypair = service.keypair();
                     service.currency(keypair);
                     service.account(keypair);
                 }
-                case CURRENCY -> {
+                case "currency" -> {
                     Keypair keypair = service.keypair();
                     service.currency(keypair);
                 }
-                case DATA -> service.data();
-                case DIFFICULTY -> {
+                case "data" -> service.data();
+                case "difficulty" -> {
                     Keypair keypair = service.keypair();
                     String currency = service.currency(keypair);
                     service.difficulty(currency, keypair);
                 }
-                case KEYPAIR -> service.keypair();
-                case SIGNED -> service.signed();
-                case STAKE -> {
+                case "keypair" -> service.keypair();
+                case "signed" -> service.signed();
+                case "stake" -> {
                     Keypair keypair = service.keypair();
                     service.currency(keypair);
                     Keypair accountKeypair = service.account(keypair);
                     service.stake(accountKeypair);
                 }
-                case UTXO -> service.utxo();
+                case "utxo" -> service.utxo();
             }
             return new ResponseEntity<>(chainService.getChainJson(), OK);
         } catch (Exception e){
@@ -85,8 +85,13 @@ public class ChainAPI {
                                     @RequestParam("requestJson") String requestJson){
         ChainService chainService = new ChainService(id);
         if (!chainService.hasChain()) return ERROR;
-        BlockType blockType = BlockType.valueOf(type);
-        Request request = JSON.fromJson(requestJson, blockType.getRequestClass());
+        Class<? extends Request> clazz;
+        try {
+            clazz = (Class<? extends Request>) Class.forName("crypto.block." + type);
+        } catch (ClassNotFoundException e) {
+            return ERROR;
+        }
+        Request request = JSON.fromJson(requestJson, clazz);
         chainService.submitRequest(request);
         chainService.requestMiner();
         return new ResponseEntity<>(chainService.getChainJson(), OK);

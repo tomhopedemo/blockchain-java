@@ -32,7 +32,7 @@ public record Stake(String publicKey, String currency, long value, int index, St
         for (Stake request : blockData.data()) {
             Caches.addStake(id, request.currency(), request.publicKey(), request.value(), size + BLOCK_EXPIRY);
         }
-        Requests.remove(id, blockData.data(), BlockType.STAKE);
+        Requests.remove(id, blockData.data(), this.getClass());
     }
 
     @Override

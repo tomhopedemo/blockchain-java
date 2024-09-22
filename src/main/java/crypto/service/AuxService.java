@@ -2,10 +2,8 @@ package crypto.service;
 
 import crypto.*;
 import crypto.block.*;
-import crypto.block.utxo.UTXORequestFactory;
 
 import java.util.List;
-
 
 public record AuxService(String id) {
 
@@ -24,21 +22,21 @@ public record AuxService(String id) {
     public Request utxoGenesis(String publicKey, String currency, Object value) {
         Keypair keypair = Caches.getKeypair(id, publicKey);
         if (keypair == null) return null;
-        return UTXORequestFactory.genesis(keypair.publicKey(), currency, (Long) value);
+        return UTXO.genesis(keypair.publicKey(), currency, (Long) value);
     }
 
     public Request account(String from, String to, String currency, Long value) throws ChainException {
-        return Account.create(id, from, to, currency, value);
+        return Transaction.create(id, from, to, currency, value);
     }
 
     public Request currency(String key, String value) throws ChainException {
         Keypair keypair = Caches.getKeypair(id, key);
         if (keypair == null) return null;
-        return new Currency(value, keypair.publicKey());
+        return Currency.create(keypair, value);
     }
 
-    public Request data(String value) {
-        return new Data(value);
+    public Request data(byte[] value, String dataFormat) {
+        return new Data(value, dataFormat);
     }
 
     public Keypair keypair() {
@@ -56,7 +54,7 @@ public record AuxService(String id) {
     }
 
     public Request utxo(String from, String to, String currency, Long value) throws ChainException {
-        return UTXORequestFactory.create(id, from, to, currency, value);
+        return UTXO.create(id, from, to, currency, value);
     }
 
     public boolean validate() {

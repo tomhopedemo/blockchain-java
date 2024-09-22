@@ -32,7 +32,7 @@ public record Keypair(String privateKey, String publicKey) implements SimpleRequ
         }
         addBlock(id, blockData);
         blockData.data().forEach(request -> Caches.addKeypair(id, request));
-        Requests.remove(id, blockData.data(), BlockType.KEYPAIR);
+        Requests.remove(id, blockData.data(), this.getClass());
     }
 
 }

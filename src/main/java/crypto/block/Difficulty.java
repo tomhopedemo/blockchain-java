@@ -16,7 +16,7 @@ public record Difficulty(Integer difficulty, String currency, String publicKey) 
         }
         addBlock(id, blockData);
         blockData.data().forEach(request -> Caches.addDifficulty(id, request));
-        Requests.remove(id, blockData.data(), BlockType.CURRENCY);
+        Requests.remove(id, blockData.data(), this.getClass());
     }
 
 }

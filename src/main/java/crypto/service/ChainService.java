@@ -17,7 +17,7 @@ public record ChainService(String id) {
         return Caches.hasChain(id);
     }
 
-    public void allowBlockType(BlockType type) {
+    public void allowBlockType(Class<? extends Request> type) {
         Caches.addType(id, type);
     }
 

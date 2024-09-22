@@ -18,6 +18,7 @@ public class Block {
         this.previousBlockHashId = previousHashId == null ? "" : previousHashId;
     }
 
+    //modify to an index based approach
     public String calculateHash(int nonce) {
         String preHash = previousBlockHashId + nonce + blockDataHash;
         byte[] hash = Hashing.hash(preHash);

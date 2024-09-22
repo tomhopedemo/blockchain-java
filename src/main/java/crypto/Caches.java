@@ -1,9 +1,10 @@
 package crypto;
 
+import crypto.block.Branch;
 import crypto.block.Currency;
 import crypto.block.Difficulty;
 import crypto.block.Keypair;
-import crypto.block.utxo.UTXOCache;
+import crypto.caches.UTXOCache;
 import crypto.caches.*;
 
 import java.util.*;
@@ -12,11 +13,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Caches {
 
     static Map<String, Blockchain> chains;
-    static Map<String, Set<BlockType>> allowedBlocktypes;
+    static Map<String, Set<Class<? extends Request>>> allowedBlocktypes;
 
-    static Map<String, Boolean> publishedMap;
+    static Map<String, Boolean> publishedCache;
 
     static Map<String, CurrencyAccountCache> currencyAccountCaches;
+    static Map<String, BranchCache> branchCaches;
     static Map<String, CurrencyCache> currencyCaches;
     static Map<String, KeypairCache> keypairCaches;
     static Map<String, CurrencyUtxoCache> currencyUtxoCaches;
@@ -26,7 +28,7 @@ public class Caches {
     static {
         chains = new ConcurrentHashMap<>();
         allowedBlocktypes = new ConcurrentHashMap<>();
-        publishedMap = new ConcurrentHashMap<>();
+        publishedCache = new ConcurrentHashMap<>();
         currencyAccountCaches = new ConcurrentHashMap<>();
         currencyCaches = new ConcurrentHashMap<>();
         keypairCaches = new ConcurrentHashMap<>();
@@ -47,11 +49,11 @@ public class Caches {
     }
 
     //type
-    public static void addType(String id, BlockType type) {
+    public static void addType(String id, Class<? extends Request> type) {
         allowedBlocktypes.computeIfAbsent(id, _ -> new HashSet<>()).add(type);
     }
 
-    public static Set<BlockType> getTypes(String id){
+    public static Set<Class<? extends Request>> getTypes(String id){
         return allowedBlocktypes.get(id);
     }
 
@@ -70,6 +72,12 @@ public class Caches {
         CurrencyAccountCache caches = currencyAccountCaches.get(id);
         if (caches == null) return false;
         return caches.hasCurrency(currency);
+    }
+
+    //branch
+
+    public static void addBranch(String id, Branch branch) {
+        branchCaches.computeIfAbsent(id, _ -> new BranchCache()).add(branch);
     }
 
     //currency
@@ -139,10 +147,11 @@ public class Caches {
     }
 
     public static boolean isPublished(String id) {
-        return publishedMap.get(id);
+        return publishedCache.get(id);
     }
 
     public static void publish(String id) {
-        publishedMap.put(id, true);
+        publishedCache.put(id, true);
     }
+
 }

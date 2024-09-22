@@ -45,46 +45,62 @@ public class ChainAPI {
         ChainService chainService = new ChainService(id);
         chainService.createChain();
         chainService.disableAutoMining();
-        Simulator service = new Simulator(id);
+        Simulator simulator = new Simulator(id);
         try {
             switch (type) {
                 case "branch" -> {
-                    Keypair keypair = service.keypair();
-                    service.branch(keypair);
+                    Keypair keypair = simulator.keypair();
+                    simulator.branch(keypair);
+                }
+                case "create" -> {
+                    simulator.create();
                 }
                 case "currency" -> {
-                    Keypair keypair = service.keypair();
-                    service.currency(keypair);
+                    Keypair keypair = simulator.keypair();
+                    simulator.currency(keypair);
                 }
-                case "data" -> service.data();
+                case "data" -> simulator.data();
                 case "difficulty" -> {
-                    Keypair keypair = service.keypair();
-                    String currency = service.currency(keypair);
-                    service.difficulty(currency, keypair);
+                    Keypair keypair = simulator.keypair();
+                    String currency = simulator.currency(keypair);
+                    simulator.difficulty(currency, keypair);
                 }
                 case "hash" -> {
-                    Keypair keypair = service.keypair();
-                    service.hash(keypair);
+                    Keypair keypair = simulator.keypair();
+                    simulator.hash(keypair);
                 }
-                case "keypair" -> service.keypair();
+                case "keypair" -> simulator.keypair();
                 case "merge" -> {
-                    Keypair keypair = service.keypair();
+                    Keypair keypair = simulator.keypair();
+                    Branch branch = simulator.branch(keypair);
+                    simulator.merge(keypair, branch.branchKey());
+                }
+                case "publish" -> {
+                    //should the chain begin with an ownership token - which when we publish the other half of
+                    //lets you know that it's ready.
+                    //alternatively we can publish with the same key but not let it known that the
+                    //so we would need to publish the ownership key with the keypair.
+                    //so keypair is required for currency. however, in order to publish you
+                    //also need to use a keypair.
+                    //is there anything that we can't do if not published? - the chain won't get picked up
+                    //and likely wont' be operated on. also publish is a trigger to let the system know to make available.
+                    //so you can begin constructing on aux, and then publish it. (or try to) - there may be id issues. (should blockchain ids be keys also?)
 
-                    Branch branch = service.branch(keypair);
-                    service.merge(keypair, branch.branchKey());
+                    Keypair keypair = simulator.create();
+                    simulator.publish(keypair);
                 }
                 case "stake" -> {
-                    Keypair keypair = service.keypair();
-                    service.currency(keypair);
-                    Keypair accountKeypair = service.account(keypair);
-                    service.stake(accountKeypair);
+                    Keypair keypair = simulator.keypair();
+                    simulator.currency(keypair);
+                    Keypair accountKeypair = simulator.account(keypair);
+                    simulator.stake(accountKeypair);
                 }
                 case "transaction" -> {
-                    Keypair keypair = service.keypair();
-                    service.currency(keypair);
-                    service.account(keypair);
+                    Keypair keypair = simulator.keypair();
+                    simulator.currency(keypair);
+                    simulator.account(keypair);
                 }
-                case "utxo" -> service.utxo();
+                case "utxo" -> simulator.utxo();
             }
             return new ResponseEntity<>(chainService.getChainJson(), OK);
         } catch (Exception e){

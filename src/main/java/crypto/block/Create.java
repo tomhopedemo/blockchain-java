@@ -1,22 +1,19 @@
 package crypto.block;
 
+
 import crypto.*;
 import crypto.encoding.Encoder;
 import crypto.hashing.Hashing;
 import crypto.signing.Signing;
 
-//this could be generalized to a flag mechanism. //also will require signature.
-//cleaner mechansim for blocks with a single instance.
-public record Publish(String key, String signature) implements SimpleRequest<Publish> {
+//proof of creating the blockchain -
+public record Create(String key, String signature) implements SimpleRequest<Create> {
 
     @Override
-    public void mine(String id, BlockData<Publish> blockData) {
-        if (blockData.data().size() != 1) return;
-        if (Caches.isPublished(id)) return;
-        Publish first = blockData.data().getFirst();
-        if (!verify(id, first)) return;
+    public void mine(String id, BlockData<Create> blockData) {
         addBlock(id, blockData);
-        Caches.publish(id);
+        Create first = blockData.data().getFirst();
+        Caches.create(id, first.key());
         Requests.remove(id, blockData.data(), this.getClass());
     }
 
@@ -25,10 +22,10 @@ public record Publish(String key, String signature) implements SimpleRequest<Pub
         return signature;
     }
 
-    public static Publish create(String id, Keypair keypair) throws ChainException {
+    public static Create create(String id, Keypair keypair) throws ChainException {
         String hash = generateHash(keypair.publicKey(), Caches.getHashType(id));
         byte[] signature = Signing.sign(keypair, hash);
-        return new Publish(keypair.publicKey(), Encoder.encodeToHexadecimal(signature));
+        return new Create(keypair.publicKey(), Encoder.encodeToHexadecimal(signature));
     }
 
     //add in nonce

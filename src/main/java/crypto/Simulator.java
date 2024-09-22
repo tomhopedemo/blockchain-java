@@ -90,6 +90,25 @@ public class Simulator {
         miner.runSynch();
     }
 
+
+    public Keypair create() throws ChainException {
+        chainService.allowBlockType(Create.class);
+        Keypair keypair = auxService.keypair();
+        Create create = auxService.create(keypair);
+        chainService.submitRequest(create);
+        Miner miner = new Miner(id);
+        miner.runSynch();
+        return keypair;
+    }
+
+    public void publish(Keypair keypair) throws ChainException {
+        chainService.allowBlockType(Publish.class);
+        Request request = auxService.publish(keypair);
+        chainService.submitRequest(request);
+        Miner miner = new Miner(id);
+        miner.runSynch();
+    }
+
     public Keypair keypair() {
         chainService.allowBlockType(Keypair.class);
         Keypair keypair = auxService.keypair();
@@ -134,5 +153,4 @@ public class Simulator {
         }
         return sb.toString();
     }
-
 }

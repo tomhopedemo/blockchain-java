@@ -14,6 +14,7 @@ public class Caches {
     static Map<String, Blockchain> chains;
     static Map<String, Set<Class<? extends Request>>> allowedBlocktypes;
 
+    static Map<String, String> createCache;
     static Map<String, Boolean> publishedCache;
 
     static Map<String, CurrencyAccountCache> currencyAccountCaches;
@@ -148,6 +149,10 @@ public class Caches {
 
     public static boolean isPublished(String id) {
         return publishedCache.get(id);
+    }
+
+    public static void create(String id, String key) {
+        createCache.put(id, key);
     }
 
     public static void publish(String id) {

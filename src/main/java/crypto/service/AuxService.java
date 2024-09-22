@@ -76,4 +76,12 @@ public record AuxService(String id) {
         if (keys.isEmpty()) return null;
         return keys.getFirst();
     }
+
+    public Create create(Keypair keypair) throws ChainException {
+        return Create.create(id, keypair);
+    }
+
+    public Request publish(Keypair keypair) throws ChainException {
+        return Publish.create(id, keypair);
+    }
 }
